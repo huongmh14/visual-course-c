@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Designed to Embed — Ôn C cho nhúng và điện tử</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Utility Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="btn-toggle-sidebar" class="icon-btn mobile-only" aria-label="Mở danh sách bài học" data-en-aria-label="Open lesson list" title="Danh sách bài học" data-en-title="Lesson list">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a href="#top" class="brand" id="brand-home" aria-label="Designed to Embed">
+          <span class="brand-prefix">Designed to</span>
+          <span class="brand-highlight">Embed</span>
+        </a>
+        <nav class="mode-tabs" aria-label="Chế độ học" data-en-aria-label="Study mode">
+          <button class="mode-tab" data-mode="practice" aria-label="Thực hành" data-en-aria-label="Practice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span data-en="Practice">Thực hành</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="topbar-right">
+        <a class="resource-jump" href="#lesson-resources" id="resource-jump" data-en="Resources">Tài liệu</a>
+        <select id="course-lang" aria-label="Ngôn ngữ khóa học" data-en-aria-label="Course language">
+          <option value="vi" lang="vi" label="VI">Tiếng Việt</option>
+          <option value="en" lang="en" label="EN">English</option>
+        </select>
+        <button id="btn-search" class="search-trigger" aria-label="Tìm kiếm bài học và khái niệm" data-en-aria-label="Search lessons and concepts">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="search-placeholder" data-en="Find lessons &amp; concepts...">Tìm bài học &amp; khái niệm...</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+
+        <button id="btn-theme" class="icon-btn" aria-label="Đổi giao diện Sáng / Tối" data-en-aria-label="Switch light/dark theme" title="Đổi giao diện Sáng / Tối" data-en-title="Switch light/dark theme">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 3-Column Workspace -->
+    <div class="workspace">
+      <!-- Left Sidebar: Course Tree + Progress -->
+      <aside id="sidebar-left" class="sidebar-left" aria-label="Lộ trình khóa học" data-en-aria-label="Course outline">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+            <span data-en="Course outline">Lộ trình</span>
+          </div>
+          <span class="sidebar-count" id="course-lesson-count"></span>
+          <button id="btn-close-sidebar" class="icon-btn mobile-only" aria-label="Đóng menu" data-en-aria-label="Close menu">✕</button>
+        </div>
+
+        <div class="course-tree" id="course-tree"></div>
+
+        <!-- Bottom Progress Drawer -->
+        <div class="progress-panel" id="progress-panel">
+          <button class="progress-toggle" id="btn-progress-toggle" aria-expanded="false">
+            <span class="progress-label" data-en="PROGRESS">TIẾN ĐỘ</span>
+            <span class="progress-ratio" id="progress-ratio"></span>
+            <span class="progress-chevron">^</span>
+          </button>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+          </div>
+          <div class="progress-breakdown" id="progress-breakdown"></div>
+        </div>
+      </aside>
+
+      <!-- Center Stage -->
+      <main class="stage-col" id="main-stage">
+        <div class="lesson-header">
+          <div class="lesson-breadcrumb" id="lesson-breadcrumb">01. C Nhúng Cốt Lõi</div>
+          <div class="lesson-title-row">
+            <h1 id="lesson-title">Bộ nhớ Vi điều khiển &amp; Kiểu dữ liệu</h1>
+            <div class="lesson-pills">
+              <span class="meta-pill pill-amber" id="pill-duration">15 phút</span>
+              <span class="meta-pill pill-green" id="pill-level">Cơ bản</span>
+              <span class="meta-pill pill-lavender" id="pill-steps">10 bước</span>
+            </div>
+          </div>
+          <p class="lesson-subtitle" id="lesson-subtitle"></p>
+        </div>
+
+        <!-- Interactive Isometric Stage -->
+        <section class="diagram-stage" id="diagram-stage" aria-label="Sơ đồ minh họa bài học" data-en-aria-label="Lesson diagram">
+          <div class="iso-grid-bg" aria-hidden="true"></div>
+
+          <!-- Top Floating Telemetry KPI Cards -->
+          <div class="kpi-strip" id="kpi-strip"></div>
+
+          <!-- Dynamic SVG Isometric Scene -->
+          <div class="svg-viewport" id="svg-viewport">
+            <svg id="iso-svg" viewBox="0 0 880 430" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mô phỏng kiến trúc bộ nhớ và dữ liệu vi điều khiển"></svg>
+          </div>
+
+          <!-- Upcoming / Locked Lesson Overlay (shown only when user clicks an upcoming lesson) -->
+          <div class="upcoming-overlay hidden" id="upcoming-overlay">
+            <div class="upcoming-card">
+              <span class="category-badge badge-setup" data-en="PLANNED">SẮP THIẾT KẾ</span>
+              <h2 id="upcoming-title">Bài 02</h2>
+              <p id="upcoming-desc"></p>
+              <div class="upcoming-meta" id="upcoming-topics"></div>
+              <div class="upcoming-actions">
+                <button class="btn-primary" id="btn-back-to-ready" data-en="Back to current lesson">Quay lại bài đang học</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Legend & Controls -->
+          <div class="stage-footer">
+            <div class="packet-legend" id="packet-legend"></div>
+            <div class="stage-controls">
+              <button class="ctrl-btn" id="btn-replay" title="Phát lại bước này (R)" data-en-title="Replay this step (R)" aria-label="Phát lại" data-en-aria-label="Replay">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+              <button class="ctrl-btn" id="btn-playpause" title="Tạm dừng / Chạy (Space)" data-en-title="Play/pause (Space)" aria-label="Tạm dừng hoặc tiếp tục" data-en-aria-label="Play or pause">
+                <svg class="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                <svg class="icon-play hidden" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <button class="ctrl-btn" id="btn-fullscreen" title="Phóng to sơ đồ (F)" data-en-title="Enlarge diagram (F)" aria-label="Phóng to sơ đồ" data-en-aria-label="Enlarge diagram">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stepper Timeline -->
+        <section class="timeline-card" aria-label="Tiến trình bài học" data-en-aria-label="Lesson timeline">
+          <div class="timeline-meta">
+            <span class="timeline-heading" data-en="Lesson steps">Các bước trong bài</span>
+            <span class="timeline-counter" id="timeline-counter"></span>
+          </div>
+          <div class="timeline-track" id="timeline-track"></div>
+        </section>
+      </main>
+
+      <!-- Right Sidebar: Narrative + Diff + Code + Checklist -->
+      <aside class="sidebar-right" aria-label="Giải thích từng bước" data-en-aria-label="Step explanation">
+        <div class="narrative-card">
+          <div class="narrative-top">
+            <span class="step-index-label" id="step-index-label"></span>
+            <span class="category-badge" id="step-category-badge"></span>
+          </div>
+
+          <h2 class="step-title" id="step-title"></h2>
+          <p class="step-body" id="step-body"></p>
+
+          <!-- Embedded Code Block -->
+          <div class="code-box" id="code-box">
+            <div class="code-box-header">
+              <span class="code-lang" id="code-lang">main.c (STM32)</span>
+              <button class="copy-code-btn" id="btn-copy-code" data-en="Copy">Sao chép</button>
+            </div>
+            <pre><code id="step-code"></code></pre>
+          </div>
+
+          <!-- Semantic Callout -->
+          <div class="callout-box" id="callout-box">
+            <div class="callout-label" id="callout-label">KEY IDEA</div>
+            <p class="callout-text" id="callout-text"></p>
+          </div>
+
+          <!-- WHAT CHANGED Diff List -->
+          <div class="diff-box" id="diff-box">
+            <div class="diff-header" data-en="Test cases and observations">Ca kiểm tra và quan sát</div>
+            <ul class="diff-list" id="diff-list"></ul>
+          </div>
+
+          <!-- Open-Ended Reflection Questions -->
+          <div class="open-q-box hidden" id="open-q-box"></div>
+
+          <!-- Interactive Self-Check Quiz (on Recap / practice step) -->
+          <div class="quiz-box hidden" id="quiz-box"></div>
+
+          <!-- Step Navigation -->
+          <div class="step-nav-row">
+            <button class="btn-secondary" id="btn-prev-step" title="Bước trước (←)" data-en-title="Previous step (←)" data-en="← Previous step">← Bước trước</button>
+            <button class="btn-primary" id="btn-next-step" title="Bước tiếp theo (→)" data-en-title="Next step (→)">Bước tiếp →</button>
+          </div>
+
+          <div class="shortcut-hints">
+            <span><kbd>←</kbd><kbd>→</kbd> <span data-en="Change step">Chuyển bước</span></span>
+            <span><kbd>Space</kbd> <span data-en="Play/pause">Dừng/Chạy</span></span>
+            <span><kbd>R</kbd> <span data-en="Replay">Phát lại</span></span>
+          </div>
+        </div>
+
+        <!-- YOU'LL LEARN Checklist -->
+        <div class="learn-card">
+          <div class="learn-header" data-en="YOU'LL LEARN">BẠN SẼ HỌC</div>
+          <ul class="learn-list" id="learn-list"></ul>
+        </div>
+        <details class="learn-card lesson-resources" id="lesson-resources">
+          <summary data-en="Reading and datasets">Tài liệu và dữ liệu</summary>
+          <ul class="resource-list" id="resource-list"></ul>
+        </details>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Sidebar Mobile Backdrop -->
+  <div class="backdrop hidden" id="sidebar-backdrop"></div>
+
+  <!-- Search Modal (Ctrl+K) -->
+  <div class="modal-backdrop hidden" id="search-modal" role="dialog" aria-modal="true" aria-label="Tìm kiếm khóa học" data-en-aria-label="Search the course">
+    <div class="search-dialog">
+      <div class="search-input-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input" type="text" aria-label="Từ khóa" data-en-aria-label="Search terms" placeholder="Tìm bài học, thanh ghi, khái niệm (vd: uint8_t, Flash, Endian)..." data-en-placeholder="Find lessons, registers, concepts (e.g. uint8_t, Flash, endian)..." autocomplete="off" />
+        <button class="kbd-close" id="btn-close-search"><kbd>Esc</kbd></button>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

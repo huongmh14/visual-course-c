@@ -1,0 +1,102 @@
+:root {
+  --bg: #f4efe4;
+  --bg-elevated: #faf7ef;
+  --bg-muted: #ebe4d5;
+  --bg-canvas: #f1ebde;
+  --ink: #1c1b18;
+  --ink-muted: #5c584e;
+  --ink-soft: #857f72;
+  --border: #2a2822;
+  --border-soft: rgba(42, 40, 34, 0.22);
+  --grid-line: rgba(42, 40, 34, 0.08);
+  --shadow: 2px 2px 0px #2a2822;
+  --shadow-sm: 1.5px 1.5px 0px #2a2822;
+
+  --sage: #b9dbb8;
+  --sage-strong: #84be88;
+  --sage-ink: #17351a;
+  --amber: #f5d88b;
+  --amber-ink: #473207;
+  --lavender: #dcd2f2;
+  --lavender-ink: #2c1d4c;
+  --rose: #f4c1c1;
+  --rose-ink: #5a1818;
+  --sky: #c4def5;
+  --sky-ink: #133552;
+
+  --code-bg: #efe9da;
+  --code-kw: #8b2e5b;
+  --code-type: #1d5d7a;
+  --code-num: #9e4b12;
+  --code-cmt: #736d60;
+
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+}
+
+[data-theme="dark"] {
+  --bg: #171613;
+  --bg-elevated: #21201c;
+  --bg-muted: #2b2924;
+  --bg-canvas: #1c1b17;
+  --ink: #eae5d8;
+  --ink-muted: #ada696;
+  --ink-soft: #7f796b;
+  --border: #4a463c;
+  --border-soft: rgba(234, 229, 216, 0.16);
+  --grid-line: rgba(234, 229, 216, 0.06);
+  --shadow: 2px 2px 0px #0b0b09;
+  --shadow-sm: 1.5px 1.5px 0px #0b0b09;
+
+  --sage: #385e41;
+  --sage-strong: #4e8a5c;
+  --sage-ink: #e2f5e4;
+  --amber: #69521e;
+  --amber-ink: #fce8b2;
+  --lavender: #443763;
+  --lavender-ink: #e4dcfa;
+  --rose: #6b2b2b;
+  --rose-ink: #fcd4d4;
+  --sky: #234969;
+  --sky-ink: #d4ebff;
+
+  --code-bg: #141310;
+  --code-kw: #f08cb6;
+  --code-type: #7ec8e3;
+  --code-num: #f4b277;
+  --code-cmt: #7e786a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input {
+  font-family: inherit;
+  color: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+

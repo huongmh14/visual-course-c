@@ -1,0 +1,6 @@
+sample,expected_state
+699,WAIT
+700,ALERT
+680,ALERT
+650,ALERT
+649,WAIT
