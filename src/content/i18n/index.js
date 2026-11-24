@@ -23,7 +23,8 @@ const LEVELS_EN = {
 };
 
 const CALLOUT_LABELS_EN = {
-  "LƯU Ý": "NOTE",
+  "CẦN NHỚ": "KEY IDEA",
+  "LƯU Ý": "WATCH OUT",
   "KIẾN THỨC": "CONCEPT",
   "THỰC HÀNH": "LAB",
   "TÓM TẮT": "RECAP"

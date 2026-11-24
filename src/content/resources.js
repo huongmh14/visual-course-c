@@ -25,8 +25,9 @@
       read(beej + "file-inputoutput.html", "Beej’s Guide to C — File Input/Output", "Đọc mục 9.6.1 để hiểu vì sao việc ghi thẳng số nguyên hoặc struct ra file có thể phụ thuộc vào máy.", "Read §9.6.1 to see how writing an integer or struct directly to a file can depend on the machine.")
     ],
     "b02-bitwise": [
-      wg14("§6.5.7 and §6.5.10–12", "Kiểm tra số bit được phép dịch và cách &, ^, | xử lý toán hạng.", "Check the valid shift range and how &, ^, and | handle their operands."),
-      read("https://www.st.com/resource/en/application_note/an4899-generalpurpose-io-gpio-configuration-for-stm32-mcus-stmicroelectronics.pdf", "ST — GPIO Configuration (AN4899)", "Đọc phần cấu hình GPIO để liên hệ mặt nạ bit với việc cấu hình một chân trên MCU.", "Read the GPIO configuration section to connect a bit mask with configuring a microcontroller pin.")
+      wg14("§6.3.1.1, §6.5.3.3, §6.5.7 & §6.5.10–14", "Đối chiếu nâng kiểu số nguyên (integer promotions), phép ~, giới hạn dịch bit hợp lệ và ưu tiên toán tử bitwise/logic.", "Look up integer promotions, bitwise NOT (~), valid shift ranges, and bitwise/logical operator precedence."),
+      read("https://www.st.com/resource/en/application_note/an4899-generalpurpose-io-gpio-configuration-for-stm32-mcus-stmicroelectronics.pdf", "ST — GPIO Configuration (AN4899)", "Đọc cấu hình thanh ghi MODER (2 bit/pin) và cơ chế ghi nguyên tử BSRR trên STM32.", "Read about 2-bit MODER fields and atomic BSRR set/reset writes on STM32."),
+      read("https://arm-software.github.io/CMSIS_5/Core/html/group__peripheral__gr.html", "ARM CMSIS — Peripheral Access (_Pos / _Msk)", "Xem quy ước đặt tên _Pos / _Msk và cách ánh xạ khối thanh ghi ngoại vi qua struct.", "Review CMSIS _Pos / _Msk naming conventions and struct-based peripheral register maps.")
     ],
     "b03-pointers-mmio": [
       read(beej + "arrays.html", "Beej’s Guide to C — Arrays", "Đọc mục 6.6.2 và thử truyền mảng cùng độ dài vào một hàm C.", "Read §6.6.2 and pass an array and its length into a C function."),

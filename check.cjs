@@ -25,6 +25,11 @@ const { join } = require("node:path");
   const introOpenCount = lessons[0].steps.reduce((acc, s) => acc + (s.openQuestions?.length || 0), 0);
   assert.ok(introOpenCount >= 5, "Lesson 00 should have open-ended project questions");
 
+  const bitwise = ready.find(({ id }) => id === "b02-bitwise");
+  assert.equal(bitwise.steps.length, 8, "b02-bitwise should have 8 steps");
+  const bitwiseOpenCount = bitwise.steps.reduce((acc, s) => acc + (s.openQuestions?.length || 0), 0);
+  assert.ok(bitwiseOpenCount >= 2, "b02-bitwise should have open-ended questions");
+
   for (const [index, lesson] of lessons.entries()) {
     assert.equal(Number(lesson.number), index);
     const translation = english[index];

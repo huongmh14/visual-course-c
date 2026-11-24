@@ -1,4 +1,5 @@
 import { createIntroLesson } from "./lesson-intro.js";
+import { createBitwiseLesson } from "./lesson-bitwise.js";
 
 export function applyFoundationCurriculum(course) {
   const { modules } = course;
@@ -142,33 +143,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
       correctIndex: 1, explain: "Trong ALERT, chỉ mẫu dưới 650 mới đưa hệ thống về WAIT."
     }),
     memory,
-    lesson("b02-bitwise", "Bitwise & mặt nạ bit", 30,
-      "Đọc và thay đổi đúng bit trong thanh ghi giả lập bằng phép toán trên số nguyên.", [
-      step("Mỗi bit biểu diễn một cờ",
-        "Bit 0 ở bên phải. Giá trị 1u << 2 đưa bit 1 đến vị trí 2. Phép & giữ lại những vị trí cùng bằng 1 ở cả hai toán hạng.",
-        "C · kiểm tra cờ",
-        "unsigned reg = 0x05u;\nunsigned mask = 1u << 2;\nbool is_set = (reg & mask) != 0;",
-        [["reg", "0000 0101"], ["mask", "0000 0100"], ["AND", "0000 0100"]],
-        "Đặt ngoặc quanh phép & trước khi so sánh. Kiểm tra chỉ số bit trước khi dịch nếu chỉ số đến từ dữ liệu nhập.",
-        ["Bit 2 đang bật. Dùng mặt nạ bit 1 thì kết quả bằng 0."]),
-      step("Giữ nguyên các bit khác khi cập nhật",
-        "Dùng OR để đặt bit, AND với mặt nạ đảo để xóa bit, XOR để đảo bit. Cả ba cập nhật trên thanh ghi giả lập đều đọc giá trị cũ trước khi tạo giá trị mới.",
-        "C · cập nhật thanh ghi giả lập",
-        "unsigned reg = 0x80u;\nconst unsigned mask = 1u << 2;\nreg |= mask;   // 0x84\nreg ^= mask;   // 0x80\nreg &= ~mask;  // 0x80",
-        [["Ban đầu", "0x80"], ["Đặt bit 2", "0x84"], ["Đảo bit 2", "0x80"]],
-        "Với MMIO thật, tra datasheet về kiểu truy cập của từng bit. Có thanh ghi dùng ghi 1 để xóa cờ hoặc dùng thanh ghi SET/CLEAR riêng.",
-        ["Bit 7 giữ nguyên qua cả ba lệnh."]),
-      step("Thực hành · bộ cờ cho ba ngoại vi",
-        "Dùng bit 0 cho LED, bit 1 cho buzzer và bit 2 cho logging. Viết hàm đặt, xóa và đọc cờ trên một từ unsigned. So sánh toàn bộ giá trị với bảng test để phát hiện thay đổi ngoài ý muốn.",
-        "C · mẫu kiểm thử",
-        "unsigned flags = 0x80u;\nconst unsigned led = 1u << 0;\nconst unsigned logging = 1u << 2;\n// Đặt LED, đặt logging, xóa LED và kiểm tra sau mỗi lệnh.",
-        [["0x80", "ban đầu"], ["0x85", "đã đặt hai cờ"], ["0x84", "đã xóa LED"]],
-        "Dùng assert(flags == 0x84u) sau bước cuối để kiểm tra cả bit 7 lẫn các cờ.",
-        ["Giá trị sau từng thao tác: 0x81 → 0x85 → 0x84.", "Đọc LED: false. Đọc logging: true."])
-    ], {
-      prompt: "Với reg = 0x03 và mask = 0x01, reg &= ~mask cho kết quả gì?",
-      options: ["0x00", "0x01", "0x02"], correctIndex: 2, explain: "Bit 0 bị xóa, bit 1 vẫn bật."
-    }),
+    createBitwiseLesson(),
     lesson("b03-pointers-mmio", "Hàm, mảng & con trỏ", 35,
       "Theo dõi đối tượng, địa chỉ và độ dài khi truyền bộ đệm vào một hàm C.", [
       step("Hàm nhận một bản sao của đối số",
