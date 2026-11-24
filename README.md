@@ -18,8 +18,9 @@ Interactive visual course for Embedded C & Electronics (**Designed to Embed**), 
 
 ## Features
 
-- **Bilingual Curriculum (`VI` / `EN`)**: 12 ready bilingual lessons (`00`–`11`) covering foundational Embedded C & Electronics (including Lesson `00`: `intro-how-to-learn`), plus 11 planned roadmap topics (`12`–`22`).
-- **Animated Isometric SVG Engine**: 16 registered SVG scenes (`flow`, 10 `memory` scenes, and 5 `onboarding` scenes) with animated data packets and step-by-step hardware/memory state transitions.
+- **Bilingual Curriculum (`VI` / `EN`)**: 20 ready bilingual lessons (`00`–`19`) covering the full Phase A Embedded C track (12 lessons from Lesson `00` to `MISRA C`) and Basic Electronics track (8 lessons from `LDO/Buck & DMM` to `UART/I2C/SPI/CAN & Datasheet`), plus 11 planned STM32/RTOS roadmap topics (`20`–`30`).
+- **Animated Isometric SVG Engine**: 34 registered SVG scenes (`flow`, 10 `memory` scenes, 5 `onboarding` scenes, 8 `bitwise` scenes, 5 `c-embedded` scenes, and 5 `electronics` scenes) with animated data packets and step-by-step hardware/memory state transitions.
+- **Linked Hands-On Labs**: Every lesson links directly to its graded exercises, WSL C17 self-checks, and 4-stage Board Bring-Up Lab in [Embedded-C](https://github.com/huongmh14/Embedded-C).
 - **Open-Ended Project Reflection**: Interactive open-ended questions (`#open-q-box`) with `localStorage` auto-save and Markdown export.
 - **Self-Check Quizzes & Boundary Data**: Per-lesson check questions (`#quiz-box`), curated course resources, and 4 CSV boundary datasets (`adc.csv`, `debounce.csv`, `fsm.csv`, `pwm.csv`).
 - **Fast Navigation & Theming**: Full bilingual search index (`SearchIndex`), Light/Dark theme switcher, and full keyboard control.
@@ -60,14 +61,18 @@ visual-course-c/
     ├── content/
     │   ├── index.js             # Merged bilingual curriculum export
     │   ├── lesson-intro.js      # Lesson 00 (intro-how-to-learn) content
+    │   ├── lesson-bitwise.js    # Lesson 04 (b02-bitwise) content
+    │   ├── lessons-c-phase-a.js # Extended Embedded C Phase A lessons
+    │   ├── lessons-electronics-ext.js # Extended Basic Electronics lessons
     │   ├── curriculum-base.js   # Core VI lesson definitions
-    │   ├── curriculum-review.js # Roadmap & review metadata (ready 00–11, planned 12–22)
-    │   ├── resources.js         # External references & dataset links
+    │   ├── curriculum-review.js # Roadmap & review metadata (ready 00–19, planned 20–30)
+    │   ├── resources.js         # External references, GitHub labs & dataset links
     │   └── i18n/                # English localization modules
     │       ├── index.js
     │       ├── en-c.js
     │       ├── en-electronics.js
-    │       └── en-memory.js
+    │       ├── en-memory.js
+    │       └── en-phase-a-ext.js
     ├── engine/
     │   ├── index.js             # Scene registration entrypoint
     │   ├── scene-registry.js    # Scene lookup (`hasScene` / renderer registry)
@@ -76,7 +81,10 @@ visual-course-c/
     │   └── scenes/
     │       ├── flow.js          # Signal/code execution flow scene
     │       ├── memory.js        # 10 memory layout & pointer/bit scenes
-    │       └── onboarding.js    # 5 Lesson 00 onboarding scenes
+    │       ├── onboarding.js    # 5 Lesson 00 onboarding scenes
+    │       ├── bitwise.js       # 8 bitwise & CMSIS register scenes
+    │       ├── c-embedded.js    # 5 C promotion, timer, build, FSM & ringbuf scenes
+    │       └── electronics.js   # 5 power, MOSFET, op-amp/RC, bus & datasheet scenes
     ├── ui/
     │   ├── sidebar.js           # Lesson navigation & progress sidebar
     │   ├── stage.js             # Interactive SVG diagram viewport & step controls
@@ -104,7 +112,7 @@ visual-course-c/
 ## Local Development & Verification
 
 ```bash
-# 1. Verify all 12 bilingual lessons, 16 registered SVG scenes, SearchIndex, and 4 CSV datasets
+# 1. Verify all 20 bilingual lessons, registered SVG scenes, SearchIndex, and 4 CSV datasets
 node check.cjs
 
 # 2. Serve locally via any static HTTP server (ES Modules require HTTP, not file://)

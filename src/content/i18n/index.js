@@ -1,16 +1,19 @@
 import { EN_C } from "./en-c.js";
 import { EN_MEMORY } from "./en-memory.js";
 import { EN_ELECTRONICS } from "./en-electronics.js";
+import { EN_PHASE_A_EXT } from "./en-phase-a-ext.js";
 
 export const COURSE_EN = {
   ...EN_C,
   ...EN_MEMORY,
-  ...EN_ELECTRONICS
+  ...EN_ELECTRONICS,
+  ...EN_PHASE_A_EXT
 };
 
 const MODULE_TITLES_EN = {
   "mod-01": "01. Embedded C",
   "mod-electronics": "02. Electronics for Embedded Systems",
+  "mod-02": "03. STM32 & ARM Cortex-M",
   "mod-03": "04. Embedded Systems & RTOS"
 };
 

@@ -13,14 +13,14 @@ const { join } = require("node:path");
   const english = COURSES.en.modules.flatMap((module) => module.lessons);
 
   assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, lessons.length);
-  assert.equal(ready.length, 12);
+  assert.equal(ready.length, 20);
   assert.equal(
-    ready.slice(0, 4).map(({ id }) => id).join(","),
-    "intro-how-to-learn,c-types-io,c-control-flow,b01-memory-types"
+    ready.slice(0, 5).map(({ id }) => id).join(","),
+    "intro-how-to-learn,c-types-io,c-operators-conversions,c-control-flow,b01-memory-types"
   );
   assert.equal(english[1].youllLearn.join("\n"), english[1].steps.slice(0, -1).map(({ title }) => title).join("\n"));
-  assert.equal(modules[0].lessons.filter((lesson) => !lesson.locked).length, 8);
-  assert.equal(modules[1].lessons.filter((lesson) => !lesson.locked).length, 4);
+  assert.equal(modules[0].lessons.filter((lesson) => !lesson.locked).length, 12);
+  assert.equal(modules[1].lessons.filter((lesson) => !lesson.locked).length, 8);
 
   const introOpenCount = lessons[0].steps.reduce((acc, s) => acc + (s.openQuestions?.length || 0), 0);
   assert.ok(introOpenCount >= 5, "Lesson 00 should have open-ended project questions");
@@ -73,7 +73,11 @@ const { join } = require("node:path");
   const searchIndex = createSearchIndex();
   assert.equal(searchIndex.search("vi", COURSES.vi, "", 50).length, lessons.length);
   assert.ok(searchIndex.search("vi", COURSES.vi, "uint8_t").some((h) => h.kind === "step"));
+  assert.ok(searchIndex.search("vi", COURSES.vi, "MISRA").some((h) => h.lesson.id === "c-ringbuf-pool-misra"));
+  assert.ok(searchIndex.search("vi", COURSES.vi, "MOSFET").some((h) => h.lesson.id === "e-components-mosfet"));
   assert.ok(searchIndex.search("en", COURSES.en, "little-endian").some((h) => h.lesson.id === "b01-memory-types"));
+  assert.ok(searchIndex.search("en", COURSES.en, "Ring Buffer").some((h) => h.lesson.id === "c-ringbuf-pool-misra"));
+  assert.ok(searchIndex.search("en", COURSES.en, "I2C").some((h) => h.lesson.id === "e-serial-datasheet"));
 
   function rows(file, header) {
     const [first, ...data] = readFileSync(join(__dirname, "datasets", file), "utf8").trim().split(/\r?\n/);

@@ -4,6 +4,8 @@
   const beej = "https://beej.us/guide/bgc/html/split/";
   const draft = "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf";
   const wg14 = (section, vi, en) => read(draft, "WG14 — C11 draft, " + section, vi, en);
+  const labRepo = "https://github.com/huongmh14/Embedded-C/tree/main/";
+  const lab = (folder, title, vi, en) => read(labRepo + folder, title, vi, en);
 
   export const COURSE_RESOURCES = {
     "intro-how-to-learn": [
@@ -58,5 +60,37 @@
     "e-pwm": [
       read("https://developerhelp.microchip.com/xwiki/bin/view/applications/power/leds/led-applications-with-pic-mcu/pwm-control/", "Microchip — LED PWM Control", "Xem duty cycle ảnh hưởng đến độ sáng LED và cách chọn tần số PWM.", "See how duty cycle affects LED brightness and how PWM frequency is chosen."),
       csv("pwm.csv", ["Mẫu ADC và số tick PWM", "ADC samples and PWM ticks"], "Giả lập 1.000 tick mỗi chu kỳ. Đếm số tick ở HIGH và so với expected_high_ticks khi bật hoặc tắt PWM.", "Simulate 1,000 ticks per period. Count HIGH ticks and compare with expected_high_ticks when PWM is enabled or disabled.")
+    ],
+    "c-operators-conversions": [
+      lab("03-operators-conversions", "Embedded-C · 03-operators-conversions", "Làm trọn bộ đề 100 điểm về nâng kiểu, trộn có/không dấu, chia làm tròn và bộ đếm quay vòng.", "Complete the 100-point module on promotions, signed/unsigned mixing, rounded division, and timer rollover."),
+      wg14("§6.3.1.8 & §6.5.7", "Tra cứu quy tắc Usual Arithmetic Conversions và hành vi không xác định khi dịch bit.", "Look up Usual Arithmetic Conversions and shift undefined-behavior rules.")
+    ],
+    "c-modular-makefile": [
+      lab("06-functions", "Embedded-C · 06–10 & P2 Sensor Lib", "Thực hành tách hàm thuần (06), header nhiều tệp (07), mảng & chuỗi UART (08–09), Makefile -MMD -MP (10) và P2.", "Practice pure functions (06), multi-file headers (07), sample arrays/UART strings (08–09), Makefile -MMD -MP (10), and P2."),
+      read("https://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html", "GNU Make — Automatic Prerequisites (-MMD -MP)", "Tìm hiểu cơ chế GCC tự sinh tệp .d giúp Make phát hiện mọi thay đổi trong tệp header.", "See how GCC generates .d dependency files so Make rebuilds on every header change.")
+    ],
+    "c-callbacks-fsm": [
+      lab("11-pointers", "Embedded-C · 11–14 & P3 Door Lock FSM", "Luyện tập con trỏ MMIO (11), Callback & Dispatch Table (12), Struct CMSIS (13), Enum/Union/FSM (14) và dự án khóa cửa P3.", "Practice MMIO pointers (11), callbacks & dispatch tables (12), CMSIS structs (13), enums/unions/FSM (14), and the P3 door-lock project."),
+      read("https://arm-software.github.io/CMSIS_5/Core/html/group__peripheral__gr.html", "ARM CMSIS — Peripheral Access Structs", "Xem cách struct thanh ghi ánh xạ thẳng lên địa chỉ ngoại vi phần cứng thật.", "Inspect how peripheral register structs map directly onto real MCU memory-mapped hardware.")
+    ],
+    "c-ringbuf-pool-misra": [
+      lab("18-linked-list-ring-buffer", "Embedded-C · 15–20 & P4 Data Logger", "Hoàn thành bài 15–20 (volatile, Static Pool, CSV HIL, Ring Buffer, MISRA C Automotive) và tổng kết P4 Data Logger.", "Complete lessons 15–20 (volatile, static pools, CSV HIL, ring buffers, MISRA C) and the P4 Data Logger capstone."),
+      read("https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html", "GCC — Strict Conversion & Type Warnings", "Tham khảo ý nghĩa -Wconversion, -Wsign-conversion, -Wcast-qual và -Wstrict-prototypes trong bộ cờ bán-MISRA.", "Review -Wconversion, -Wsign-conversion, -Wcast-qual, and -Wstrict-prototypes used in defensive builds.")
+    ],
+    "e-power-rails-dmm": [
+      lab("electric-basic/01-dc-ohm-power-dmm", "Embedded-C · E01 Nguồn, Cầu phân áp & DMM", "Làm 50 điểm code C tính nhiệt LDO/Buck, sụt áp cầu phân áp có tải và 30 điểm thực hành đo nguội/nóng DMM.", "Complete 50 pts of C power/divider modeling plus the 30-pt cold and hot DMM multimeter lab."),
+      read("https://www.allaboutcircuits.com/textbook/direct-current/", "All About Circuits — DC Voltage, Ohm & Dividers", "Ôn định luật Ohm, công suất P = VI và cầu phân áp qua mô phỏng mạch DC.", "Review Ohm's law, P = VI dissipation, and DC voltage-divider circuits.")
+    ],
+    "e-components-mosfet": [
+      lab("electric-basic/02-passive-active-components", "Embedded-C · E02 Decoupling, MOSFET & Flyback", "Làm bài tập chọn R_DS(on) logic-level N-MOSFET, trở cực B BJT, Optocoupler PC817 và lắp/mô phỏng tải 12V.", "Practice logic-level N-MOSFET sizing, BJT saturation, PC817 optocouplers, and 12V low-side switching lab."),
+      read("https://www.ti.com/lit/an/slva157/slva157.pdf", "TI — Decoupling Capacitors for Microcontrollers", "Xem lý do tụ gốm 100 nF phải đặt sát cặp chân nguồn VDD–VSS của vi điều khiển.", "Learn why 100 nF ceramic decoupling capacitors must sit right next to MCU VDD–VSS pins.")
+    ],
+    "e-opamp-rc": [
+      lab("electric-basic/04-analog-adc-pwm-opamp", "Embedded-C · E03–E04 Logic, Op-Amp & Lọc RC", "Làm bài tính ngưỡng logic, bộ tính PSC/ARR/CCR cho PWM, khuếch đại Op-Amp và mạch lọc RC biến PWM thành DC.", "Solve logic-margin checks, PWM timer math, op-amp rail scaling, and the PWM-to-DC RC low-pass filter lab."),
+      read("https://www.electronics-tutorials.ws/filter/filter_2.html", "Electronics Tutorials — Passive RC Low-Pass Filter", "Ôn tần số cắt fc = 1/(2πRC) và thời gian đáp ứng bậc thang 5τ.", "Review RC cutoff frequency fc = 1/(2πRC) and 5τ step response.")
+    ],
+    "e-serial-datasheet": [
+      lab("electric-basic/05-serial-buses-electrical", "Embedded-C · E05–E06 & Lab P1 Board Bring-Up", "Làm bài kiểm tra sườn lên I2C, bộ giải mã UART/SPI, ngân sách dòng Datasheet (E06) và lộ trình thực hành 4 chặng Lab P1.", "Complete I2C rise-time checks, UART/SPI frame decoders, datasheet current budgeting (E06), and the 4-stage Lab P1."),
+      lab("electric-basic/p1-board-bringup-lab", "Embedded-C · Lộ trình Lab 4 chặng lên STM32", "Thực hành từ Breadboard/Falstad đến Wokwi/STM32 Logic Analyzer và lập trình thanh ghi trực tiếp từ Reference Manual.", "Follow the 4-stage bring-up from breadboard/Falstad to Logic Analyzer captures and bare-metal registers.")
     ]
   };

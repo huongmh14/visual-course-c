@@ -1,9 +1,13 @@
 import { createIntroLesson } from "./lesson-intro.js";
 import { createBitwiseLesson } from "./lesson-bitwise.js";
+import { createPhaseACLessons } from "./lessons-c-phase-a.js";
+import { createElectronicsExtLessons } from "./lessons-electronics-ext.js";
 
 export function applyFoundationCurriculum(course) {
   const { modules } = course;
   const [c, stm32, systems] = modules;
+  const [cOps, cMod, cFsm, cMisra] = createPhaseACLessons();
+  const [ePower, eMosfet, eOpamp, eSerial] = createElectronicsExtLessons();
 
   function step(title, body, codeLang, code, nodes, takeaway, cases) {
     return {
@@ -100,6 +104,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
       options: ["(double)(sum / 3)", "sum / 3.0", "sum / 3"], correctIndex: 1,
       explain: "Toán hạng 3.0 làm phép chia dùng số thực. Ép kiểu sau khi chia nguyên không khôi phục phần lẻ."
     }),
+    cOps,
     lesson("c-control-flow", "If, switch, vòng lặp & máy trạng thái", 45,
       "Theo dõi điều kiện, chỉ số và trạng thái qua từng bước trước khi đưa logic lên vi điều khiển.", [
       step("Đọc điều kiện theo thứ tự thực thi",
@@ -144,6 +149,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
     }),
     memory,
     createBitwiseLesson(),
+    cMod,
     lesson("b03-pointers-mmio", "Hàm, mảng & con trỏ", 35,
       "Theo dõi đối tượng, địa chỉ và độ dài khi truyền bộ đệm vào một hàm C.", [
       step("Hàm nhận một bản sao của đối số",
@@ -200,6 +206,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
       options: ["Vì UART chỉ nhận ký tự", "Vì padding và thứ tự byte có thể khác giao thức", "Vì uint16_t luôn chiếm 4 byte"],
       correctIndex: 1, explain: "Giao thức quy định vị trí và thứ tự byte. Bố cục struct do ABI và compiler quyết định."
     }),
+    cFsm,
     lesson("b05-volatile-storage", "Vòng đời biến, volatile & super-loop", 35,
       "Phân biệt biến sống qua nhiều lần gọi, truy cập ngoại vi và xử lý thời gian không chặn.", [
       step("Biến static cục bộ giữ giá trị giữa các lần gọi",
@@ -226,7 +233,8 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
     ], {
       prompt: "volatile có bảo đảm phép count++ chạy nguyên tử giữa hai ngữ cảnh không?",
       options: ["Có", "Không"], correctIndex: 1, explain: "count++ gồm đọc, tính và ghi. Cần cơ chế đồng bộ phù hợp."
-    })
+    }),
+    cMisra
   ];
 
   memory.steps.push({
@@ -243,6 +251,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
   modules.splice(1, 0, {
     id: "mod-electronics", title: "02. Điện tử cho nhúng", color: "#88b7dd",
     lessons: [
+      ePower,
       lesson("e-led-ohm", "Điện áp, dòng điện & LED", 30,
         "Dùng định luật Ohm để chọn điện trở hạn dòng và kiểm tra mạch LED DC 3,3 V.", [
         step("Đo điện áp giữa hai điểm",
@@ -270,6 +279,7 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
         prompt: "Giữ nguyên nguồn và LED. Tăng điện trở nối tiếp từ 330 Ω lên 470 Ω thì dòng thường thế nào?",
         options: ["Tăng", "Giảm", "Giữ nguyên"], correctIndex: 1, explain: "Điện trở lớn hơn làm giảm dòng qua mạch nối tiếp."
       }),
+      eMosfet,
       lesson("e-gpio-button", "GPIO, pull-up & nút nhấn", 35,
         "Biến điện áp tại chân GPIO thành một sự kiện nhấn đáng tin cậy.", [
         step("Pull-up giữ chân ở mức xác định",
@@ -353,7 +363,9 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
         prompt: "Chu kỳ 1 ms, tín hiệu cao 0,75 ms. Duty là bao nhiêu?",
         options: ["25%", "75%", "100%"], correctIndex: 1,
         explain: "Duty = thời gian mức cao / chu kỳ = 0,75 / 1 = 75%."
-      })
+      }),
+      eOpamp,
+      eSerial
     ]
   });
   stm32.title = "03. STM32 & ARM Cortex-M";
