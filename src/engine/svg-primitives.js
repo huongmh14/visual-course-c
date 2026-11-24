@@ -273,89 +273,50 @@ export function drawIsoBlock(parent, x, y, w, d, h, tone = "paper", title = "", 
   const cy = (p0[1] + p2[1]) / 2;
 
   if (title || sub) {
-    const maxBadgeW = Math.max(54, Math.round(Math.min(w, d) * 1.15));
-    const diamondH = (w + d) * 0.5;
-    const maxBadgeH = Math.max(40, Math.round(diamondH * 0.58));
+    const diamondW = (w + d) * 0.866;
+    const maxTextW = Math.max(76, Math.round(diamondW * 0.54));
+    const maxTextH = Math.max(36, Math.round((w + d) * 0.5 * 0.68));
 
     const layout = layoutTextBlock(
-      maxBadgeW,
-      maxBadgeH,
+      maxTextW,
+      maxTextH,
       title,
       sub,
       [
-        { titleSize: 10.8, subSize: 9.4 },
-        { titleSize: 9.8, subSize: 8.6 },
-        { titleSize: 9.0, subSize: 8.0 }
+        { titleSize: 11, subSize: 9.5 },
+        { titleSize: 10, subSize: 8.8 },
+        { titleSize: 9.2, subSize: 8.2 }
       ],
-      { padX: 12, padY: 10, allowDivider: false, preferUnwrapped: true }
+      { padX: 6, padY: 4, allowDivider: false, preferUnwrapped: true }
     );
 
-    let maxLinePx = 0;
-    for (const line of layout.titleLines) {
-      maxLinePx = Math.max(maxLinePx, visualLength(line) * layout.titleSize * 0.61);
-    }
-    for (const line of layout.subLines) {
-      maxLinePx = Math.max(maxLinePx, visualLength(line) * layout.subSize * 0.61);
-    }
-    const bw = Math.min(maxBadgeW, Math.max(52, Math.ceil(maxLinePx + 14)));
-    const bh = Math.min(maxBadgeH, Math.max(26, Math.ceil(layout.totalH + 10)));
-    const bx = cx - bw / 2;
-    const by = cy - bh / 2;
-
-    const clipId = `iso-clip-${++clipSeq}`;
-    const clip = svgEl("clipPath", { id: clipId });
-    clip.appendChild(
-      svgEl("rect", {
-        x: bx + 2,
-        y: by + 1,
-        width: Math.max(0, bw - 4),
-        height: Math.max(0, bh - 2),
-        rx: 5
-      })
-    );
-    g.appendChild(clip);
-
-    g.appendChild(
-      svgEl("rect", {
-        x: bx,
-        y: by,
-        width: bw,
-        height: bh,
-        rx: 6,
-        fill: "var(--bg-elevated)",
-        "fill-opacity": "0.92",
-        stroke: "var(--border-soft)",
-        "stroke-width": "1"
-      })
-    );
-
-    const badgeTextGroup = svgEl("g", { "clip-path": `url(#${clipId})` });
-    const topPad = Math.max(4, (bh - layout.totalH) / 2);
-    const firstBaseY = by + topPad + layout.cap;
+    const haloStyle = `paint-order: stroke; stroke: ${c.top}; stroke-width: 2.5px; stroke-linejoin: round;`;
+    const firstBaseY = cy - layout.totalH / 2 + layout.cap;
     const lastTitleY = firstBaseY + layout.titleSpan;
     const subBaseY = layout.titleLines.length
       ? lastTitleY + layout.titleToSubStep
       : firstBaseY;
 
     if (layout.titleLines.length) {
-      appendWrappedText(badgeTextGroup, cx, firstBaseY, layout.titleLines, {
+      appendWrappedText(g, cx, firstBaseY, layout.titleLines, {
         "text-anchor": "middle",
         "font-size": String(layout.titleSize),
         "font-weight": "700",
-        fill: "var(--ink)",
+        fill: "#1c1b18",
+        style: haloStyle,
         lineHeight: layout.titleLH
       });
     }
     if (layout.subLines.length) {
-      appendWrappedText(badgeTextGroup, cx, subBaseY, layout.subLines, {
+      appendWrappedText(g, cx, subBaseY, layout.subLines, {
         "text-anchor": "middle",
         "font-size": String(layout.subSize),
         "font-weight": "500",
-        fill: "var(--ink-muted)",
+        fill: "#3a372f",
+        style: haloStyle,
         lineHeight: layout.subLH
       });
     }
-    g.appendChild(badgeTextGroup);
   }
 
   parent.appendChild(g);
@@ -401,12 +362,33 @@ export function drawFlatCard(parent, x, y, w, h, fill, title, sub = "", options 
   const { valign = "center" } = options;
   const g = svgEl("g");
 
+  const layoutTargetH = Math.max(h, title && sub ? 54 : h);
+  const layout =
+    title || sub
+      ? layoutTextBlock(
+          w,
+          layoutTargetH,
+          title,
+          sub,
+          [
+            { titleSize: 11.5, subSize: 10 },
+            { titleSize: 10.5, subSize: 9.3 },
+            { titleSize: 9.8, subSize: 8.8 }
+          ],
+          { padX: 22, padY: 14, allowDivider: true, dividerMinH: 66 }
+        )
+      : null;
+
+  const neededH = layout ? Math.ceil(layout.totalH + 14) : h;
+  const finalH = Math.min(424 - y, Math.max(h, neededH));
+  const finalY = y <= 24 && finalH > h ? Math.max(6, y - Math.floor((finalH - h) / 2)) : y;
+
   g.appendChild(
     svgEl("rect", {
       x: x + 2,
-      y: y + 2,
+      y: finalY + 2,
       width: w,
-      height: h,
+      height: finalH,
       rx: 9,
       fill: "var(--border)"
     })
@@ -414,9 +396,9 @@ export function drawFlatCard(parent, x, y, w, h, fill, title, sub = "", options 
   g.appendChild(
     svgEl("rect", {
       x,
-      y,
+      y: finalY,
       width: w,
-      height: h,
+      height: finalH,
       rx: 9,
       fill,
       stroke: "var(--border)",
@@ -424,28 +406,15 @@ export function drawFlatCard(parent, x, y, w, h, fill, title, sub = "", options 
     })
   );
 
-  if (title || sub) {
-    const layout = layoutTextBlock(
-      w,
-      h,
-      title,
-      sub,
-      [
-        { titleSize: 11.5, subSize: 10 },
-        { titleSize: 10.5, subSize: 9.3 },
-        { titleSize: 9.8, subSize: 8.8 }
-      ],
-      { padX: 22, padY: 14, allowDivider: true, dividerMinH: 66 }
-    );
-
+  if (layout) {
     const clipId = `card-clip-${++clipSeq}`;
     const clip = svgEl("clipPath", { id: clipId });
     clip.appendChild(
       svgEl("rect", {
         x: x + 3,
-        y: y + 2,
+        y: finalY + 2,
         width: Math.max(0, w - 6),
-        height: Math.max(0, h - 4),
+        height: Math.max(0, finalH - 4),
         rx: 7
       })
     );
@@ -460,9 +429,9 @@ export function drawFlatCard(parent, x, y, w, h, fill, title, sub = "", options 
     const topPad =
       valign === "top"
         ? 10
-        : Math.max(7, (h - layout.totalH) / 2);
+        : Math.max(7, (finalH - layout.totalH) / 2);
 
-    const firstBaseY = y + topPad + layout.cap;
+    const firstBaseY = finalY + topPad + layout.cap;
     const lastTitleY = firstBaseY + layout.titleSpan;
     const subBaseY = layout.titleLines.length
       ? lastTitleY + layout.titleToSubStep
@@ -490,7 +459,7 @@ export function drawFlatCard(parent, x, y, w, h, fill, title, sub = "", options 
           "stroke-width": "1"
         })
       );
-    } else if (valign === "top" && layout.titleLines.length && !layout.subLines.length && h >= 100) {
+    } else if (valign === "top" && layout.titleLines.length && !layout.subLines.length && finalH >= 100) {
       const dividerY = Math.round((lastTitleY + layout.titleSize * 0.22 + 7) * 10) / 10;
       textGroup.appendChild(
         svgEl("line", {

@@ -29,6 +29,8 @@ const CALLOUT_LABELS_EN = {
   "CẦN NHỚ": "KEY IDEA",
   "LƯU Ý": "WATCH OUT",
   "KIẾN THỨC": "CONCEPT",
+  "KIẾN THỨC HAY": "GOOD TO KNOW",
+  "TIẾP THEO": "UP NEXT",
   "THỰC HÀNH": "LAB",
   "TÓM TẮT": "RECAP"
 };
@@ -74,6 +76,33 @@ export function buildEnglishCourse(viCourse) {
           ...labels,
           steps: lesson.steps.map((step, i) => {
             const { callout, diff, nodes, quiz, openQuestions, kpis, legend, ...text } = steps[i];
+            const localizedScene = nodes
+              ? {
+                  ...step.scene,
+                  nodes,
+                  header: text.title ?? step.scene.header,
+                  subheader: text.codeLang ?? step.scene.subheader
+                }
+              : step.scene;
+            const localizedKpis =
+              nodes && !kpis
+                ? step.kpis.map((item, j) => ({
+                    ...item,
+                    label: nodes[j]?.[0] ?? item.label,
+                    value: nodes[j]?.[1] ?? item.value,
+                    sub: `Stage ${j + 1}`
+                  }))
+                : step.kpis.map((item, j) => ({ ...item, ...kpis?.[j] }));
+            const localizedLegend =
+              nodes && !legend
+                ? step.legend.map((item, j) => ({
+                    ...item,
+                    label: nodes[j]?.[0] ?? item.label
+                  }))
+                : step.legend.map((item, j) => ({
+                    ...item,
+                    label: legend?.[j] ?? item.label
+                  }));
             return {
               ...step,
               ...text,
@@ -83,14 +112,11 @@ export function buildEnglishCourse(viCourse) {
                 ...callout
               },
               diff: step.diff.map((item, j) => ({ ...item, text: diff[j] })),
-              scene: nodes ? { ...step.scene, nodes } : step.scene,
+              scene: localizedScene,
               quiz: step.quiz?.map((question, j) => ({ ...question, ...quiz[j] })),
               openQuestions: step.openQuestions?.map((q, j) => ({ ...q, ...openQuestions?.[j] })),
-              kpis: step.kpis.map((item, j) => ({ ...item, ...kpis?.[j] })),
-              legend: step.legend.map((item, j) => ({
-                ...item,
-                label: legend?.[j] ?? item.label
-              }))
+              kpis: localizedKpis,
+              legend: localizedLegend
             };
           })
         };

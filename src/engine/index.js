@@ -8,6 +8,7 @@ import {
 import { registerFlowScene } from "./scenes/flow.js";
 import { registerMemoryScenes } from "./scenes/memory.js";
 import { registerOnboardingScenes } from "./scenes/onboarding.js";
+import { registerEarlyCScenes } from "./scenes/early-c.js";
 import { registerBitwiseScenes } from "./scenes/bitwise.js";
 import { registerCEmbeddedScenes } from "./scenes/c-embedded.js";
 import { registerElectronicsScenes } from "./scenes/electronics.js";
@@ -15,6 +16,7 @@ import { registerElectronicsScenes } from "./scenes/electronics.js";
 registerFlowScene(registerScene);
 registerMemoryScenes(registerScene);
 registerOnboardingScenes(registerScene);
+registerEarlyCScenes(registerScene);
 registerBitwiseScenes(registerScene);
 registerCEmbeddedScenes(registerScene);
 registerElectronicsScenes(registerScene);

@@ -8,7 +8,7 @@ const FLOW_TONES = [
 ];
 
 export function registerFlowScene(registerScene) {
-  registerScene("flow", (staticLayer, scene, { addPacketTrack, vertical }) => {
+  registerScene("flow", (staticLayer, scene, { addPacketTrack, t, vertical }) => {
     const nodes = scene.nodes || [];
     const count = nodes.length;
     if (count === 0) return;
@@ -19,7 +19,7 @@ export function registerFlowScene(registerScene) {
       const cardH = count >= 4 ? 58 : 68;
       const gap = count >= 4 ? 14 : 26;
       const totalH = count * cardH + (count - 1) * gap;
-      const y0 = Math.max(10, Math.round((292 - totalH) / 2));
+      const y0 = Math.max(10, Math.round((320 - totalH) / 2));
 
       nodes.forEach(([title, value], i) => {
         const y = y0 + i * (cardH + gap);
@@ -46,6 +46,10 @@ export function registerFlowScene(registerScene) {
       return;
     }
 
+    if (scene.header) {
+      drawFlatCard(staticLayer, 50, 14, 780, 48, "var(--bg-elevated)", scene.header, scene.subheader || "");
+    }
+
     let cardW = 240;
     let gap = 38;
     if (count === 2) {
@@ -67,8 +71,8 @@ export function registerFlowScene(registerScene) {
 
     const totalW = count * cardW + Math.max(0, count - 1) * gap;
     const x0 = Math.round((880 - totalW) / 2);
-    const y = 52;
-    const h = 124;
+    const y = scene.header ? 112 : 76;
+    const h = 132;
 
     nodes.forEach(([title, value], i) => {
       const x = x0 + i * (cardW + gap);
@@ -102,5 +106,13 @@ export function registerFlowScene(registerScene) {
       const card = drawFlatCard(staticLayer, x, y, cardW, h, tone, title, value);
       card.classList.add("lesson-flow-node");
     });
+
+    drawPillTag(
+      staticLayer,
+      440,
+      y + h + 28,
+      t("Theo dõi luồng dữ liệu qua từng chặng từ trái sang phải", "Follow data transformations step by step from left to right"),
+      "var(--bg-elevated)"
+    );
   });
 }

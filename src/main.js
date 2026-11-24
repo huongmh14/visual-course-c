@@ -307,6 +307,11 @@ function render(state) {
     vertical: step.scene.type === "flow" && narrowDiagram.matches
   });
 
+  el.diagramStage.classList.toggle(
+    "is-flow-stage",
+    stageMode !== "archify" && step.scene.type === "flow"
+  );
+
   syncArchifyStage(el, {
     lessonId: lesson.id,
     theme: state.theme,

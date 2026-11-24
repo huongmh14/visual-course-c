@@ -10,35 +10,34 @@ import {
 function sceneIntroLoop(g, _scene, { addPacketTrack, t }) {
   drawFlatCard(
     g,
-    130,
-    36,
-    620,
-    42,
+    100,
+    24,
+    680,
+    44,
     "var(--bg-elevated)",
     t("Vòng lặp học chủ động 70 phút/tối", "70-Minute Active Learning Loop"),
     t("Không đọc thụ động: Đoán → Phá code để thấy lỗi → Tự trả lời câu hỏi mở", "Don't read passively: Predict → Break code to see failure → Answer open questions")
   );
 
-  drawIsoBlock(g, 240, 125, 130, 82, 26, "sky", t("1. Đoán 15 giây", "1. Predict 15s"), t("Trước khi bấm Next", "Before clicking Next"));
-  drawIsoBlock(g, 640, 125, 130, 82, 26, "amber", t("2. Phá code + assert", "2. Break + assert"), t("Thử sai để nhớ lâu", "Fail fast to remember"));
-  drawIsoBlock(g, 440, 265, 140, 84, 28, "sage", t("3. Câu hỏi mở", "3. Open Question"), t("Viết lại bằng lời mình", "Explain in own words"));
+  drawIsoBlock(g, 165, 144, 136, 86, 26, "sky", t("1. Đoán 15s", "1. Predict 15s"), t("Trước khi bấm Next", "Before clicking Next"));
+  drawIsoBlock(g, 440, 144, 136, 86, 26, "amber", t("2. Thử sai + assert", "2. Break + assert"), t("Gặp lỗi để nhớ lâu", "Fail fast to remember"));
+  drawIsoBlock(g, 715, 144, 136, 86, 26, "sage", t("3. Câu hỏi mở", "3. Open Question"), t("Viết bằng lời mình", "Explain in own words"));
 
-  const p1 = [352, 175];
-  const p2 = [569, 175];
-  const p3 = [505, 305];
-  const p4 = [375, 305];
+  const w1 = [[284, 204], [364, 204]];
+  const w2 = [[559, 204], [639, 204]];
+  const loopBack = [[735, 290], [735, 328], [185, 328], [185, 290]];
 
-  addWire(g, [p1, p2], "#84b4df", false, { markerEnd: true });
-  addWire(g, [[610, 225], p3], "#d3b25a", false, { markerEnd: true });
-  addWire(g, [p4, [270, 225]], "#84b684", false, { markerEnd: true });
+  addWire(g, w1, "#84b4df", false, { markerEnd: true });
+  addWire(g, w2, "#d3b25a", false, { markerEnd: true });
+  addWire(g, loopBack, "#84b684", true, { markerEnd: true });
 
-  drawPillTag(g, 460, 138, t("Kiểm chứng trực quan", "Visual feedback"), PALETTE.sky.top);
-  drawPillTag(g, 645, 290, t("Ghi chú bài toán thật", "Real-world note"), PALETTE.amber.top);
-  drawPillTag(g, 235, 290, t("Khóa kiến thức", "Lock insight"), PALETTE.sage.top);
+  drawPillTag(g, 322, 126, t("Kiểm chứng trực quan", "Visual feedback"), PALETTE.sky.top);
+  drawPillTag(g, 597, 126, t("Ghi chú bài toán thật", "Real-world note"), PALETTE.amber.top);
+  drawPillTag(g, 460, 368, t("Khóa kiến thức · Lặp lại ở bước sau", "Lock insight · Repeat next step"), PALETTE.sage.top);
 
-  addPacketTrack([p1, p2], "#84b4df", 1, 0.36, "predict");
-  addPacketTrack([[610, 225], p3], "#f5d88b", 1, 0.36, "assert");
-  addPacketTrack([p4, [270, 225]], "#84be88", 1, 0.36, "reflect");
+  addPacketTrack(w1, "#84b4df", 1, 0.36, "predict");
+  addPacketTrack(w2, "#f5d88b", 1, 0.36, "assert");
+  addPacketTrack(loopBack, "#84be88", 1, 0.28, "reflect");
 }
 
 function sceneIntroCaseBms(g, _scene, { addPacketTrack, t }) {
@@ -159,24 +158,91 @@ function sceneIntroCaseUart(g, _scene, { addPacketTrack, t }) {
 
 function sceneIntroRoadmap(g, _scene, { addPacketTrack, t }) {
   const stages = [
-    { x: 115, y: 245, tone: "sky", title: "01. C Nhúng + CSV", sub: t("Tuần 1–4 · Bài 00–07", "Weeks 1–4 · L00–07") },
-    { x: 325, y: 195, tone: "amber", title: t("02. Điện tử cơ bản", "02. Electronics"), sub: t("Ohm, Pull-up, ADC, PWM", "Ohm, Pull-up, ADC, PWM") },
-    { x: 545, y: 145, tone: "lavender", title: "03. STM32 Cortex-M", sub: t("Tuần 5–12 · GPIO/IRQ/UART", "Weeks 5–12 · Peripherals") },
-    { x: 755, y: 95, tone: "sage", title: "04. RTOS & LoRa", sub: t("Tuần 13–24+ · Dự án thật", "Weeks 13–24+ · Real Capstones") }
+    { x: 135, y: 240, tone: "sky", title: "01. C Nhúng + CSV", sub: t("Bài 00–11", "Lessons 00–11") },
+    { x: 335, y: 188, tone: "amber", title: t("02. Điện tử cơ bản", "02. Electronics"), sub: t("Bài 12–19", "Lessons 12–19") },
+    { x: 535, y: 136, tone: "lavender", title: "03. STM32 Cortex-M", sub: t("Bài 20–26", "Lessons 20–26") },
+    { x: 735, y: 84, tone: "sage", title: "04. RTOS & LoRa", sub: t("Bài 27–30", "Lessons 27–30") }
   ];
 
   stages.forEach((st, i) => {
-    drawIsoBlock(g, st.x, st.y, 125, 78, 24, st.tone, st.title, st.sub);
+    drawIsoBlock(g, st.x, st.y, 124, 78, 24, st.tone, st.title, st.sub);
     if (i > 0) {
       const prev = stages[i - 1];
-      const pA = [prev.x + 108, prev.y + 58];
-      const pB = [st.x - 68, st.y + 42];
+      const pA = [prev.x + 104, prev.y + 54];
+      const pB = [st.x - 66, st.y + 38];
       addWire(g, [pA, pB], "#84b684", false, { markerEnd: true });
       addPacketTrack([pA, pB], "#84be88", 1, 0.35);
     }
   });
 
-  drawPillTag(g, 440, 355, t("Mỗi chặng đều có bài tập PC + dataset CSV + câu hỏi mở", "Every stage pairs C labs + CSV datasets + open questions"), PALETTE.sage.top);
+  drawPillTag(g, 440, 368, t("Mỗi chặng đều có bài tập PC + dataset CSV + câu hỏi mở", "Every stage pairs C labs + CSV datasets + open questions"), PALETTE.sage.top);
+}
+
+function sceneIntroWeek1Lab(g, _scene, { addPacketTrack, t }) {
+  drawFlatCard(
+    g,
+    70,
+    24,
+    740,
+    50,
+    "var(--bg-elevated)",
+    t("Khởi động Tuần 1: Quy trình học, ghi chú .md & repo C17", "Week 1 Kickoff: Study Rhythm, .md Notes & C17 Repo"),
+    t("Chốt khung giờ · Xuất câu hỏi mở thành file notes.md · Biên dịch với -Werror", "Lock your daily slot · Export Open Qs to notes.md · Build cleanly with -Werror")
+  );
+
+  drawFlatCard(
+    g,
+    52,
+    104,
+    216,
+    114,
+    PALETTE.sky.top,
+    t("1. Đoán 15s trên sơ đồ", "1. Predict 15s on stage"),
+    t("Dừng ở bước PROBLEM\nĐoán tràn số / thứ tự byte\nrồi mới bấm Bước tiếp", "Pause on PROBLEM steps\nPredict overflow / endian\nbefore clicking Next")
+  );
+  drawFlatCard(
+    g,
+    332,
+    104,
+    216,
+    114,
+    PALETTE.amber.top,
+    t("2. Ghi câu hỏi mở (.md)", "2. Save Open Qs (.md)"),
+    t("Viết ngắn bằng lời mình\nNhấn Sao chép (.md)\nlưu vào week01/notes.md", "Write 3 concise lines\nClick Copy (.md)\nsave into week01/notes.md")
+  );
+  drawFlatCard(
+    g,
+    612,
+    104,
+    216,
+    114,
+    PALETTE.sage.top,
+    t("3. Repo week01 + -Werror", "3. week01 Repo + -Werror"),
+    t("mkdir -p embedded-journey\ngcc -std=c17 -Wall\n-Wextra -Werror main.c", "mkdir -p embedded-journey\ngcc -std=c17 -Wall\n-Wextra -Werror main.c")
+  );
+
+  addWire(g, [[268, 161], [332, 161]], "#84b4df", false, { markerEnd: true });
+  addWire(g, [[548, 161], [612, 161]], "#d3b25a", false, { markerEnd: true });
+  addPacketTrack([[268, 161], [332, 161]], "#84b4df", 1, 0.36, "predict");
+  addPacketTrack([[548, 161], [612, 161]], "#f5d88b", 1, 0.36, ".md");
+
+  drawFlatCard(
+    g,
+    115,
+    266,
+    650,
+    72,
+    "var(--bg-elevated)",
+    t("Đầu ra Tuần 1: 1 file notes.md + 3 bài C17 biên dịch không cảnh báo", "Week 1 Output: 1 notes.md + 3 Warning-Free C17 Programs"),
+    t("types.c · temperature.c · average.c — chạy đủ ca biên & assert trước khi commit", "types.c · temperature.c · average.c — verify edge cases & asserts before commit")
+  );
+
+  addWire(g, [[720, 218], [720, 266]], "#84b684", false, { markerEnd: true });
+  addPacketTrack([[720, 218], [720, 266]], "#84be88", 1, 0.36, "commit");
+
+  drawPillTag(g, 195, 376, t("Space: Dừng soi sơ đồ", "Space: Pause diagram"), PALETTE.sky.top);
+  drawPillTag(g, 440, 376, t("Nút Sao chép (.md)", "Copy (.md) button"), PALETTE.amber.top);
+  drawPillTag(g, 685, 376, "-std=c17 -Wall -Wextra -Werror", PALETTE.sage.top);
 }
 
 export function registerOnboardingScenes(registerScene) {
@@ -185,4 +251,5 @@ export function registerOnboardingScenes(registerScene) {
   registerScene("intro_case_debounce", sceneIntroCaseDebounce);
   registerScene("intro_case_uart", sceneIntroCaseUart);
   registerScene("intro_roadmap", sceneIntroRoadmap);
+  registerScene("intro_week1_lab", sceneIntroWeek1Lab);
 }

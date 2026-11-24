@@ -10,12 +10,40 @@ export function applyFoundationCurriculum(course) {
   const [ePower, eMosfet, eOpamp, eSerial] = createElectronicsExtLessons();
 
   function step(title, body, codeLang, code, nodes, takeaway, cases) {
+    const tones = ["sky", "amber", "sage", "lavender"];
+    const dotColors = ["#84b4df", "#f5d88b", "#84be88", "#c7b8ea"];
     return {
-      title, body, codeLang, code,
-      scene: { type: "flow", nodes },
+      title,
+      body,
+      codeLang,
+      code,
+      scene: { type: "flow", header: title, subheader: codeLang, nodes },
       callout: { type: "key-idea", label: "CẦN NHỚ", text: takeaway },
       diff: cases.map((text) => ({ op: "+", text })),
-      kpis: [], legend: []
+      kpis: nodes.map(([label, value], i) => ({
+        label,
+        value,
+        sub: `Chặng ${i + 1}`,
+        tone: tones[i % tones.length]
+      })),
+      legend: nodes.map(([label], i) => ({
+        label,
+        color: dotColors[i % dotColors.length]
+      }))
+    };
+  }
+
+  function richStep({ title, body, codeLang, code, sceneType, takeaway, cases, kpis, legend }) {
+    return {
+      title,
+      body,
+      codeLang,
+      code,
+      scene: { type: sceneType },
+      callout: { type: "key-idea", label: "CẦN NHỚ", text: takeaway },
+      diff: cases.map((text) => ({ op: "+", text })),
+      kpis,
+      legend
     };
   }
 
@@ -37,10 +65,11 @@ export function applyFoundationCurriculum(course) {
     createIntroLesson(),
     lesson("c-types-io", "Kiểu dữ liệu, biến, printf & scanf", 70,
       "T1 N3 · Chọn kiểu theo miền giá trị, nhập và in trên PC, rồi tách phép tính thành hàm dùng được với dữ liệu cảm biến.", [
-      step("Chọn kiểu từ miền giá trị",
-        "Một biến có kiểu và giá trị. Kiểu cho biết miền giá trị có thể lưu và cách C xử lý giá trị đó. ADC 12 bit có 4096 mã, từ 0 đến 4095, nên một biến uint16_t đủ chứa một mẫu. Thử dự đoán kích thước từng kiểu trước khi chạy.",
-        "C · đo kích thước kiểu",
-        `#include <stdint.h>
+      richStep({
+        title: "Chọn kiểu từ miền giá trị",
+        body: "Một biến có kiểu và giá trị. Kiểu cho biết miền giá trị có thể lưu và cách C xử lý giá trị đó. ADC 12 bit có 4096 mã, từ 0 đến 4095, nên một biến uint16_t đủ chứa một mẫu. Thử dự đoán kích thước từng kiểu trước khi chạy.",
+        codeLang: "C · đo kích thước kiểu",
+        code: `#include <stdint.h>
 #include <stdio.h>
 
 int main(void) {
@@ -49,13 +78,25 @@ int main(void) {
     printf("int: %zu byte(s)\\n", sizeof(int));
     return 0;
 }`,
-        [["ADC 12 bit", "0…4095"], ["Kiểu lưu", "uint16_t"], ["Kích thước", "sizeof raw"]],
-        "sizeof là toán tử và trả kích thước theo byte của C với kiểu size_t. printf và scanf là hàm thư viện chuẩn khai báo trong <stdio.h>.",
-        ["Viết thêm phép đo cho uint8_t, uint16_t và uint32_t.", "Đối chiếu giới hạn của uint8_t với mã ADC lớn nhất. sizeof(int) phụ thuộc hệ biên dịch đích."]),
-      step("Đọc và kiểm tra trước khi tính",
-        "Trên PC, scanf đọc đầu vào chuẩn. %lf yêu cầu địa chỉ của một biến double để ghi kết quả vào đó. Chỉ dùng biến sau khi scanf trả về 1, tức là đã đọc và gán thành công một giá trị. printf dùng %.2f để hiển thị số thực với hai chữ số sau dấu thập phân.",
-        "C · nhập, kiểm tra và in",
-        `#include <stdio.h>
+        sceneType: "c_types_range",
+        takeaway: "sizeof là toán tử và trả kích thước theo byte của C với kiểu size_t. printf và scanf là hàm thư viện chuẩn khai báo trong <stdio.h>.",
+        cases: ["Viết thêm phép đo cho uint8_t, uint16_t và uint32_t.", "Đối chiếu giới hạn của uint8_t với mã ADC lớn nhất. sizeof(int) phụ thuộc hệ biên dịch đích."],
+        kpis: [
+          { label: "ADC 12 bit", value: "0…4095", sub: "Cần ≥ 12 bit", tone: "sky" },
+          { label: "uint8_t", value: "Tràn 255 ❌", sub: "Quá hẹp (1 byte)", tone: "rose" },
+          { label: "uint16_t", value: "2 bytes ✓", sub: "0…65,535 an toàn", tone: "sage" }
+        ],
+        legend: [
+          { label: "Tràn miền 8-bit", color: "#e57373" },
+          { label: "Kiểu chuẩn vừa khít", color: "#84be88" },
+          { label: "Đo bằng sizeof", color: "#c7b8ea" }
+        ]
+      }),
+      richStep({
+        title: "Đọc và kiểm tra trước khi tính",
+        body: "Trên PC, scanf đọc đầu vào chuẩn. %lf yêu cầu địa chỉ của một biến double để ghi kết quả vào đó. Chỉ dùng biến sau khi scanf trả về 1, tức là đã đọc và gán thành công một giá trị. printf dùng %.2f để hiển thị số thực với hai chữ số sau dấu thập phân.",
+        codeLang: "C · nhập, kiểm tra và in",
+        code: `#include <stdio.h>
 
 int main(void) {
     double celsius;
@@ -66,39 +107,83 @@ int main(void) {
     printf("%.2f C\\n", celsius);
     return 0;
 }`,
-        [["Đầu vào", "25.5 hoặc abc"], ["scanf", "1 hoặc 0"], ["Đầu ra", "25.50 C hoặc báo lỗi"]],
-        "&celsius cho scanf địa chỉ để ghi. Ở firmware, dữ liệu có thể đến từ bộ đọc cảm biến. Hàm tính nhận giá trị đó làm đối số.",
-        ["Nhập 25.5 rồi nhập abc. Dự đoán nhánh chạy trong mỗi trường hợp.", "Thử kết thúc đầu vào trước khi nhập số. Chương trình phải đi vào nhánh báo lỗi."]),
-      step("Viết hàm tính từ yêu cầu",
-        "Yêu cầu là nhận nhiệt độ °C và trả về °F. Viết đầu vào, kiểu trả về và công thức F = C × 9/5 + 32 trước khi viết thân hàm. Tính tay với 100 °C. Nếu viết (9 / 5), phép chia nguyên cho 1 trước khi nhân, nên kết quả sai là 132 °F.",
-        "C · hàm đổi nhiệt độ",
-        `double celsius_to_fahrenheit(double celsius) {
+        sceneType: "c_scanf_guard",
+        takeaway: "&celsius cho scanf địa chỉ để ghi. Ở firmware, dữ liệu có thể đến từ bộ đọc cảm biến. Hàm tính nhận giá trị đó làm đối số.",
+        cases: ["Nhập 25.5 rồi nhập abc. Dự đoán nhánh chạy trong mỗi trường hợp.", "Thử kết thúc đầu vào trước khi nhập số. Chương trình phải đi vào nhánh báo lỗi."],
+        kpis: [
+          { label: "Đầu vào", value: "25.5 / abc", sub: "Luồng stdin", tone: "sky" },
+          { label: "Kiểm tra scanf", value: "== 1", sub: "Gán đủ 1 biến", tone: "amber" },
+          { label: "Đầu ra", value: "25.50 C / Lỗi", sub: "Rẽ nhánh an toàn", tone: "sage" }
+        ],
+        legend: [
+          { label: "Đọc thành công (1)", color: "#84be88" },
+          { label: "Sai định dạng (0)", color: "#e57373" }
+        ]
+      }),
+      richStep({
+        title: "Viết hàm tính từ yêu cầu",
+        body: "Yêu cầu là nhận nhiệt độ °C và trả về °F. Viết đầu vào, kiểu trả về và công thức F = C × 9/5 + 32 trước khi viết thân hàm. Tính tay với 100 °C. Nếu viết (9 / 5), phép chia nguyên cho 1 trước khi nhân, nên kết quả sai là 132 °F.",
+        codeLang: "C · hàm đổi nhiệt độ",
+        code: `double celsius_to_fahrenheit(double celsius) {
     return celsius * (9.0 / 5.0) + 32.0;
 }`,
-        [["Đầu vào", "100 °C"], ["Tính", "100 × 1.8 + 32"], ["Giá trị trả về", "212 °F"]],
-        "Giữ scanf và printf trong main. Gọi cùng một hàm tính từ bài kiểm thử hoặc khi nhận giá trị của cảm biến.",
-        ["0 °C → 32 °F, 100 °C → 212 °F, −40 °C → −40 °F.", "Trong main, thay giá trị in bằng kết quả gọi celsius_to_fahrenheit(celsius)."]),
-      step("Tính cả miền giá trị của tổng",
-        "Trước khi viết hàm trung bình, liệt kê đầu vào, đầu ra và các bước trung gian. Ba mẫu uint16_t có tổng tối đa 196605 nên cần kiểu rộng hơn cho tổng. Bên trong hàm, đổi kiểu toán hạng đầu trước khi cộng để biểu thức có đủ miền giá trị cả trên đích có int 16 bit.",
-        "C · tính tổng rộng hơn kiểu mẫu",
-        `uint32_t sum = (uint32_t)a + b + c;
+        sceneType: "c_temp_func",
+        takeaway: "Giữ scanf và printf trong main. Gọi cùng một hàm tính từ bài kiểm thử hoặc khi nhận giá trị của cảm biến.",
+        cases: ["0 °C → 32 °F, 100 °C → 212 °F, −40 °C → −40 °F.", "Trong main, thay giá trị in bằng kết quả gọi celsius_to_fahrenheit(celsius)."],
+        kpis: [
+          { label: "Đầu vào", value: "100.0 °C", sub: "Tham số double", tone: "sky" },
+          { label: "Bẫy 9 / 5", value: "132.0 °F ❌", sub: "Chia nguyên = 1", tone: "rose" },
+          { label: "9.0 / 5.0", value: "212.0 °F ✓", sub: "Đúng phép chia thực", tone: "sage" }
+        ],
+        legend: [
+          { label: "Bẫy chia nguyên", color: "#e57373" },
+          { label: "Chia số thực đúng", color: "#84be88" }
+        ]
+      }),
+      richStep({
+        title: "Tính cả miền giá trị của tổng",
+        body: "Trước khi viết hàm trung bình, liệt kê đầu vào, đầu ra và các bước trung gian. Ba mẫu uint16_t có tổng tối đa 196605 nên cần kiểu rộng hơn cho tổng. Bên trong hàm, đổi kiểu toán hạng đầu trước khi cộng để biểu thức có đủ miền giá trị cả trên đích có int 16 bit.",
+        codeLang: "C · tính tổng rộng hơn kiểu mẫu",
+        code: `uint32_t sum = (uint32_t)a + b + c;
 double integer_result = 5 / 3;
 double fractional_result = 5 / 3.0;`,
-        [["Ba mẫu", "1, 2, 2"], ["Tổng", "5"], ["Chia thực", "1.666…"]],
-        "Gán vào double sau phép chia nguyên chỉ đổi kiểu của kết quả đã mất phần lẻ. Dùng 3.0 để giữ phần lẻ khi chia tổng.",
-        ["Với ba mẫu 65535, tổng là 196605 và trung bình là 65535.", "Áp dụng cùng cách tính cho ba mẫu ADC 12 bit như 0, 2048 và 4095."]),
-      step("Thực hành · viết ba chương trình và tự kiểm tra",
-        "Viết types.c để in kích thước kiểu, temperature.c để đọc và đổi nhiệt độ, average.c để đọc ba số và in trung bình. Với mỗi file, ghi một ca thường, một ca biên và đầu ra mong đợi trước khi chạy. Trong average.c, viết average3 cho ba số thực, rồi thử biến thể average_adc3 với dữ liệu mẫu giả lập.",
-        "C · chữ ký bài tập",
-        `double celsius_to_fahrenheit(double celsius);
+        sceneType: "c_sum_widen",
+        takeaway: "Gán vào double sau phép chia nguyên chỉ đổi kiểu của kết quả đã mất phần lẻ. Dùng 3.0 để giữ phần lẻ khi chia tổng.",
+        cases: ["Với ba mẫu 65535, tổng là 196605 và trung bình là 65535.", "Áp dụng cùng cách tính cho ba mẫu ADC 12 bit như 0, 2048 và 4095."],
+        kpis: [
+          { label: "3 × 65535", value: "196,605", sub: "Vượt uint16_t", tone: "amber" },
+          { label: "Ép kiểu sớm", value: "(uint32_t)a", sub: "Mở rộng trước cộng", tone: "sage" },
+          { label: "Chia thực", value: "sum / 3.0", sub: "5/3.0 = 1.666…", tone: "sky" }
+        ],
+        legend: [
+          { label: "Tràn / mất phần lẻ", color: "#e57373" },
+          { label: "Mở rộng an toàn", color: "#84be88" }
+        ]
+      }),
+      richStep({
+        title: "Thực hành · viết ba chương trình và tự kiểm tra",
+        body: "Viết types.c để in kích thước kiểu, temperature.c để đọc và đổi nhiệt độ, average.c để đọc ba số và in trung bình. Với mỗi file, ghi một ca thường, một ca biên và đầu ra mong đợi trước khi chạy. Trong average.c, viết average3 cho ba số thực, rồi thử biến thể average_adc3 với dữ liệu mẫu giả lập.",
+        codeLang: "C · chữ ký bài tập",
+        code: `double celsius_to_fahrenheit(double celsius);
 double average3(double a, double b, double c);
 double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
-        [["Dự đoán", "kiểu, miền và đầu ra"], ["Viết", "nhập → hàm → in"], ["Kiểm tra", "đối chiếu rồi commit"]],
-        "Biên dịch từng file với -std=c17 -Wall -Wextra -Wpedantic. Commit khi cả ba file đều qua các ca thử và biên dịch không cảnh báo.",
-        ["types.c: in sizeof của int, uint8_t, uint16_t và uint32_t. Giải thích chọn kiểu nào cho một mẫu ADC 12 bit.",
+        sceneType: "c_types_lab",
+        takeaway: "Biên dịch từng file với -std=c17 -Wall -Wextra -Wpedantic. Commit khi cả ba file đều qua các ca thử và biên dịch không cảnh báo.",
+        cases: ["types.c: in sizeof của int, uint8_t, uint16_t và uint32_t. Giải thích chọn kiểu nào cho một mẫu ADC 12 bit.",
           "temperature.c: thử 0, 100, −40 và abc. Mỗi đầu vào hợp lệ in đúng °F, abc báo lỗi.",
           "average.c: dùng scanf với ba %lf và kiểm tra giá trị trả về là 3. Thử 1 2 2 → 1.67, -1 0 1 → 0.00, 1 x 2 → báo lỗi.",
-          "Thử gọi average_adc3(65535, 65535, 65535) và kiểm tra kết quả là 65535."])
+          "Thử gọi average_adc3(65535, 65535, 65535) và kiểm tra kết quả là 65535."],
+        kpis: [
+          { label: "Bước 1", value: "Dự đoán", sub: "Miền & đầu ra", tone: "sky" },
+          { label: "Bước 2", value: "3 file C17", sub: "types / temp / avg", tone: "amber" },
+          { label: "Bước 3", value: "0 cảnh báo", sub: "-Wall -Wextra", tone: "sage" }
+        ],
+        legend: [
+          { label: "Đo kích thước", color: "#84b4df" },
+          { label: "Kiểm tra scanf", color: "#f5d88b" },
+          { label: "Kiểm thử biên", color: "#84be88" }
+        ]
+      })
     ], {
       prompt: "Tổng nguyên sum = 5. Biểu thức nào giữ lại phần lẻ của trung bình?",
       options: ["(double)(sum / 3)", "sum / 3.0", "sum / 3"], correctIndex: 1,
@@ -107,41 +192,96 @@ double average_adc3(uint16_t a, uint16_t b, uint16_t c);`,
     cOps,
     lesson("c-control-flow", "If, switch, vòng lặp & máy trạng thái", 45,
       "Theo dõi điều kiện, chỉ số và trạng thái qua từng bước trước khi đưa logic lên vi điều khiển.", [
-      step("Đọc điều kiện theo thứ tự thực thi",
-        "Trong C, 0 là sai và giá trị khác 0 là đúng. Với &&, chỉ khi vế trái đúng thì vế phải mới chạy. Dùng quy tắc này để kiểm tra mẫu hợp lệ trước khi tính tỷ lệ.",
-        "C · phân loại mẫu",
-        "uint16_t sample = 740;\nuint16_t limit = 1000;\nbool high = limit != 0 && (uint32_t)sample * 100 / limit >= 70;",
-        [["Mẫu", "740 / 1000"], ["Kiểm tra", "limit ≠ 0"], ["Cảnh báo", "74% ≥ 70%"]],
-        "Khi limit bằng 0, C bỏ qua toàn bộ vế phải. Ép kiểu trước phép nhân để phép tính đủ rộng.",
-        ["Đổi limit thành 0 và dự đoán high.", "Dùng <stdbool.h> và <stdint.h> cho các kiểu trong ví dụ."]),
-      step("Đi qua mảng theo từng mẫu",
-        "Vòng for kiểm tra điều kiện trước mỗi lượt. Với 3 phần tử, điều kiện i < n chỉ cho phép các chỉ số 0, 1, 2. Mỗi lượt có thể xử lý một mẫu rồi chuyển sang lượt tiếp theo.",
-        "C · đếm mẫu vượt ngưỡng",
-        "uint16_t samples[] = {690, 700, 740};\nsize_t n = sizeof samples / sizeof samples[0];\nsize_t high_count = 0;\nfor (size_t i = 0; i < n; ++i) {\n    if (samples[i] >= 700) ++high_count;\n}",
-        [["Chỉ số 0", "690 → bỏ qua"], ["Chỉ số 1", "700 → đếm"], ["Chỉ số 2", "740 → đếm"]],
-        "Phép sizeof để tính số phần tử áp dụng tại nơi còn thấy đối tượng mảng. Dùng size_t từ <stddef.h>.",
-        ["Kết quả high_count là 2.", "Với n = 0, thân vòng lặp chạy 0 lần."]),
-      step("While, do while và giới hạn chờ",
-        "while kiểm tra trước mỗi lượt, nên có thể chạy 0 lần. do while kiểm tra cuối lượt, nên luôn chạy ít nhất một lần. Ví dụ đọc một cờ trước rồi cho phép thử lại đến khi đủ 4 lần đọc.",
-        "C · đọc cờ có giới hạn",
-        "unsigned tries = 0;\nbool ready;\ndo {\n    ready = read_ready();\n    ++tries;\n} while (!ready && tries < 4);\n// ready == false sau vòng lặp: đã chạm giới hạn thử.",
-        [["Đọc lần đầu", "tries = 1"], ["Kiểm tra", "!ready && tries < 4"], ["Kết thúc", "sẵn sàng hoặc hết lượt"]],
-        "Giới hạn lượt đọc giúp thoát khi phần cứng chưa phản hồi. Trong superloop, có thể đọc một lần mỗi lượt và dùng mốc thời gian để các việc khác tiếp tục chạy.",
-        ["Giả lập read_ready() trả true ngay: 1 lần đọc.", "Giả lập luôn trả false: đúng 4 lần đọc."]),
-      step("Switch chọn hành vi theo trạng thái",
-        "Một lần gọi hàm xử lý một sự kiện và trả về trạng thái kế tiếp. Vòng lặp firmware có thể gọi hàm cho mỗi mẫu. return kết thúc hàm ngay tại nhánh được chọn.",
-        "C · chuyển trạng thái",
-        "enum State { WAIT, ALERT };\nenum State next_state(enum State state, unsigned sample) {\n    switch (state) {\n        case WAIT:  return sample >= 700 ? ALERT : WAIT;\n        case ALERT: return sample < 650 ? WAIT : ALERT;\n        default:    return WAIT;\n    }\n}",
-        [["WAIT", "mẫu = 700"], ["Điều kiện", "mẫu ≥ 700"], ["ALERT", "giữ đến khi < 650"]],
-        "Hai ngưỡng 700 và 650 tạo vùng trễ, giúp trạng thái ổn định khi mẫu dao động quanh 700.",
-        ["WAIT, 699 → WAIT", "WAIT, 700 → ALERT", "ALERT, 650 → ALERT", "ALERT, 649 → WAIT"]),
-      step("Thực hành · ôn 4 bài C và viết cảnh báo",
-        "Chạy lại FizzBuzz, kiểm tra số nguyên tố, bảng cửu chương và máy tính switch trong c-nhung/day-05-if-switch-loop. Sau đó tự viết next_state, dùng for đưa từng mẫu vào hàm rồi in trạng thái tương ứng.",
-        "C · dữ liệu kiểm thử",
-        "unsigned samples[] = {699, 700, 680, 650, 649};\n// Bắt đầu từ WAIT. Gọi next_state cho từng mẫu.",
-        [["Chuỗi mẫu", "699, 700, 680…"], ["next_state", "mỗi mẫu một lượt"], ["Kết quả", "so với bảng test"]],
-        "Chạy trên PC bằng GCC với -std=c17 -Wall -Wextra -Wpedantic. Dùng assert hoặc so sánh kết quả in ra.",
-        ["Chuỗi kỳ vọng: WAIT, ALERT, ALERT, ALERT, WAIT.", "FizzBuzz: 15 → FizzBuzz. Prime: 1 sai, 2 đúng, 9 sai.", "Bảng cửu chương: 9 × 9 = 81. Máy tính: 6 / 2 = 3; chia 0 phải báo lỗi."])
+      richStep({
+        title: "Đọc điều kiện theo thứ tự thực thi",
+        body: "Trong C, 0 là sai và giá trị khác 0 là đúng. Với &&, chỉ khi vế trái đúng thì vế phải mới chạy. Dùng quy tắc này để kiểm tra mẫu hợp lệ trước khi tính tỷ lệ.",
+        codeLang: "C · phân loại mẫu",
+        code: "uint16_t sample = 740;\nuint16_t limit = 1000;\nbool high = limit != 0 && (uint32_t)sample * 100 / limit >= 70;",
+        sceneType: "c_short_circuit",
+        takeaway: "Khi limit bằng 0, C bỏ qua toàn bộ vế phải. Ép kiểu trước phép nhân để phép tính đủ rộng.",
+        cases: ["Đổi limit thành 0 và dự đoán high.", "Dùng <stdbool.h> và <stdint.h> cho các kiểu trong ví dụ."],
+        kpis: [
+          { label: "Mẫu", value: "740 / 1000", sub: "Tỷ lệ 74%", tone: "sky" },
+          { label: "Bảo vệ &&", value: "limit != 0", sub: "Chặn chia 0", tone: "amber" },
+          { label: "Cảnh báo", value: "high = true", sub: "74% ≥ 70%", tone: "sage" }
+        ],
+        legend: [
+          { label: "Bỏ qua chia 0", color: "#e57373" },
+          { label: "Đánh giá tỷ lệ", color: "#84be88" }
+        ]
+      }),
+      richStep({
+        title: "Đi qua mảng theo từng mẫu",
+        body: "Vòng for kiểm tra điều kiện trước mỗi lượt. Với 3 phần tử, điều kiện i < n chỉ cho phép các chỉ số 0, 1, 2. Mỗi lượt có thể xử lý một mẫu rồi chuyển sang lượt tiếp theo.",
+        codeLang: "C · đếm mẫu vượt ngưỡng",
+        code: "uint16_t samples[] = {690, 700, 740};\nsize_t n = sizeof samples / sizeof samples[0];\nsize_t high_count = 0;\nfor (size_t i = 0; i < n; ++i) {\n    if (samples[i] >= 700) ++high_count;\n}",
+        sceneType: "c_for_bounds",
+        takeaway: "Phép sizeof để tính số phần tử áp dụng tại nơi còn thấy đối tượng mảng. Dùng size_t từ <stddef.h>.",
+        cases: ["Kết quả high_count là 2.", "Với n = 0, thân vòng lặp chạy 0 lần."],
+        kpis: [
+          { label: "Chỉ số 0..2", value: "690, 700, 740", sub: "n = 3 phần tử", tone: "sky" },
+          { label: "Điều kiện dừng", value: "i < n", sub: "Chặn đọc [3]", tone: "rose" },
+          { label: "high_count", value: "2 mẫu", sub: "700 & 740 ≥ 700", tone: "sage" }
+        ],
+        legend: [
+          { label: "Đạt ngưỡng ≥ 700", color: "#84be88" },
+          { label: "Rào chặn ngoài biên", color: "#e57373" }
+        ]
+      }),
+      richStep({
+        title: "While, do while và giới hạn chờ",
+        body: "while kiểm tra trước mỗi lượt, nên có thể chạy 0 lần. do while kiểm tra cuối lượt, nên luôn chạy ít nhất một lần. Ví dụ đọc một cờ trước rồi cho phép thử lại đến khi đủ 4 lần đọc.",
+        codeLang: "C · đọc cờ có giới hạn",
+        code: "unsigned tries = 0;\nbool ready;\ndo {\n    ready = read_ready();\n    ++tries;\n} while (!ready && tries < 4);\n// ready == false sau vòng lặp: đã chạm giới hạn thử.",
+        sceneType: "c_dowhile_timeout",
+        takeaway: "Giới hạn lượt đọc giúp thoát khi phần cứng chưa phản hồi. Trong superloop, có thể đọc một lần mỗi lượt và dùng mốc thời gian để các việc khác tiếp tục chạy.",
+        cases: ["Giả lập read_ready() trả true ngay: 1 lần đọc.", "Giả lập luôn trả false: đúng 4 lần đọc."],
+        kpis: [
+          { label: "do-while", value: "≥ 1 lần đọc", sub: "Kiểm tra cuối lượt", tone: "sky" },
+          { label: "Điều kiện lặp", value: "!ready && < 4", sub: "Tối đa 4 lượt", tone: "amber" },
+          { label: "Thoát an toàn", value: "ready / Timeout", sub: "Không treo CPU", tone: "sage" }
+        ],
+        legend: [
+          { label: "Thử lại có giới hạn", color: "#f5d88b" },
+          { label: "Sẵn sàng (thoát)", color: "#84be88" },
+          { label: "Hết lượt (timeout)", color: "#e57373" }
+        ]
+      }),
+      richStep({
+        title: "Switch chọn hành vi theo trạng thái",
+        body: "Một lần gọi hàm xử lý một sự kiện và trả về trạng thái kế tiếp. Vòng lặp firmware có thể gọi hàm cho mỗi mẫu. return kết thúc hàm ngay tại nhánh được chọn.",
+        codeLang: "C · chuyển trạng thái",
+        code: "enum State { WAIT, ALERT };\nenum State next_state(enum State state, unsigned sample) {\n    switch (state) {\n        case WAIT:  return sample >= 700 ? ALERT : WAIT;\n        case ALERT: return sample < 650 ? WAIT : ALERT;\n        default:    return WAIT;\n    }\n}",
+        sceneType: "c_switch_hysteresis",
+        takeaway: "Hai ngưỡng 700 và 650 tạo vùng trễ, giúp trạng thái ổn định khi mẫu dao động quanh 700.",
+        cases: ["WAIT, 699 → WAIT", "WAIT, 700 → ALERT", "ALERT, 650 → ALERT", "ALERT, 649 → WAIT"],
+        kpis: [
+          { label: "Ngưỡng bật", value: "≥ 700", sub: "WAIT → ALERT", tone: "rose" },
+          { label: "Vùng trễ", value: "650…699", sub: "Giữ trạng thái", tone: "lavender" },
+          { label: "Ngưỡng tắt", value: "< 650", sub: "ALERT → WAIT", tone: "sage" }
+        ],
+        legend: [
+          { label: "Kích hoạt cảnh báo", color: "#e57373" },
+          { label: "Hồi phục bình thường", color: "#84be88" }
+        ]
+      }),
+      richStep({
+        title: "Thực hành · ôn 4 bài C và viết cảnh báo",
+        body: "Chạy lại FizzBuzz, kiểm tra số nguyên tố, bảng cửu chương và máy tính switch trong c-nhung/day-05-if-switch-loop. Sau đó tự viết next_state, dùng for đưa từng mẫu vào hàm rồi in trạng thái tương ứng.",
+        codeLang: "C · dữ liệu kiểm thử",
+        code: "unsigned samples[] = {699, 700, 680, 650, 649};\n// Bắt đầu từ WAIT. Gọi next_state cho từng mẫu.",
+        sceneType: "c_fsm_csv_lab",
+        takeaway: "Chạy trên PC bằng GCC với -std=c17 -Wall -Wextra -Wpedantic. Dùng assert hoặc so sánh kết quả in ra.",
+        cases: ["Chuỗi kỳ vọng: WAIT, ALERT, ALERT, ALERT, WAIT.", "FizzBuzz: 15 → FizzBuzz. Prime: 1 sai, 2 đúng, 9 sai.", "Bảng cửu chương: 9 × 9 = 81. Máy tính: 6 / 2 = 3; chia 0 phải báo lỗi."],
+        kpis: [
+          { label: "Chuỗi mẫu", value: "699…649", sub: "5 điểm biên CSV", tone: "sky" },
+          { label: "Vùng trễ", value: "680, 650", sub: "Giữ nguyên ALERT", tone: "amber" },
+          { label: "Kiểm thử", value: "assert()", sub: "4 bài C + FSM", tone: "sage" }
+        ],
+        legend: [
+          { label: "Chuyển trạng thái", color: "#84be88" }
+        ]
+      })
     ], {
       prompt: "Đang ở ALERT, nhận mẫu 670. Trạng thái mới là gì?",
       options: ["WAIT", "ALERT", "Lỗi vì 670 < 700"],

@@ -18,25 +18,38 @@ export function formatInlineMd(str) {
 
 export function highlightC(code) {
   const tokens = [];
+  const tagFor = (index) =>
+    `@@TOK${String(index).replace(/\d/g, (d) => "ABCDEFGHIJ"[d])}@@`;
   let out = escHtml(code);
-  // Extract comments first so keywords inside comments are not tokenized
-  out = out.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)/g, (match) => {
-    const id = `@@CMT${tokens.length}@@`;
-    tokens.push(`<span class="tok-cmt">${match}</span>`);
-    return id;
-  });
+  // Extract comments and string/char literals first so keywords inside them are never tokenized
   out = out.replace(
-    /\b(int|void|const|static|volatile|while|for|if|else|return|struct|union|enum|typedef|#include|#define)\b/g,
+    /(\/\/[^\n]*|\/\*[\s\S]*?\*\/|&quot;(?:\\.|(?!&quot;)[^\n])*?&quot;|'(?:\\.|[^'\n])*?')/g,
+    (match) => {
+      const id = tagFor(tokens.length);
+      const html = match.startsWith("/") ? `<span class="tok-cmt">${match}</span>` : match;
+      tokens.push({ id, html });
+      return id;
+    }
+  );
+  out = out.replace(
+    /(^|[^\w])(#(?:include|define|ifdef|ifndef|endif|pragma))\b/g,
+    '$1<span class="tok-kw">$2</span>'
+  );
+  out = out.replace(
+    /\b(int|void|const|static|volatile|while|for|do|if|else|switch|case|default|break|continue|return|sizeof|struct|union|enum|typedef)\b/g,
     '<span class="tok-kw">$1</span>'
   );
   out = out.replace(
-    /\b(uint8_t|uint16_t|uint32_t|int8_t|int16_t|int32_t|size_t|bool)\b/g,
+    /\b(uint8_t|uint16_t|uint32_t|uint64_t|int8_t|int16_t|int32_t|int64_t|size_t|uintptr_t|ptrdiff_t|bool|double|float|char|unsigned|signed|FILE)\b/g,
     '<span class="tok-type">$1</span>'
   );
-  out = out.replace(/\b(0x[0-9A-Fa-f_]+|0b[01_]+|\d+[uU]?)\b/g, '<span class="tok-num">$1</span>');
-  tokens.forEach((html, i) => {
-    out = out.replace(`@@CMT${i}@@`, html);
-  });
+  out = out.replace(
+    /\b(0x[0-9A-Fa-f_]+|0b[01_]+|\d+[uU]?|true|false|NULL)\b/g,
+    '<span class="tok-num">$1</span>'
+  );
+  for (const { id, html } of tokens) {
+    out = out.replace(id, html);
+  }
   return out;
 }
 

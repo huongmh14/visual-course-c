@@ -182,10 +182,10 @@ if (read_button() == 0) {
         body:
           "Bạn sẽ không học rời rạc từng lệnh C, mà đi qua 4 chặng nối tiếp nhau: (1) C Nhúng cốt lõi & CSV test trên PC; (2) Điện tử cơ bản (Ohm, Pull-up, ADC, PWM); (3) Vi điều khiển STM32 Cortex-M; (4) FreeRTOS, Makefile & LoRa. Mỗi bài học đều gắn với một bài toán phần cứng có thật.",
         codeLang: "Lộ trình thực hành · PC → STM32",
-        code: `// Chặng 1 (Bài 01–07): C chuẩn công nghiệp + assert + Makefile
-// Chặng 2 (Bài 08–11): Đo điện áp LED, lọc nút, ADC, tạo xung PWM
-// Chặng 3 (Bài 12–18): Thanh ghi STM32, Ngắt NVIC, Timer, UART/I2C/SPI/CAN
-// Chặng 4 (Bài 19–22): FreeRTOS, Bare-metal Linker, Bootloader, LoRa`,
+        code: `// Chặng 1 (Bài 00–11): C chuẩn C17 + bitwise + Makefile + FSM
+// Chặng 2 (Bài 12–19): Điện tử cơ bản (Ohm, MOSFET, Op-Amp, UART/I2C/SPI)
+// Chặng 3 (Bài 20–26): Thanh ghi STM32, Ngắt NVIC, Timer, CAN
+// Chặng 4 (Bài 27–30): FreeRTOS, Bare-metal Linker, Bootloader, LoRa`,
         callout: {
           type: "key-idea",
           label: "CẦN NHỚ",
@@ -196,9 +196,9 @@ if (read_button() == 0) {
           { op: "+", text: "Mọi bộ dữ liệu CSV đều mô phỏng nhiễu và biên như mạch thật." }
         ],
         kpis: [
-          { label: "Sẵn sàng học", value: "12 bài", sub: "Chặng 1 & 2 đầy đủ", tone: "sage" },
+          { label: "Sẵn sàng học", value: "20 bài", sub: "12 C + 8 Điện tử", tone: "sage" },
           { label: "Bộ dữ liệu", value: "4 CSV", sub: "fsm, debounce, adc, pwm", tone: "amber" },
-          { label: "Lộ trình đầy đủ", value: "23 bài", sub: "Mở rộng từng bước", tone: "lavender" }
+          { label: "Lộ trình đầy đủ", value: "31 bài", sub: "Mở rộng từng bước", tone: "lavender" }
         ],
         legend: [
           { label: "Lộ trình nâng cấp liên tục", color: "#84be88" }
@@ -236,17 +236,18 @@ EOF`,
           { op: "+", text: "Gõ câu trả lời cho các câu hỏi mở ở Bước 2–6." },
           { op: "+", text: "Nhấn nút Sao chép (.md) để xuất toàn bộ ghi chú sang Markdown." }
         ],
-        kpis: [],
-        legend: [],
+        kpis: [
+          { label: "Bước 1", value: "Đoán 15s", sub: "Trước khi mở lời giải", tone: "sky" },
+          { label: "Bước 2", value: "notes.md", sub: "Xuất câu hỏi mở (.md)", tone: "amber" },
+          { label: "Bước 3", value: "gcc -Werror", sub: "Biên dịch sạch C17", tone: "sage" }
+        ],
+        legend: [
+          { label: "Dự đoán chủ động", color: "#84b4df" },
+          { label: "Ghi chú Markdown", color: "#f5d88b" },
+          { label: "Kiểm thử C17", color: "#84be88" }
+        ],
         learnUnlock: [],
-        scene: {
-          type: "flow",
-          nodes: [
-            ["Đọc & Đoán", "Sơ đồ từng bước"],
-            ["Trả lời mở", "Bài toán thực tế"],
-            ["Xuất .md + Code", "embedded-journey/week01"]
-          ]
-        },
+        scene: { type: "intro_week1_lab" },
         openQuestions: [
           {
             id: "q-commitment",

@@ -71,6 +71,14 @@
   overflow: hidden;
 }
 
+.diagram-stage.is-flow-stage:not(.fullscreen) {
+  min-height: 410px;
+}
+
+.diagram-stage.is-flow-stage:not(.fullscreen) #iso-svg {
+  max-height: 300px;
+}
+
 .diagram-stage.fullscreen {
   position: fixed;
   inset: 14px;

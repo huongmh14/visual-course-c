@@ -39,7 +39,7 @@ int main(void) {
 }`,
               callout: {
                 type: "key-idea",
-                label: "KEY IDEA",
+                label: "CẦN NHỚ",
                 text: "Vi điều khiển dùng kiến trúc không gian địa chỉ phẳng 32-bit (0x0000_0000 → 0xFFFF_FFFF): Flash bắt đầu từ 0x0800_0000, SRAM từ 0x2000_0000, Ngoại vi từ 0x4000_0000."
               },
               diff: [
@@ -75,7 +75,7 @@ int adc_mv = 40000;
 // avr-gcc với int 16 bit: kết quả thường thấy là -25536`,
               callout: {
                 type: "watch-out",
-                label: "WATCH OUT",
+                label: "LƯU Ý",
                 text: "Kiểm tra INT_MIN và INT_MAX trong <limits.h>. Khi thanh ghi hoặc giao thức quy định độ rộng cụ thể, dùng kiểu phù hợp trong <stdint.h> và tuần tự hóa từng byte theo giao thức."
               },
               diff: [
@@ -111,7 +111,7 @@ uint32_t baudrate   = 115200U; // 4 byte (0 .. 4.29 tỷ)
 // Tổng SRAM chỉ tốn: 1 + 2 + 4 = 7 bytes (thay vì 12 bytes dùng int)`,
               callout: {
                 type: "key-idea",
-                label: "KEY IDEA",
+                label: "CẦN NHỚ",
                 text: "Trong phỏng vấn và dự án thực tế (Rikkei / Automotive / STM32), dùng <stdint.h> là chuẩn mực bắt buộc để kiểm soát chính xác từng bit bộ nhớ."
               },
               diff: [
@@ -150,7 +150,7 @@ const uint8_t font_rom[256] = { 0x3E, 0x51, 0x49 };
 uint32_t rx_count; // C bảo đảm giá trị 0 trước khi chương trình bắt đầu.`,
               callout: {
                 type: "good-to-know",
-                label: "GOOD TO KNOW",
+                label: "KIẾN THỨC HAY",
                 text: "Đặt const cho bảng tra chỉ đọc. Kiểm tra linker map để xác nhận bảng được giữ trong bản build và nằm ở Flash hay SRAM."
               },
               diff: [
@@ -188,7 +188,7 @@ tick++;             // Cộng trong int: 255 + 1 = 256
 // for (uint8_t i = 0; i <= 255; i++) { ... } // i luôn <= 255!`,
               callout: {
                 type: "watch-out",
-                label: "WATCH OUT",
+                label: "LƯU Ý",
                 text: "Trong vòng lặp `for (uint8_t i = 0; i <= 255; i++)`, mọi giá trị của i đều thỏa điều kiện. Nếu thân vòng lặp không có lối thoát thì nó chạy mãi. Dùng `unsigned int` cho biến đếm nếu cần duyệt đủ 0 đến 255."
               },
               diff: [
@@ -224,7 +224,7 @@ int8_t sum = a + b;
 // Cộng trong int: 10 + (-5) = 5; lưu lại được vào int8_t`,
               callout: {
                 type: "key-idea",
-                label: "KEY IDEA",
+                label: "CẦN NHỚ",
                 text: "Miền giá trị của `int8_t` là `-128 .. +127` (lệch về âm 1 số vì số 0 chiếm một tổ hợp dương). Muốn tính nhanh số âm: lấy `256 - |x|` (với 8-bit)."
               },
               diff: [
@@ -262,7 +262,7 @@ const unsigned char *p = (const unsigned char *)&magic;
 // p[3] @ 0x2000_0003 == 0x12  (byte cao)`,
               callout: {
                 type: "good-to-know",
-                label: "GOOD TO KNOW",
+                label: "KIẾN THỨC HAY",
                 text: "Khi debug, xem từng byte theo địa chỉ tăng dần để thấy thứ tự trong RAM. Khi hiển thị theo từ 32 bit, trình debug có thể ghép chúng thành giá trị 0x12345678."
               },
               diff: [
@@ -303,7 +303,7 @@ tx_buf[0] = (mv >> 8) & 0xFF; // 0x03 (Byte cao đi trước - Big Endian)
 tx_buf[1] =  mv       & 0xFF; // 0xE8 (Byte thấp đi sau)`,
               callout: {
                 type: "watch-out",
-                label: "WATCH OUT",
+                label: "LƯU Ý",
                 text: "Các giao thức công nghiệp (Modbus, TCP/IP, nhiều frame CAN ô tô) thường dùng Big-Endian. Không bao giờ truyền trực tiếp byte thô của struct đa byte mà không chuẩn hóa Endian!"
               },
               diff: [
@@ -343,7 +343,7 @@ void turn_on_led_pa5(void) {
 }`,
               callout: {
                 type: "key-idea",
-                label: "KEY IDEA",
+                label: "CẦN NHỚ",
                 text: "Đọc hoặc ghi địa chỉ thanh ghi truy cập phần cứng theo tài liệu MCU. Phép |= là đọc–sửa–ghi. STM32F103 có BSRR để đặt hoặc xóa bit GPIO bằng một lần ghi."
               },
               diff: [

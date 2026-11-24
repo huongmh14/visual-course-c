@@ -32,17 +32,50 @@ function createStubSvgRoot() {
 function measureVisualUnits(text) {
   let units = 0;
   for (const ch of text) {
-    units += /[\u0100-\uFFFF]/.test(ch) ? 1.05 : 1.0;
+    const cp = ch.codePointAt(0);
+    if (cp > 0x2600 && (cp === 0x274c || cp === 0x2705 || cp >= 0x1f000)) {
+      units += 2.0;
+    } else {
+      units += /[\u0100-\uFFFF]/.test(ch) ? 1.05 : 1.0;
+    }
   }
   return units;
+}
+
+function measureTextSpan(tx) {
+  const fs = parseFloat(tx.attrs["font-size"] || "11");
+  const base0 = parseFloat(tx.attrs.y || "0");
+  const spans = tx.children.filter((c) => c.tag === "tspan");
+  const lines = spans.length ? spans.map((s) => s.textContent) : [tx.textContent];
+  let curBase = base0;
+  if (spans.length) {
+    for (let i = 0; i < spans.length; i++) {
+      if (i > 0) curBase += parseFloat(spans[i].attrs.dy || "0");
+      else curBase += parseFloat(spans[0].attrs.dy || "0");
+    }
+  }
+  return {
+    fs,
+    lines,
+    top: base0 + (spans.length ? parseFloat(spans[0].attrs.dy || "0") : 0) - fs * 0.78,
+    bottom: curBase + fs * 0.26
+  };
 }
 
 (async () => {
   const svgStub = createStubSvgRoot();
   const { COURSES, COURSE_EN, COURSE_RESOURCES } = await import("./src/content/index.js");
   const { hasScene, listRegisteredScenes, renderScene } = await import("./src/engine/index.js");
+  const { highlightC } = await import("./src/core/formatters.js");
   const { getArchifyDiagram } = await import("./src/ui/stage.js");
   const { createSearchIndex } = await import("./src/core/search-index.js");
+
+  const highlighted = highlightC('#include <stdint.h>\ndouble f(bool ok) { printf("int: %d", ok); switch (ok) { case true: return 0; } }');
+  assert.ok(highlighted.includes('<span class="tok-kw">#include</span>'), "highlightC should style #include");
+  assert.ok(highlighted.includes('<span class="tok-type">double</span>'), "highlightC should style double");
+  assert.ok(highlighted.includes('<span class="tok-kw">switch</span>'), "highlightC should style switch");
+  assert.ok(highlighted.includes('<span class="tok-num">true</span>'), "highlightC should style true");
+  assert.ok(!highlighted.includes('&quot;<span class="tok-kw">int</span>'), "highlightC must not tokenize keywords inside strings");
 
   const { modules } = COURSES.vi;
   const lessons = modules.flatMap((module) => module.lessons);
@@ -169,46 +202,63 @@ function measureVisualUnits(text) {
           vertical: false
         });
         renderedCount++;
+        const [, , vbW = 880, vbH = 430] = (svgStub.getAttribute("viewBox") || "0 0 880 430")
+          .split(/\s+/)
+          .map(Number);
+
+        const collectDirectOrGroupTexts = (node) => {
+          const direct = node.children.filter((c) => c.tag === "text");
+          const groupTexts = node.children
+            .filter((c) => c.tag === "g" && !c.children.some((gChild) => gChild.tag === "rect"))
+            .flatMap((g) => g.children.filter((c) => c.tag === "text"));
+          return [...direct, ...groupTexts];
+        };
+
         const walk = (node, depth = 0) => {
-          if (node.attrs.id === "scene-packets") return;
+          if (node.attrs.id === "scene-packets" || node.tag === "clipPath") return;
           const rects = node.children.filter((c) => c.tag === "rect");
-          const texts = node.children.filter((c) => c.tag === "text");
-          // Check card/pill containers (<g> nodes below root staticLayer/packetLayer)
-          if (depth >= 2 && rects.length >= 1 && texts.length >= 1) {
-            const box = rects.reduce((best, cur) =>
-              parseFloat(cur.attrs.width || "0") > parseFloat(best.attrs.width || "0") ? cur : best
-            );
+          const directTexts = node.children.filter((c) => c.tag === "text");
+          const cardTexts = rects.length >= 1 ? collectDirectOrGroupTexts(node) : [];
+
+          // Check card/pill containers (<g> nodes with a background rect and own/clipped texts)
+          if (depth >= 2 && rects.length >= 1 && cardTexts.length >= 1) {
+            const box = rects.find((r) => r.attrs.stroke) || rects[rects.length - 1];
             const bw = parseFloat(box.attrs.width || "0");
+            const bh = parseFloat(box.attrs.height || "0");
             const bx = parseFloat(box.attrs.x || "0");
-            if (bx < -2 || bx + bw > 882) {
-              geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] box OOB x=${bx}, w=${bw}`);
+            const by = parseFloat(box.attrs.y || "0");
+            if (bx < -2 || bx + bw > vbW + 2 || by < -2 || by + bh > vbH + 2) {
+              geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] box OOB (${bx},${by},${bw},${bh})`);
             }
-            for (const tx of texts) {
-              const fs = parseFloat(tx.attrs["font-size"] || "11");
-              const spans = tx.children.filter((c) => c.tag === "tspan");
-              const lines = spans.length ? spans.map((s) => s.textContent) : [tx.textContent];
-              for (const line of lines) {
-                const est = measureVisualUnits(line) * fs * 0.61;
-                if (bw > 40 && est > bw - 8) {
+            for (const tx of cardTexts) {
+              const spanInfo = measureTextSpan(tx);
+              for (const line of spanInfo.lines) {
+                const est = measureVisualUnits(line) * spanInfo.fs * 0.61;
+                if (bw > 40 && est > bw - 6) {
                   geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text(${Math.round(est)}) > box(${bw}): "${line}"`);
                 }
               }
+              if (bh > 18 && (spanInfo.top < by - 1.5 || spanInfo.bottom > by + bh + 1.5)) {
+                geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text V-OOB [${Math.round(spanInfo.top)}..${Math.round(spanInfo.bottom)}] vs box [${by}..${by + bh}]`);
+              }
             }
           }
-          // Check global horizontal bounds 0..880 for every text element
-          for (const tx of texts) {
-            const fs = parseFloat(tx.attrs["font-size"] || "11");
+
+          // Check global horizontal and vertical bounds for every text element
+          for (const tx of directTexts) {
+            const spanInfo = measureTextSpan(tx);
             const x = parseFloat(tx.attrs.x || "0");
             const anchor = tx.attrs["text-anchor"] || "start";
-            const spans = tx.children.filter((c) => c.tag === "tspan");
-            const lines = spans.length ? spans.map((s) => s.textContent) : [tx.textContent];
-            for (const line of lines) {
-              const w = measureVisualUnits(line) * fs * 0.61;
+            for (const line of spanInfo.lines) {
+              const w = measureVisualUnits(line) * spanInfo.fs * 0.61;
               const left = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
               const right = left + w;
-              if (left < -4 || right > 884) {
+              if (left < -4 || right > vbW + 4) {
                 geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text OOB [${Math.round(left)}..${Math.round(right)}]: "${line}"`);
               }
+            }
+            if (spanInfo.top < -2 || spanInfo.bottom > vbH + 2) {
+              geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text V-OOB [${Math.round(spanInfo.top)}..${Math.round(spanInfo.bottom)}] vs vbH=${vbH}`);
             }
           }
           node.children.forEach((c) => walk(c, depth + 1));

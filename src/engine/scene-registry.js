@@ -60,7 +60,7 @@ export function renderScene(svg, scene, animator, ctx) {
   );
   svg.setAttribute(
     "viewBox",
-    scene.type === "flow" ? (vertical ? "0 0 300 292" : "0 0 880 220") : "0 0 880 430"
+    scene.type === "flow" ? (vertical ? "0 0 300 320" : "0 0 880 300") : "0 0 880 430"
   );
 
   const defs = svgEl("defs");

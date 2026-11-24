@@ -1,22 +1,22 @@
 import { PALETTE, svgEl, drawIsoBlock, drawPillTag, drawFlatCard, addWire } from "../svg-primitives.js";
 
 function sceneMcuOverview(g, _scene, { addPacketTrack, t }) {
-  drawIsoBlock(g, 440, 150, 115, 78, 22, "amber", "AHB / APB Bus", "32-bit Address");
-  drawIsoBlock(g, 440, 22, 110, 74, 24, "sky", "ARM Cortex-M3", "CPU Core (72 MHz)");
-  drawIsoBlock(g, 200, 150, 120, 80, 32, "lavender", "FLASH (64 KB)", "0x0800_0000");
-  drawIsoBlock(g, 680, 150, 120, 80, 28, "sage", "SRAM (20 KB)", "0x2000_0000");
-  drawIsoBlock(g, 440, 296, 125, 74, 24, "paper", "PERIPHERALS", "0x4000_0000 (GPIO)");
+  drawIsoBlock(g, 440, 150, 120, 80, 22, "amber", "AHB / APB Bus", "32-bit Address");
+  drawIsoBlock(g, 440, 16, 128, 82, 24, "sky", "ARM Cortex-M3", "CPU Core (72 MHz)");
+  drawIsoBlock(g, 200, 150, 124, 82, 32, "lavender", "FLASH (64 KB)", "0x0800_0000");
+  drawIsoBlock(g, 680, 150, 124, 82, 28, "sage", "SRAM (20 KB)", "0x2000_0000");
+  drawIsoBlock(g, 440, 294, 144, 86, 24, "paper", "PERIPHERALS", "0x4000_0000 (GPIO)");
 
   const cpuP = [440, 128];
   const busP = [440, 166];
   const flashP = [294, 204];
   const sramP = [612, 204];
-  const periphP = [440, 304];
+  const periphP = [440, 296];
 
   addWire(g, [cpuP, busP]);
   addWire(g, [flashP, [372, 204]]);
   addWire(g, [[538, 204], sramP]);
-  addWire(g, [[440, 266], periphP]);
+  addWire(g, [[440, 256], periphP]);
 
   drawPillTag(g, 195, 116, t("Lưu code & const", "Stores code & constants"));
   drawPillTag(g, 685, 116, t("Lưu biến & Stack", "Stores variables & stack"));
@@ -24,7 +24,7 @@ function sceneMcuOverview(g, _scene, { addPacketTrack, t }) {
 
   addPacketTrack([flashP, [372, 204]], "#c7b8ea", 1, 0.36, "fetch");
   addPacketTrack([[538, 204], sramP], "#84be88", 1, 0.32, "R/W");
-  addPacketTrack([[440, 266], periphP], "#f5d88b", 1, 0.28, "GPIO");
+  addPacketTrack([[440, 256], periphP], "#f5d88b", 1, 0.28, "GPIO");
 }
 
 function sceneIntTrap(g, _scene, { addPacketTrack, t }) {
@@ -127,7 +127,7 @@ function sceneOverflowAlu(g, _scene, { addPacketTrack, t }) {
     660,
     44,
     "var(--bg-elevated)",
-    "uint8_t tick = 255; tick++;  →  0b1111_1111 + 1",
+    "uint8_t tick = 255; tick++;  // 0xFF (1111 1111₂) + 1",
     t("Cộng trong int, rồi lưu vào uint8_t theo modulo 256", "Add as int, then store as uint8_t modulo 256")
   );
 
@@ -151,7 +151,7 @@ function sceneOverflowAlu(g, _scene, { addPacketTrack, t }) {
   addWire(g, [[365, 217], [190, 275]], "#d38383", true);
 
   addPacketTrack([[440, 165], [440, 240], [440, 275]], "#84be88", 1, 0.4);
-  addPacketTrack([[365, 217], [190, 275]], "#e57373", 2, 0.42, t("bit ngoài uint8_t", "bit outside uint8_t"));
+  addPacketTrack([[365, 217], [190, 275]], "#e57373", 2, 0.42, t("tràn b8", "carry b8"));
 }
 
 function sceneTwosComplement(g, _scene, { addPacketTrack, t }) {
@@ -278,14 +278,14 @@ function sceneRecapMap(g, _scene, { addPacketTrack, t }) {
 
   drawFlatCard(g, 675, 164, 165, 92, PALETTE.sage.top, t("Phần cứng thật", "Physical hardware"), "LED, Timer, UART,\nCAN, LoRa SX1278");
 
-  addWire(g, [[272, 204], [384, 88]], "#ad9cd8", false, { markerEnd: true });
-  addWire(g, [[272, 210], [384, 218]], "#84b684", false, { markerEnd: true });
-  addWire(g, [[272, 216], [384, 348]], "#d3b25a", false, { markerEnd: true });
-  addWire(g, [[567, 348], [675, 210]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[272, 204], [384, 70]], "#ad9cd8", false, { markerEnd: true });
+  addWire(g, [[272, 210], [384, 204]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[272, 216], [384, 338]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[567, 358], [675, 210]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[272, 204], [384, 88]], "#d9c8f0", 1, 0.32);
-  addPacketTrack([[272, 210], [384, 218]], "#84be88", 1, 0.35);
-  addPacketTrack([[272, 216], [384, 348], [567, 348], [675, 210]], "#f5d88b", 2, 0.32);
+  addPacketTrack([[272, 204], [384, 70]], "#d9c8f0", 1, 0.32);
+  addPacketTrack([[272, 210], [384, 204]], "#84be88", 1, 0.35);
+  addPacketTrack([[272, 216], [384, 338], [567, 358], [675, 210]], "#f5d88b", 2, 0.32);
 }
 
 export function registerMemoryScenes(registerScene) {

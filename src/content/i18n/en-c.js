@@ -14,6 +14,10 @@ export const EN_C = {
         title: "Learn Embedded C through real problems, not passive reading",
         body: "Reading slides passively gets boring fast. Each 70-minute session follows 3 beats: (1) Study the diagram and predict the outcome for 15 seconds before clicking `Next step →`; (2) In the `LAB` step, deliberately break types to observe bugs and verify fixes with `assert`; (3) Answer the open question in your own words.",
         codeLang: "Study loop · 70 minutes",
+        code: `// 20': Predict output from diagram + press Space/R to inspect each byte
+// 35': Open terminal and compile cleanly with:
+//      gcc -Wall -Wextra -Werror main.c -o app && ./app
+// 15': Answer the Open Question & note 1 bug you just caught`,
         callout: { text: "Memory sticks strongest when you commit to a prediction and get surprised by the diagram or compiler." },
         diff: [
           "Press Space to pause the diagram and inspect each signal packet.",
@@ -30,6 +34,10 @@ export const EN_C = {
         title: "Case #1: EV Battery gauge drops 99% → 0%",
         body: "A Battery Management System (BMS) measures cell voltages `0..4200 mV` and charge/discharge currents `-5000..+5000 mA`. Choosing the wrong integer type (such as summing into a `uint8_t`) wraps past 255 back to 0 — reporting a false empty battery mid-ride.",
         codeLang: "C · range overflow trap",
+        code: `uint8_t total = 200;
+total += 80;       // 280 % 256 = 24 -> sudden gauge drop!
+// When summing 4 12-bit ADC samples (max 4095 * 4 = 16380):
+// Pick a type wide enough for the sum before dividing.`,
         callout: { text: "Always size intermediate accumulators (sums and products) for their worst-case maximum, not just the final output." },
         diff: [
           "uint8_t total = 200 + 80 wraps modulo 256 to 24.",
@@ -54,6 +62,11 @@ export const EN_C = {
         title: "Case #2: One button press triggers 3 times",
         body: "Mechanical switch contacts bounce electrically for 5–20 ms. Adding `delay_ms(50)` freezes the entire CPU for 50 ms — dropping UART bytes, starving motor control loops, and making the system feel sluggish.",
         codeLang: "C · blocking delay trap",
+        code: `// BAD PATTERN: Freezes the entire MCU for 50 ms
+if (read_button() == 0) {
+    delay_ms(50);          // CPU stalls, missing every other sensor!
+    if (read_button() == 0) toggle_led();
+}`,
         callout: { text: "In real firmware (super-loop or RTOS), busy-wait delays break real-time responsiveness." },
         diff: [
           "delay_ms(50) blocks all other sensors in the main loop.",
@@ -77,6 +90,10 @@ export const EN_C = {
         title: "Case #3: 10.00 °C sensor reads 59,395 °C over UART",
         body: "STM32 stores `uint16_t temp_x100 = 1000` (`0x03E8`) in RAM in **little-endian** order (`0xE8` then `0x03`). Casting a struct pointer directly to `uint8_t*` and sending it to a **big-endian** receiver turns `0x03E8` into `0xE803 = 59,395`!",
         codeLang: "C · raw RAM transmit trap",
+        code: `struct Telemetry { uint8_t id; uint16_t temp_x100; };
+// BUG 1: Compiler may insert 1 padding byte between id and temp_x100!
+// BUG 2: Raw byte order depends on CPU endianness.
+// FIX: Pack every wire byte explicitly with shifts (>> 8) & 0xFF.`,
         callout: { text: "In-memory struct layout belongs to the compiler and CPU; wire framing must be explicitly encoded byte by byte." },
         diff: [
           "Sending raw &struct leaks padding bytes and reverses byte order.",
@@ -101,15 +118,19 @@ export const EN_C = {
         title: "4-stage roadmap & your personal project goal",
         body: "Instead of isolated syntax drills, you progress through 4 connected stages: (1) Core Embedded C + PC CSV testing; (2) Electronics (Ohm's law, Pull-up, ADC, PWM); (3) STM32 Cortex-M registers & buses; (4) FreeRTOS, Makefiles & LoRa.",
         codeLang: "Practice path · PC → STM32",
+        code: `// Stage 1 (L00–11): Embedded C17 + bitwise + Makefile + FSM
+// Stage 2 (L12–19): Basic Electronics (Ohm, MOSFET, Op-Amp, Serial)
+// Stage 3 (L20–26): STM32 registers, NVIC Interrupts, Timers, CAN
+// Stage 4 (L27–30): FreeRTOS, Bare-metal Linker, Bootloader, LoRa`,
         callout: { text: "Great firmware is verified on a PC against boundary CSV datasets before flashing real hardware." },
         diff: [
           "Direct bridge between PC C labs and STM32 peripheral registers.",
           "Every CSV dataset models realistic noise and edge cases."
         ],
         kpis: [
-          { label: "Ready lessons", value: "12 lessons", sub: "Stages 1 & 2 complete" },
+          { label: "Ready lessons", value: "20 lessons", sub: "12 C + 8 Electronics" },
           { label: "Test datasets", value: "4 CSVs", sub: "fsm, debounce, adc, pwm" },
-          { label: "Full roadmap", value: "23 lessons", sub: "Expanding step by step" }
+          { label: "Full roadmap", value: "31 lessons", sub: "Expanding step by step" }
         ],
         legend: ["Continuous progression"],
         openQuestions: [
@@ -124,16 +145,22 @@ export const EN_C = {
         title: "Lab · Kick off your Week 1 study rhythm",
         body: "Before jumping into Lesson 01, lock in your daily schedule in the open question below, click `Copy (.md)` to save your answers into `week01/notes.md` inside `embedded-journey`, and complete the quick check.",
         codeLang: "Terminal · Initialize week01 notes",
+        code: `mkdir -p embedded-journey/week01 && cd embedded-journey
+# Create your markdown notes file for these open questions:
+cat > week01/notes.md << 'EOF'
+# Lesson 00 Notes — Learning Method & Open Questions
+EOF`,
         callout: { text: "Three honest lines written in your own words beat ten pages of copied slides." },
         diff: [
           "Fill in your answers to the open questions in Steps 2–6.",
           "Click Copy (.md) to export your notes to Markdown."
         ],
-        nodes: [
-          ["Read & Predict", "Step diagrams"],
-          ["Answer Open Qs", "Real firmware cases"],
-          ["Export .md + Code", "embedded-journey/week01"]
+        kpis: [
+          { label: "Step 1", value: "Predict 15s", sub: "Before revealing solution" },
+          { label: "Step 2", value: "notes.md", sub: "Export Open Qs (.md)" },
+          { label: "Step 3", value: "gcc -Werror", sub: "Clean C17 builds" }
         ],
+        legend: ["Active prediction", "Markdown notes", "C17 verification"],
         openQuestions: [
           {
             scenario: "WEEK 1 COMMITMENT",
@@ -163,7 +190,12 @@ export const EN_C = {
         title: "Choose a type by its range",
         body: "A variable has a type and a value. Its type determines the range of values it can hold and how C handles those values. A 12-bit ADC has 4096 codes from 0 to 4095, so uint16_t can hold one sample. Predict each type's size before running the program.",
         codeLang: "C · measure type sizes",
-        nodes: [["12-bit ADC", "0…4095"], ["Storage type", "uint16_t"], ["Size", "sizeof raw"]],
+        kpis: [
+          { label: "12-bit ADC", value: "0…4095", sub: "Needs ≥ 12 bits" },
+          { label: "uint8_t", value: "Wraps 255 ❌", sub: "Too narrow (1 byte)" },
+          { label: "uint16_t", value: "2 bytes ✓", sub: "0…65,535 safe fit" }
+        ],
+        legend: ["8-bit overflow", "Exact <stdint.h> fit", "Measure with sizeof"],
         callout: { text: "The sizeof operator returns a size in C bytes as a size_t value. printf and scanf are standard library functions declared in <stdio.h>." },
         diff: ["Add measurements for uint8_t, uint16_t, and uint32_t.", "Compare the uint8_t limit with the largest ADC code. The value of sizeof(int) depends on the compilation target."]
       },
@@ -171,7 +203,12 @@ export const EN_C = {
         title: "Read and check before calculating",
         body: "On a PC, scanf reads from standard input. The %lf conversion requires the address of a double variable so it can store the result there. Use the variable only after scanf returns 1, indicating one successful assignment. printf uses %.2f to display a real number with two decimal places.",
         codeLang: "C · read, check, and print",
-        nodes: [["Input", "25.5 or abc"], ["scanf", "1 or 0"], ["Output", "25.50 C or an error"]],
+        kpis: [
+          { label: "Input", value: "25.5 / abc", sub: "stdin stream" },
+          { label: "scanf check", value: "== 1", sub: "1 field assigned" },
+          { label: "Output", value: "25.50 C / Err", sub: "Guarded branch" }
+        ],
+        legend: ["Valid read (1)", "Format error (0)"],
         callout: { text: "&celsius gives scanf the address to write to. In firmware, the data can come from a sensor reader. The calculation function takes that value as an argument." },
         diff: ["Enter 25.5 and then abc. Predict which branch runs in each case.", "End the input before entering a number. The program should take the error branch."]
       },
@@ -179,7 +216,12 @@ export const EN_C = {
         title: "Turn a requirement into a function",
         body: "The requirement is to accept °C and return °F. Write down the input, return type, and equation F = C × 9/5 + 32 before coding the function body. Trace 100 °C by hand. With (9 / 5), integer division gives 1 before multiplication, producing the incorrect result 132 °F.",
         codeLang: "C · convert temperatures",
-        nodes: [["Input", "100 °C"], ["Calculate", "100 × 1.8 + 32"], ["Return value", "212 °F"]],
+        kpis: [
+          { label: "Input", value: "100.0 °C", sub: "double parameter" },
+          { label: "9 / 5 trap", value: "132.0 °F ❌", sub: "Integer quotient 1" },
+          { label: "9.0 / 5.0", value: "212.0 °F ✓", sub: "Floating-point divide" }
+        ],
+        legend: ["Integer division trap", "Floating-point division"],
         callout: { text: "Keep scanf and printf in main. Call the same calculation function from a test or when you receive a sensor reading." },
         diff: ["0 °C → 32 °F, 100 °C → 212 °F, −40 °C → −40 °F.", "In main, print the result of celsius_to_fahrenheit(celsius)."]
       },
@@ -187,7 +229,12 @@ export const EN_C = {
         title: "Check the range of the sum",
         body: "Before writing the averaging function, list the inputs, output, and intermediate operations. Three uint16_t samples can add up to 196605, so the sum needs a wider type. Convert the first operand before addition so the expression has enough range even on a target with a 16-bit int.",
         codeLang: "C · sum using a wider type",
-        nodes: [["Three samples", "1, 2, 2"], ["Sum", "5"], ["Floating-point division", "1.666…"]],
+        kpis: [
+          { label: "3 × 65535", value: "196,605", sub: "Exceeds uint16_t" },
+          { label: "Early cast", value: "(uint32_t)a", sub: "Widen before add" },
+          { label: "Real divide", value: "sum / 3.0", sub: "5/3.0 = 1.666…" }
+        ],
+        legend: ["Overflow / lost fraction", "Wider safe accumulator"],
         callout: { text: "Assigning to double after integer division converts a result that has already lost its fraction. Divide by 3.0 to keep the fraction." },
         diff: ["For three samples of 65535, the sum is 196605 and the average is 65535.", "Apply the same calculation to three 12-bit ADC samples such as 0, 2048, and 4095."]
       },
@@ -195,7 +242,12 @@ export const EN_C = {
         title: "Lab · write and check three programs",
         body: "Write types.c to print type sizes, temperature.c to read and convert a temperature, and average.c to read three numbers and print their average. For each file, write down a typical case, a boundary case, and the expected output before running it. In average.c, write average3 for three real numbers, then try the average_adc3 variant with simulated readings.",
         codeLang: "C · exercise signatures",
-        nodes: [["Predict", "type, range, and output"], ["Write", "read → calculate → print"], ["Check", "compare and commit"]],
+        kpis: [
+          { label: "Step 1", value: "Predict", sub: "Range & expected out" },
+          { label: "Step 2", value: "3 C17 files", sub: "types / temp / avg" },
+          { label: "Step 3", value: "0 warnings", sub: "-Wall -Wextra" }
+        ],
+        legend: ["Measure sizes", "Guard scanf", "Edge verification"],
         callout: { text: "Compile each file with -std=c17 -Wall -Wextra -Wpedantic. Commit once all three files pass their test cases and compile without warnings." },
         diff: ["types.c: print sizeof for int, uint8_t, uint16_t, and uint32_t. Explain which type can hold a 12-bit ADC sample.",
           "temperature.c: try 0, 100, −40, and abc. Each valid input prints the expected °F value, and abc reports an error.",
@@ -217,7 +269,12 @@ export const EN_C = {
         title: "Read conditions in evaluation order",
         body: "In C, zero is false and a nonzero value is true. With &&, C evaluates the right operand only when the left operand is true. Use this rule to check that the denominator is valid before calculating a percentage.",
         codeLang: "C · classify a sample",
-        nodes: [["Sample", "740 / 1000"], ["Check", "limit ≠ 0"], ["Alert", "74% ≥ 70%"]],
+        kpis: [
+          { label: "Sample", value: "740 / 1000", sub: "Ratio 74%" },
+          { label: "&& guard", value: "limit != 0", sub: "Blocks / 0" },
+          { label: "Alert", value: "high = true", sub: "74% ≥ 70%" }
+        ],
+        legend: ["Skip divide by zero", "Evaluate percentage"],
         callout: { text: "When limit is zero, C skips the entire right operand. Cast before multiplying so the calculation uses a wide enough type." },
         diff: ["Set limit to 0 and predict high.", "Use <stdbool.h> and <stdint.h> for the types in this example."]
       },
@@ -225,7 +282,12 @@ export const EN_C = {
         title: "Process an array one sample at a time",
         body: "A for loop checks its condition before each iteration. With three elements, i < n allows indexes 0, 1, and 2. Each iteration can process one sample and then advance to the next.",
         codeLang: "C · count samples at or above a threshold",
-        nodes: [["Index 0", "690 → skip"], ["Index 1", "700 → count"], ["Index 2", "740 → count"]],
+        kpis: [
+          { label: "Indexes 0..2", value: "690, 700, 740", sub: "n = 3 elements" },
+          { label: "Loop bound", value: "i < n", sub: "Blocks OOB [3]" },
+          { label: "high_count", value: "2 samples", sub: "700 & 740 ≥ 700" }
+        ],
+        legend: ["Count ≥ 700", "Out-of-bounds barrier"],
         callout: { text: "Use sizeof to count elements wherever the array object itself is visible. Use size_t from <stddef.h>." },
         diff: ["The result is high_count = 2.", "With n = 0, the loop body runs zero times."]
       },
@@ -234,7 +296,12 @@ export const EN_C = {
         body: "A while loop checks its condition before each iteration, so it can run zero times. A do while loop checks at the end, so it runs at least once. This example reads a flag and retries up to a total of four reads.",
         codeLang: "C · read a flag with a retry limit",
         code: "unsigned tries = 0;\nbool ready;\ndo {\n    ready = read_ready();\n    ++tries;\n} while (!ready && tries < 4);\n// If ready is false after the loop, the retry limit was reached.",
-        nodes: [["First read", "tries = 1"], ["Check", "!ready && tries < 4"], ["Exit", "ready or out of tries"]],
+        kpis: [
+          { label: "do-while", value: "≥ 1 read", sub: "Post-condition check" },
+          { label: "Retry guard", value: "!ready && < 4", sub: "Max 4 attempts" },
+          { label: "Safe exit", value: "ready / Timeout", sub: "Never hangs CPU" }
+        ],
+        legend: ["Bounded retry", "Ready early", "Retry cap reached"],
         callout: { text: "A read limit lets the loop exit when hardware does not respond. In a superloop, read once per iteration and track elapsed time so other tasks can keep running." },
         diff: ["Simulate read_ready() returning true immediately → 1 read.", "Simulate read_ready() always returning false → exactly 4 reads."]
       },
@@ -242,7 +309,12 @@ export const EN_C = {
         title: "Use switch to choose behavior by state",
         body: "One call processes one event and returns the next state. The firmware loop can call the function for each sample. A return statement exits the function as soon as its branch is selected.",
         codeLang: "C · state transition",
-        nodes: [["WAIT", "sample = 700"], ["Condition", "sample ≥ 700"], ["ALERT", "hold until sample < 650"]],
+        kpis: [
+          { label: "Trip high", value: "≥ 700", sub: "WAIT → ALERT" },
+          { label: "Hysteresis", value: "650…699", sub: "Holds state" },
+          { label: "Clear low", value: "< 650", sub: "ALERT → WAIT" }
+        ],
+        legend: ["Trigger ALERT", "Return to WAIT"],
         callout: { text: "Thresholds of 700 and 650 create hysteresis, which keeps the state stable when samples fluctuate around 700." },
         diff: ["WAIT, 699 → WAIT", "WAIT, 700 → ALERT", "ALERT, 650 → ALERT", "ALERT, 649 → WAIT"]
       },
@@ -251,7 +323,12 @@ export const EN_C = {
         body: "Rerun FizzBuzz, the prime check, the multiplication table, and the switch calculator in c-nhung/day-05-if-switch-loop. Then write next_state, use a for loop to pass each sample to it, and print the resulting state.",
         codeLang: "C · test data",
         code: "unsigned samples[] = {699, 700, 680, 650, 649};\n// Start in WAIT. Call next_state for each sample.",
-        nodes: [["Sample sequence", "699, 700, 680…"], ["next_state", "one call per sample"], ["Result", "compare with expected states"]],
+        kpis: [
+          { label: "Sample feed", value: "699…649", sub: "5 CSV edge cases" },
+          { label: "Hysteresis", value: "680, 650", sub: "Keeps ALERT active" },
+          { label: "Verification", value: "assert()", sub: "4 C tasks + FSM" }
+        ],
+        legend: ["State trace flow"],
         callout: { text: "Run on a PC with GCC using -std=c17 -Wall -Wextra -Wpedantic. Use assert or compare the printed results." },
         diff: [
           "Expected sequence: WAIT, ALERT, ALERT, ALERT, WAIT.",
