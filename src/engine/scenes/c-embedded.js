@@ -49,39 +49,43 @@ function sceneConvPromotionTrap(g, _scene, { addPacketTrack, t }) {
   );
 
   // Top track: -1 < 1U trap
-  drawFlatCard(g, 40, 80, 175, 92, PALETTE.sky.top, "int a = -1;", "0xFFFFFFFF (signed)");
-  drawLabel(g, 127, 156, "uint32_t b = 1U;", { fill: "#1c1b18", weight: 600 });
+  drawFlatCard(
+    g,
+    40,
+    80,
+    190,
+    92,
+    PALETTE.sky.top,
+    "int a = -1;",
+    "0xFFFFFFFF (signed)\nuint32_t b = 1U;"
+  );
 
   drawFlatCard(
     g,
-    290,
+    295,
     80,
-    280,
+    265,
     92,
     PALETTE.amber.top,
     t("Nâng hạng: int → unsigned int", "Usual Conversion: int → unsigned"),
-    "-1  →  0xFFFFFFFFU"
+    "-1  →  0xFFFFFFFFU\n4,294,967,295U < 1U ?"
   );
-  drawLabel(g, 430, 156, "4,294,967,295U < 1U ?", { fill: "#1c1b18", weight: 700 });
 
   drawFlatCard(
     g,
-    645,
+    625,
     80,
-    195,
+    215,
     92,
     PALETTE.rose.top,
     t("KẾT QUẢ: 0 (FALSE) !", "RESULT: 0 (FALSE) !"),
-    t("4.29B < 1 là SAI ngầm!", "4.29B < 1 is FALSE!")
+    t("4.29B < 1 là SAI ngầm!\nSửa: khớp kiểu signed", "4.29B < 1 is FALSE!\nFix: match signedness")
   );
-  drawLabel(g, 742, 156, t("Sửa: khớp kiểu signed", "Fix: match signedness"), {
-    fill: "#3f3c33"
-  });
 
-  addWire(g, [[215, 126], [290, 126]], "#d38383");
-  addWire(g, [[570, 126], [645, 126]], "#d38383");
-  addPacketTrack([[215, 126], [290, 126]], "#e57373", 1, 0.36, "int→uint");
-  addPacketTrack([[570, 126], [645, 126]], "#e57373", 1, 0.36, "0 (false)");
+  addWire(g, [[230, 126], [295, 126]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[560, 126], [625, 126]], "#d38383", false, { markerEnd: true });
+  addPacketTrack([[230, 126], [295, 126]], "#e57373", 1, 0.36, "int→uint");
+  addPacketTrack([[560, 126], [625, 126]], "#e57373", 1, 0.36, "0 (false)");
 
   drawPillTag(
     g,
@@ -100,47 +104,39 @@ function sceneConvPromotionTrap(g, _scene, { addPacketTrack, t }) {
     g,
     40,
     232,
-    175,
+    190,
     100,
     PALETTE.paper.top,
     "uint8_t x = 250, y = 10;",
-    t("Hẹp hơn int (32-bit)", "Narrower than int")
+    t("Hẹp hơn int (32-bit)\nuint8_t sum = x + y;", "Narrower than int\nuint8_t sum = x + y;")
   );
-  drawLabel(g, 127, 312, "uint8_t sum = x + y;", { fill: "#1c1b18", weight: 600 });
 
   drawFlatCard(
     g,
-    290,
+    295,
     232,
-    280,
+    265,
     100,
     PALETTE.amber.top,
     t("Integer Promotion → int", "Integer Promotion → int"),
-    "(int)250 + (int)10 = 260"
+    t("(int)250 + (int)10 = 260\n0x0104 (chưa tràn ở int)", "(int)250 + (int)10 = 260\n0x0104 (no overflow in int)")
   );
-  drawLabel(g, 430, 312, t("0x0104 (chưa tràn ở int)", "0x0104 (no overflow in int)"), {
-    fill: "#3f3c33",
-    weight: 600
-  });
 
   drawFlatCard(
     g,
-    645,
+    625,
     232,
-    195,
+    215,
     100,
     PALETTE.sage.top,
     t("Gán uint8_t (mod 256)", "Narrow uint8_t (mod 256)"),
-    "0x0104 & 0xFF = 4"
+    t("0x0104 & 0xFF = 4\nMất bit 8! Cần u16", "0x0104 & 0xFF = 4\nBit 8 dropped! Use u16")
   );
-  drawLabel(g, 742, 312, t("Mất bit 8! Cần u16", "Bit 8 dropped! Use u16"), {
-    fill: "#3f3c33"
-  });
 
-  addWire(g, [[215, 282], [290, 282]], "#d3b25a");
-  addWire(g, [[570, 282], [645, 282]], "#84b684");
-  addPacketTrack([[215, 282], [290, 282]], "#f5d88b", 1, 0.36, "int 260");
-  addPacketTrack([[570, 282], [645, 282]], "#84be88", 1, 0.36, "u8 = 4");
+  addWire(g, [[230, 282], [295, 282]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[560, 282], [625, 282]], "#84b684", false, { markerEnd: true });
+  addPacketTrack([[230, 282], [295, 282]], "#f5d88b", 1, 0.36, "int 260");
+  addPacketTrack([[560, 282], [625, 282]], "#84be88", 1, 0.36, "u8 = 4");
 
   drawPillTag(
     g,
@@ -268,50 +264,32 @@ function sceneConvTimerWrap(g, _scene, { addPacketTrack, t }) {
     94,
     PALETTE.sky.top,
     t("1. Phép trừ Unsigned 16-bit (mod 2¹⁶)", "1. 16-bit Unsigned Subtraction (mod 2¹⁶)"),
-    "(uint16_t)(0x0005U - 0xFFF0U)  =  0x0015  =  21"
+    "(uint16_t)(0x0005U - 0xFFF0U) = 0x0015 = 21\n0xFFF0→0xFFFF (16) + 0x0005 (5) = 21 ticks ✓"
   );
-  drawLabel(g, 632, 162, "0xFFF0→0xFFFF (16) + 0x0005 (5) = 21 ticks ✓", {
-    fill: "#1c1b18",
-    weight: 600
-  });
 
   drawFlatCard(
     g,
     425,
-    206,
+    202,
     415,
-    86,
+    90,
     PALETTE.sage.top,
     t("2. Bộ so sánh Timeout (elapsed >= 20)", "2. Timeout Comparator (elapsed >= 20)"),
-    "(uint16_t)(now - start) >= 20U  →  21 >= 20  →  TRUE ✓"
-  );
-  drawLabel(
-    g,
-    632,
-    274,
-    t("Chuẩn 100% khi tràn qua 0xFFFF → 0x0000", "Zero glitch across 0xFFFF → 0x0000"),
-    { fill: "#3f3c33" }
+    t("(uint16_t)(now - start) >= 20U → 21 >= 20 → TRUE ✓\nChuẩn 100% khi tràn qua 0xFFFF → 0x0000", "(uint16_t)(now - start) >= 20U → 21 >= 20 → TRUE ✓\nZero glitch across 0xFFFF → 0x0000")
   );
 
   drawFlatCard(
     g,
     425,
-    316,
+    312,
     415,
-    86,
+    92,
     PALETTE.rose.top,
     t("BẪY CỔ ĐIỂN: if (now >= deadline) ← SAI!", "CLASSIC BUG: if (now >= deadline) ← FAILS!"),
-    "deadline = (uint16_t)(0xFFF0 + 20) = 0x0004"
-  );
-  drawLabel(
-    g,
-    632,
-    384,
-    t("Tại 0xFFF1 > 0x0004 → kích timeout SỚM!", "At 0xFFF1 > 0x0004 → fires PREMATURELY!"),
-    { fill: "#1c1b18", weight: 600 }
+    t("deadline = (uint16_t)(0xFFF0 + 20) = 0x0004\nTại 0xFFF1 > 0x0004 → kích timeout SỚM!", "deadline = (uint16_t)(0xFFF0 + 20) = 0x0004\nAt 0xFFF1 > 0x0004 → fires PREMATURELY!")
   );
 
-  addWire(g, [[324, 235], [425, 235]], "#84b684");
+  addWire(g, [[324, 235], [425, 235]], "#84b684", false, { markerEnd: true });
   addPacketTrack([[324, 235], [425, 235]], "#84be88", 1, 0.36, "21 ticks");
 }
 
@@ -334,56 +312,105 @@ function sceneModularBuildDag(g, _scene, { addPacketTrack, t }) {
   );
 
   // Col 1: .h and .c units
-  drawFlatCard(g, 32, 86, 168, 96, PALETTE.lavender.top, "sensor.h", "#ifndef SENSOR_H");
-  drawLabel(g, 116, 144, "#define SENSOR_H", { fill: "#3f3c33" });
-  drawLabel(g, 116, 162, t("Khai báo API & type", "Public API & types"), { fill: "#1c1b18" });
+  drawFlatCard(
+    g,
+    32,
+    86,
+    168,
+    96,
+    PALETTE.lavender.top,
+    "sensor.h",
+    t("#ifndef SENSOR_H\n#define SENSOR_H\nKhai báo API & type", "#ifndef SENSOR_H\n#define SENSOR_H\nPublic API & types")
+  );
 
-  drawFlatCard(g, 32, 206, 168, 82, PALETTE.sky.top, "sensor.c", '#include "sensor.h"');
-  drawLabel(g, 116, 268, t("Hàm + biến static", "Impl + static state"), { fill: "#3f3c33" });
+  drawFlatCard(
+    g,
+    32,
+    206,
+    168,
+    82,
+    PALETTE.sky.top,
+    "sensor.c",
+    t('#include "sensor.h"\nHàm + biến static', '#include "sensor.h"\nImpl + static state')
+  );
 
-  drawFlatCard(g, 32, 308, 168, 78, PALETTE.sky.top, "main.c", '#include "sensor.h"');
-  drawLabel(g, 116, 368, t("main() gọi sensor", "main() calls API"), { fill: "#3f3c33" });
+  drawFlatCard(
+    g,
+    32,
+    308,
+    168,
+    78,
+    PALETTE.sky.top,
+    "main.c",
+    t('#include "sensor.h"\nmain() gọi sensor', '#include "sensor.h"\nmain() calls API')
+  );
 
   // Col 2: gcc -c -MMD -MP -> .o + .d
   drawPillTag(g, 360, 86, "gcc -std=c17 -c -MMD -MP", PALETTE.amber.top, "#1c1b18");
 
-  drawFlatCard(g, 265, 118, 190, 110, PALETTE.paper.top, "sensor.o  +  sensor.d", t("Mã máy + đồ thị .h", "Object + header deps"));
-  drawLabel(g, 360, 178, ".text  .data  .bss", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 360, 198, "sensor.o: sensor.c .h", { fill: "#3f3c33" });
+  drawFlatCard(
+    g,
+    265,
+    118,
+    190,
+    110,
+    PALETTE.paper.top,
+    "sensor.o + sensor.d",
+    t("Mã máy + đồ thị .h\n.text  .data  .bss\nsensor.o: sensor.c .h", "Object + header deps\n.text  .data  .bss\nsensor.o: sensor.c .h")
+  );
 
-  drawFlatCard(g, 265, 266, 190, 110, PALETTE.paper.top, "main.o  +  main.d", t("Chờ giải quyết symbol", "Unresolved externals"));
-  drawLabel(g, 360, 326, "main.o: main.c sensor.h", { fill: "#3f3c33" });
-  drawLabel(g, 360, 346, "U sensor_read", { fill: "#1c1b18", weight: 600 });
+  drawFlatCard(
+    g,
+    265,
+    266,
+    190,
+    110,
+    PALETTE.paper.top,
+    "main.o + main.d",
+    t("Chờ giải quyết symbol\nmain.o: main.c sensor.h\nU sensor_read", "Unresolved externals\nmain.o: main.c sensor.h\nU sensor_read")
+  );
 
   // Col 3: Linker
-  drawIsoBlock(g, 578, 188, 78, 56, 24, "amber", "Linker (ld)", "firmware.elf");
+  drawIsoBlock(g, 568, 180, 108, 76, 24, "amber", "Linker (ld)", "firmware.elf");
 
   // Col 4: Flash & SRAM
-  drawFlatCard(g, 710, 96, 144, 128, PALETTE.lavender.top, "FLASH (ROM)", "0x0800_0000");
-  drawLabel(g, 782, 156, ".text (code)", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 782, 176, ".rodata (const)", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 782, 198, "+ .data init", { fill: "#3f3c33" });
+  drawFlatCard(
+    g,
+    710,
+    96,
+    144,
+    128,
+    PALETTE.lavender.top,
+    "FLASH (ROM)",
+    "0x0800_0000\n.text (code)\n.rodata (const)\n+ .data init"
+  );
 
-  drawFlatCard(g, 710, 256, 144, 124, PALETTE.sage.top, "SRAM (RAM)", "0x2000_0000");
-  drawLabel(g, 782, 314, ".data (init != 0)", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 782, 334, ".bss  (zeroed)", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 782, 356, "stack / static", { fill: "#3f3c33" });
+  drawFlatCard(
+    g,
+    710,
+    256,
+    144,
+    124,
+    PALETTE.sage.top,
+    "SRAM (RAM)",
+    "0x2000_0000\n.data (init != 0)\n.bss  (zeroed)\nstack / static"
+  );
 
   // Wires
-  addWire(g, [[200, 134], [265, 164]], "#ad9cd8", true);
-  addWire(g, [[200, 134], [265, 310]], "#ad9cd8", true);
-  addWire(g, [[200, 247], [232, 247], [232, 182], [265, 182]], "#84b4df");
-  addWire(g, [[200, 347], [232, 347], [232, 322], [265, 322]], "#84b4df");
+  addWire(g, [[200, 134], [265, 164]], "#ad9cd8", true, { markerEnd: true });
+  addWire(g, [[200, 134], [265, 310]], "#ad9cd8", true, { markerEnd: true });
+  addWire(g, [[200, 247], [232, 247], [232, 182], [265, 182]], "#84b4df", false, { markerEnd: true });
+  addWire(g, [[200, 347], [232, 347], [232, 322], [265, 322]], "#84b4df", false, { markerEnd: true });
 
-  addWire(g, [[455, 173], [530, 218]], "#d3b25a");
-  addWire(g, [[455, 321], [530, 236]], "#d3b25a");
-  addWire(g, [[645, 218], [710, 160]], "#ad9cd8");
-  addWire(g, [[645, 236], [710, 318]], "#84b684");
+  addWire(g, [[455, 173], [504, 218]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[455, 321], [504, 244]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[660, 218], [710, 160]], "#ad9cd8", false, { markerEnd: true });
+  addWire(g, [[660, 244], [710, 318]], "#84b684", false, { markerEnd: true });
 
   addPacketTrack([[200, 247], [232, 247], [232, 182], [265, 182]], "#84b4df", 1, 0.34, ".o/.d");
-  addPacketTrack([[455, 173], [530, 218]], "#f5d88b", 1, 0.38, "link");
-  addPacketTrack([[645, 218], [710, 160]], "#c7b8ea", 1, 0.36, ".text");
-  addPacketTrack([[645, 236], [710, 318]], "#84be88", 1, 0.36, ".bss");
+  addPacketTrack([[455, 173], [504, 218]], "#f5d88b", 1, 0.38, "link");
+  addPacketTrack([[660, 218], [710, 160]], "#c7b8ea", 1, 0.36, ".text");
+  addPacketTrack([[660, 244], [710, 318]], "#84be88", 1, 0.36, ".bss");
 
   drawPillTag(
     g,
@@ -420,43 +447,40 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
   drawFlatCard(
     g,
     40,
-    78,
+    74,
     210,
-    88,
+    92,
     PALETTE.sky.top,
     t("1. Ngắt / Sự kiện (IRQ)", "1. Peripheral IRQ / Event"),
-    "EXTI / Keypad / Timer"
+    "EXTI / Keypad / Timer\nevt = KEY_DIGIT / PIN_OK"
   );
-  drawLabel(g, 145, 144, "evt = KEY_DIGIT / PIN_OK", { fill: "#1c1b18", weight: 600 });
 
   drawFlatCard(
     g,
     315,
-    78,
+    74,
     250,
-    88,
+    92,
     PALETTE.amber.top,
     "2. Callback Dispatch",
-    "typedef void (*cb_t)(evt, void *ctx);"
+    "typedef void (*cb_t)(evt, void *ctx);\nif (cb) cb(evt, ctx);"
   );
-  drawLabel(g, 440, 144, "if (cb) cb(evt, ctx);", { fill: "#1c1b18", weight: 700 });
 
   drawFlatCard(
     g,
     630,
-    78,
+    74,
     210,
-    88,
+    92,
     PALETTE.lavender.top,
     t("3. Tra bảng O(1)", "3. O(1) Table Lookup"),
-    "next = table[state][evt];"
+    "next = table[state][evt];\nstate = next; action(ctx);"
   );
-  drawLabel(g, 735, 144, "state = next; action(ctx);", { fill: "#1c1b18", weight: 600 });
 
-  addWire(g, [[250, 122], [315, 122]], "#84b4df");
-  addWire(g, [[565, 122], [630, 122]], "#d3b25a");
-  addPacketTrack([[250, 122], [315, 122]], "#84b4df", 1, 0.38, "IRQ");
-  addPacketTrack([[565, 122], [630, 122]], "#f5d88b", 1, 0.38, "cb(evt)");
+  addWire(g, [[250, 120], [315, 120]], "#84b4df", false, { markerEnd: true });
+  addWire(g, [[565, 120], [630, 120]], "#d3b25a", false, { markerEnd: true });
+  addPacketTrack([[250, 120], [315, 120]], "#84b4df", 1, 0.38, "IRQ");
+  addPacketTrack([[565, 120], [630, 120]], "#f5d88b", 1, 0.38, "cb(evt)");
 
   // Bottom-Left: 2D State Transition Table
   drawFlatCard(
@@ -466,8 +490,9 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
     412,
     216,
     "var(--bg-elevated)",
-    t("Bảng chuyển trạng thái  table[STATE][EVT]", "2D State Transition Table  table[STATE][EVT]"),
-    ""
+    t("Bảng chuyển trạng thái table[STATE][EVT]", "2D State Table table[STATE][EVT]"),
+    "",
+    { valign: "top" }
   );
 
   const cols = ["STATE \\ EVT", "KEY_DIGIT", "PIN_OK", "3×_FAIL"];
@@ -540,21 +565,22 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
     216,
     "var(--bg-elevated)",
     t("Luồng chuyển trạng thái thực thi", "Runtime State Transitions"),
-    ""
+    "",
+    { valign: "top" }
   );
 
-  drawFlatCard(g, 490, 228, 128, 44, PALETTE.paper.top, "LOCKED", "idle / lock=1");
-  drawFlatCard(g, 684, 228, 140, 44, PALETTE.amber.top, "ENTERING", "tries < 3");
-  drawFlatCard(g, 490, 344, 128, 44, PALETTE.sage.top, "UNLOCKED", "relay ON ✓");
-  drawFlatCard(g, 684, 344, 140, 44, PALETTE.rose.top, "LOCKOUT", "5s cooldown");
+  drawFlatCard(g, 490, 232, 128, 46, PALETTE.paper.top, "LOCKED", "idle / lock=1");
+  drawFlatCard(g, 684, 232, 140, 46, PALETTE.amber.top, "ENTERING", "tries < 3");
+  drawFlatCard(g, 490, 344, 128, 46, PALETTE.sage.top, "UNLOCKED", "relay ON ✓");
+  drawFlatCard(g, 684, 344, 140, 46, PALETTE.rose.top, "LOCKOUT", "5s cooldown");
 
-  addWire(g, [[618, 250], [684, 250]], "#d3b25a");
-  addWire(g, [[684, 264], [618, 354]], "#84b684");
-  addWire(g, [[754, 272], [754, 344]], "#d38383");
+  addWire(g, [[618, 255], [684, 255]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[684, 268], [618, 354]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[754, 278], [754, 344]], "#d38383", false, { markerEnd: true });
 
-  addPacketTrack([[618, 250], [684, 250]], "#f5d88b", 1, 0.36, "digit");
-  addPacketTrack([[684, 264], [618, 354]], "#84be88", 1, 0.36, "OK");
-  addPacketTrack([[754, 272], [754, 344]], "#e57373", 1, 0.34, "fail");
+  addPacketTrack([[618, 255], [684, 255]], "#f5d88b", 1, 0.36, "digit");
+  addPacketTrack([[684, 268], [618, 354]], "#84be88", 1, 0.36, "OK");
+  addPacketTrack([[754, 278], [754, 344]], "#e57373", 1, 0.34, "fail");
 }
 
 function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
@@ -581,15 +607,16 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     32,
     74,
     396,
-    298,
+    308,
     "var(--bg-elevated)",
     t("Ring Buffer 8 ô (N = 2³ → mask = & 7)", "8-Slot Circular Buffer (N = 2³ → & 7)"),
-    t("head chỉ ISR ghi  |  tail chỉ main đọc", "ISR writes head  |  main reads tail")
+    t("head chỉ ISR ghi  |  tail chỉ main đọc", "ISR writes head  |  main reads tail"),
+    { valign: "top" }
   );
 
-  const cx = 230;
-  const cy = 228;
-  const r = 80;
+  const cx = 236;
+  const cy = 248;
+  const r = 78;
   g.appendChild(
     svgEl("circle", {
       cx,
@@ -633,13 +660,13 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
   drawLabel(g, cx, cy - 6, "(idx + 1) & 7", { size: 11, weight: 700, fill: "var(--ink)" });
   drawLabel(g, cx, cy + 12, "Empty: head == tail", { size: 9.5 });
 
-  drawPillTag(g, 88, 128, "main (tail)", PALETTE.sage.top, "#1c1b18");
-  drawPillTag(g, 88, 336, "ISR (head)", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 88, 154, "main (tail)", PALETTE.sage.top, "#1c1b18");
+  drawPillTag(g, 88, 344, "ISR (head)", PALETTE.amber.top, "#1c1b18");
 
-  addWire(g, [[208, 146], [136, 128]], "#84b684");
-  addWire(g, [[136, 336], [208, 310]], "#d3b25a");
-  addPacketTrack([[208, 146], [136, 128]], "#84be88", 1, 0.36, "pop");
-  addPacketTrack([[136, 336], [208, 310]], "#f5d88b", 1, 0.36, "push");
+  addWire(g, [[214, 166], [138, 154]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[138, 344], [214, 328]], "#d3b25a", false, { markerEnd: true });
+  addPacketTrack([[214, 166], [138, 154]], "#84be88", 1, 0.36, "pop");
+  addPacketTrack([[138, 344], [214, 328]], "#f5d88b", 1, 0.36, "push");
 
   // Right Top: Static Memory Pool
   drawFlatCard(
@@ -647,20 +674,21 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     452,
     74,
     396,
-    206,
+    208,
     "var(--bg-elevated)",
     t("Static Memory Pool (Khối cố định 32B)", "Static Memory Pool (Fixed 32B Blocks)"),
-    t("Free list O(1): alloc()/free() không phân mảnh RAM", "O(1) free list: deterministic alloc()/free(), zero fragmentation")
+    t("Free list O(1): alloc()/free() không phân mảnh RAM", "O(1) free list: deterministic, zero fragmentation"),
+    { valign: "top" }
   );
 
-  drawFlatCard(g, 472, 128, 170, 50, PALETTE.sky.top, "Blk #0 (USED)", "UART RX frame");
-  drawFlatCard(g, 658, 128, 170, 50, PALETTE.sage.top, "Blk #1 (FREE)", "next → #3");
-  drawFlatCard(g, 472, 188, 170, 50, PALETTE.sky.top, "Blk #2 (USED)", "CAN TX payload");
-  drawFlatCard(g, 658, 188, 170, 50, PALETTE.sage.top, "Blk #3 (FREE)", "next → NULL");
+  drawFlatCard(g, 472, 134, 170, 48, PALETTE.sky.top, "Blk #0 (USED)", "UART RX frame");
+  drawFlatCard(g, 658, 134, 170, 48, PALETTE.sage.top, "Blk #1 (FREE)", "next → #3");
+  drawFlatCard(g, 472, 192, 170, 48, PALETTE.sky.top, "Blk #2 (USED)", "CAN TX payload");
+  drawFlatCard(g, 658, 192, 170, 48, PALETTE.sage.top, "Blk #3 (FREE)", "next → NULL");
 
-  drawPillTag(g, 558, 258, "free_head → #1 → #3", PALETTE.amber.top, "#1c1b18");
-  addWire(g, [[640, 258], [743, 258], [743, 238]], "#84b684");
-  addPacketTrack([[640, 258], [743, 258], [743, 238]], "#84be88", 1, 0.38, "O(1)");
+  drawPillTag(g, 558, 260, "free_head → #1 → #3", PALETTE.amber.top, "#1c1b18");
+  addWire(g, [[640, 260], [743, 260], [743, 240]], "#84b684", false, { markerEnd: true });
+  addPacketTrack([[640, 260], [743, 260], [743, 240]], "#84be88", 1, 0.38, "O(1)");
 
   // Right Bottom: MISRA Gate Badge
   drawFlatCard(
@@ -668,14 +696,15 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     452,
     294,
     396,
-    78,
+    88,
     PALETTE.rose.top,
     t("Cổng kiểm soát MISRA-C & An toàn Embedded", "MISRA-C & Embedded Safety Gate"),
-    t("Kiểm tra tĩnh bắt buộc trước khi build Firmware", "Mandatory compile-time rules before flashing")
+    t("Kiểm tra tĩnh bắt buộc trước khi build Firmware", "Mandatory compile-time rules before flashing"),
+    { valign: "top" }
   );
-  drawPillTag(g, 520, 352, "No malloc", PALETTE.paper.top, "#1c1b18");
-  drawPillTag(g, 650, 352, "No recursion", PALETTE.paper.top, "#1c1b18");
-  drawPillTag(g, 778, 352, "-Werror", PALETTE.sage.top, "#1c1b18");
+  drawPillTag(g, 520, 360, "No malloc", PALETTE.paper.top, "#1c1b18");
+  drawPillTag(g, 650, 360, "No recursion", PALETTE.paper.top, "#1c1b18");
+  drawPillTag(g, 778, 360, "-Werror", PALETTE.sage.top, "#1c1b18");
 
   drawPillTag(
     g,

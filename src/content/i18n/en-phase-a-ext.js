@@ -93,9 +93,9 @@ uint16_t adc_to_mv(uint16_t raw) {
           "(uint32_t)(raw * 3300U) on a 16-bit int MCU truncates to 13,513,500 mod 65,536 = 13,084!"
         ],
         kpis: [
-          { label: "INT32_MIN / -1", value: "UB (+2³¹ overflow)", sub: "Must guard before /" },
+          { label: "INT32_MIN / -1", value: "UB (+2³¹ overflow)", sub: "Guard before division" },
           { label: "4095 × 3300", value: "13,513,500", sub: "Overflows 16-bit int (65,535)" },
-          { label: "Widen before *", value: "(uint32_t)raw *", sub: "Portable across MCUs" }
+          { label: "Widen before *", value: "(uint32_t)raw * 3300U", sub: "Portable across MCUs" }
         ],
         legend: ["Widening cast", "32-bit intermediate", "Boundary UB guard"],
         nodes: [

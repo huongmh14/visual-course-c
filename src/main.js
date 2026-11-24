@@ -17,7 +17,8 @@ import {
   renderKpis,
   renderLegend,
   renderTimeline,
-  showUpcomingOverlay
+  showUpcomingOverlay,
+  syncArchifyStage
 } from "./ui/stage.js";
 import {
   renderNarrative,
@@ -47,7 +48,13 @@ const el = {
   pillSteps: document.getElementById("pill-steps"),
   diagramStage: document.getElementById("diagram-stage"),
   kpiStrip: document.getElementById("kpi-strip"),
+  svgViewport: document.getElementById("svg-viewport"),
   isoSvg: document.getElementById("iso-svg"),
+  archifyViewport: document.getElementById("archify-viewport"),
+  archifyFrame: document.getElementById("archify-frame"),
+  btnViewStep: document.getElementById("btn-view-step"),
+  btnViewArchify: document.getElementById("btn-view-archify"),
+  btnArchifyExt: document.getElementById("btn-archify-ext"),
   packetLegend: document.getElementById("packet-legend"),
   upcomingOverlay: document.getElementById("upcoming-overlay"),
   upcomingTitle: document.getElementById("upcoming-title"),
@@ -117,6 +124,7 @@ const animator = createAnimator({
 });
 const narrowDiagram = matchMedia("(max-width: 640px)");
 const t = createTranslator(() => store.getState().lang);
+let stageMode = "step";
 
 function computeVisitUpdate(state, lesson, stepIndex) {
   const visited = new Set(state.visitedSteps[lesson.id] || []);
@@ -298,6 +306,13 @@ function render(state) {
     t,
     vertical: step.scene.type === "flow" && narrowDiagram.matches
   });
+
+  syncArchifyStage(el, {
+    lessonId: lesson.id,
+    theme: state.theme,
+    mode: stageMode,
+    t
+  });
 }
 
 const searchModal = createSearchModal(el, {
@@ -362,6 +377,16 @@ function bindEvents() {
 
   el.btnFullscreen.addEventListener("click", () => {
     el.diagramStage.classList.toggle("fullscreen");
+  });
+
+  el.btnViewStep.addEventListener("click", () => {
+    stageMode = "step";
+    render(store.getState());
+  });
+
+  el.btnViewArchify.addEventListener("click", () => {
+    stageMode = "archify";
+    render(store.getState());
   });
 
   el.btnCopyCode.addEventListener("click", async () => {

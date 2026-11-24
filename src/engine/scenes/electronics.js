@@ -70,7 +70,7 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
   );
 
   // Top Rail: 12V -> LDO (AMS1117) -> 3.3V @ 300mA
-  drawPillTag(g, 75, 134, "12V (3.6W)", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 64, 134, "12V (3.6W)", PALETTE.amber.top, "#1c1b18");
   drawFlatCard(
     g,
     150,
@@ -79,18 +79,10 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     108,
     PALETTE.rose.top,
     "LDO (AMS1117-3.3)",
-    "P_heat = (12 - 3.3) × 0.3A"
-  );
-  drawLabel(g, 252, 142, "= 2,610 mW  (HOT! η = 27.5%)", {
-    fill: "#1c1b18",
-    weight: 700
-  });
-  drawLabel(
-    g,
-    252,
-    164,
-    t("Tỏa nhiệt nặng, dễ ngắt nhiệt", "Severe heat, thermal cutoff risk"),
-    { fill: "#3f3c33" }
+    t(
+      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (HOT! η = 27.5%)\nTỏa nhiệt nặng, dễ ngắt nhiệt",
+      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (HOT! η = 27.5%)\nSevere heat, thermal cutoff risk"
+    )
   );
 
   drawFlatCard(
@@ -101,16 +93,15 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     88,
     PALETTE.paper.top,
     "3.3V @ 300 mA",
-    "0.99W Load"
+    t("0.99W Load\nChỉ hợp <50 mA", "0.99W Load\nOK only <50 mA")
   );
-  drawLabel(g, 495, 156, t("Chỉ hợp <50 mA", "OK only <50 mA"), { fill: "#3f3c33" });
 
-  addWire(g, [[118, 134], [150, 134]], "#d38383");
-  addWire(g, [[355, 136], [428, 136]], "#d38383");
+  addWire(g, [[108, 134], [150, 134]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[355, 136], [428, 136]], "#d38383", false, { markerEnd: true });
   addPacketTrack([[355, 136], [428, 136]], "#e57373", 1, 0.36, "2.6W heat");
 
   // Bottom Rail: 12V -> Buck (90%) -> 3.3V @ 300mA
-  drawPillTag(g, 75, 294, "12V (1.1W)", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 64, 294, "12V (1.1W)", PALETTE.amber.top, "#1c1b18");
   drawFlatCard(
     g,
     150,
@@ -119,18 +110,10 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     108,
     PALETTE.sage.top,
     "Buck (90% Eff)",
-    "Switching + Inductor"
-  );
-  drawLabel(g, 252, 300, "P_loss = 110 mW  (COOL ✓)", {
-    fill: "#1c1b18",
-    weight: 700
-  });
-  drawLabel(
-    g,
-    252,
-    322,
-    t("Mát & tiết kiệm pin vượt trội", "Cool & battery-friendly"),
-    { fill: "#3f3c33" }
+    t(
+      "Switching + Inductor\nP_loss = 110 mW (COOL ✓)\nMát & tiết kiệm pin vượt trội",
+      "Switching + Inductor\nP_loss = 110 mW (COOL ✓)\nCool & battery-friendly"
+    )
   );
 
   drawFlatCard(
@@ -141,15 +124,11 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     88,
     PALETTE.sky.top,
     "3.3V @ 300 mA",
-    "0.99W Load"
+    t("0.99W Load\nTiết kiệm 2.5W!", "0.99W Load\nSaves 2.5W!")
   );
-  drawLabel(g, 495, 314, t("Tiết kiệm 2.5W!", "Saves 2.5W!"), {
-    fill: "#1c1b18",
-    weight: 600
-  });
 
-  addWire(g, [[118, 294], [150, 294]], "#84b684");
-  addWire(g, [[355, 294], [428, 294]], "#84b684");
+  addWire(g, [[108, 294], [150, 294]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[355, 294], [428, 294]], "#84b684", false, { markerEnd: true });
   addPacketTrack([[355, 294], [428, 294]], "#84be88", 1, 0.38, "90% eff");
 
   drawPillTag(
@@ -170,7 +149,8 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     330,
     PALETTE.rose.top,
     t("NGUY HIỂM: 5V TX → GPIO 3.3V", "DANGER: 5V TX → Non-FT 3.3V Pin"),
-    t("Diode ESD ghim dòng ngược lên VDD!", "ESD clamp injects current into VDD!")
+    t("Diode ESD ghim dòng ngược lên VDD!", "ESD clamp injects current into VDD!"),
+    { valign: "top" }
   );
 
   // Inner schematic box
@@ -231,16 +211,11 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     98,
     "var(--bg-elevated)",
     t("Kéo VDD vọt lên ~4.3V!", "Pulls 3.3V Rail up to ~4.3V!"),
-    "V_pin > 3.3V + 0.7V = 4.0V"
+    t(
+      "V_pin > 3.3V + 0.7V = 4.0V\nTreo / cháy MCU & cháy ESD\nSửa: cầu chia 1k/2k hoặc chân FT",
+      "V_pin > 3.3V + 0.7V = 4.0V\nLatches up / burns MCU & ESD\nFix: 1k/2k divider or FT pin"
+    )
   );
-  drawLabel(g, 718, 352, t("Treo / cháy MCU & cháy ESD", "Latches up / burns MCU & ESD"), {
-    size: 10
-  });
-  drawLabel(g, 718, 372, t("Sửa: cầu chia 1k/2k hoặc chân FT", "Fix: 1k/2k divider or FT pin"), {
-    size: 10,
-    weight: 700,
-    fill: "var(--ink)"
-  });
 }
 
 function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
@@ -276,14 +251,14 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
   // MCU Block
   addWire(g, [[200, 92], [200, 134]], "#84b4df");
   addWire(g, [[200, 304], [200, 346]], "var(--border)");
-  drawFlatCard(g, 136, 134, 128, 170, PALETTE.sky.top, "MCU (3.3V)", "VDD ← 100 nF");
-  drawLabel(g, 200, 198, "GPIO Push-Pull", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 200, 222, "HIGH = 3.3V", { fill: "#3f3c33" });
-  drawLabel(g, 200, 240, "LOW  = 0V", { fill: "#3f3c33" });
+  drawFlatCard(g, 136, 134, 128, 170, PALETTE.sky.top, "MCU (3.3V)", "VDD ← 100 nF", { valign: "top" });
+  drawLabel(g, 200, 204, "GPIO Push-Pull", { fill: "#1c1b18", weight: 600 });
+  drawLabel(g, 200, 228, "HIGH = 3.3V", { fill: "#3f3c33" });
+  drawLabel(g, 200, 246, "LOW  = 0V", { fill: "#3f3c33" });
   drawLabel(g, 200, 286, "VSS (GND)", { fill: "#1c1b18", weight: 600 });
 
   // Gate network: 100 ohm series + 10k pull-down
-  addWire(g, [[264, 240], [424, 240]], "#d3b25a");
+  addWire(g, [[264, 240], [424, 240]], "#d3b25a", false, { markerEnd: true });
   g.appendChild(
     svgEl("rect", {
       x: 296,
@@ -323,10 +298,8 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     96,
     PALETTE.amber.top,
     "N-MOSFET",
-    "AO3400 / IRLZ44N"
+    "AO3400 / IRLZ44N\nVgs(th) ≈ 1.0–2.0V\nRds(on) < 50 mΩ"
   );
-  drawLabel(g, 498, 268, "Vgs(th) ≈ 1.0–2.0V", { fill: "#1c1b18", weight: 600 });
-  drawLabel(g, 498, 288, "Rds(on) < 50 mΩ", { fill: "#3f3c33" });
 
   // Source to GND
   addWire(g, [[498, 308], [498, 346]], "var(--border)");
@@ -346,9 +319,8 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     72,
     PALETTE.lavender.top,
     t("Cuộn Relay", "Inductive Load"),
-    "12V Coil (L)"
+    "12V Coil (L)\nV = -L · dI/dt"
   );
-  drawLabel(g, 498, 154, "V = -L · dI/dt", { fill: "#1c1b18", weight: 600 });
 
   addWire(g, [[498, 170], [498, 212]], "#84b684");
   addWire(g, [[498, 192], [660, 192], [660, 84]], "#84b684");
@@ -377,18 +349,11 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     102,
     PALETTE.sage.top,
     t("Vòng xả dòng cảm ứng", "Safe Kickback Loop"),
-    t("Khi MOSFET ngắt:", "When MOSFET turns OFF:")
+    t(
+      "Khi MOSFET ngắt:\nxả -L·dI/dt qua Diode về +12V\nGhim V_DS ≤ 12.7V ✓",
+      "When MOSFET turns OFF:\nrecirculates -L·dI/dt to +12V\nClamps V_DS ≤ 12.7V ✓"
+    )
   );
-  drawLabel(
-    g,
-    743,
-    282,
-    t("xả -L·dI/dt qua Diode về +12V", "recirculates -L·dI/dt to +12V"),
-    { fill: "#1c1b18", weight: 600 }
-  );
-  drawLabel(g, 743, 302, t("Ghim V_DS ≤ 12.7V ✓", "Clamps V_DS ≤ 12.7V ✓"), {
-    fill: "#3f3c33"
-  });
 
   // 2 animated tracks: gate drive & flyback loop
   addPacketTrack([[264, 240], [424, 240]], "#f5d88b", 1, 0.36, "Gate 3.3V");
@@ -432,33 +397,34 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
   );
 
   // Stage 1: PWM 3.3V
-  drawFlatCard(g, 30, 96, 162, 196, PALETTE.sky.top, "PWM 3.3V", "Duty D = 50% (20 kHz)");
+  drawFlatCard(g, 26, 96, 160, 196, PALETTE.sky.top, "PWM 3.3V", "Duty D = 50% (20 kHz)", { valign: "top" });
   g.appendChild(
     svgEl("path", {
-      d: "M48,200 L48,162 L74,162 L74,200 L100,200 L100,162 L126,162 L126,200 L152,200 L152,162 L174,162",
+      d: "M42,200 L42,162 L68,162 L68,200 L94,200 L94,162 L120,162 L120,200 L146,200 L146,162 L170,162",
       fill: "none",
       stroke: "#1c1b18",
       "stroke-width": "2"
     })
   );
-  drawLabel(g, 111, 232, "V_avg = 1.65V", { fill: "#1c1b18", weight: 700 });
-  drawLabel(g, 111, 254, t("Nhiều hài cao tần", "High-freq ripple"), { fill: "#3f3c33" });
+  drawLabel(g, 106, 232, "V_avg = 1.65V", { fill: "#1c1b18", weight: 700 });
+  drawLabel(g, 106, 254, t("Nhiều hài cao tần", "High-freq ripple"), { fill: "#3f3c33" });
 
   // Stage 2: RC Low-Pass Filter
   drawFlatCard(
     g,
-    248,
+    232,
     96,
-    176,
+    178,
     196,
     PALETTE.amber.top,
     t("Lọc thông thấp RC", "RC Low-Pass Filter"),
-    "τ = R × C"
+    "τ = R × C",
+    { valign: "top" }
   );
-  addWire(g, [[262, 166], [282, 166]], "#1c1b18");
+  addWire(g, [[246, 166], [264, 166]], "#1c1b18");
   g.appendChild(
     svgEl("rect", {
-      x: 282,
+      x: 264,
       y: 158,
       width: 44,
       height: 16,
@@ -468,23 +434,23 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
       "stroke-width": "1.3"
     })
   );
-  drawLabel(g, 304, 152, "R = 10 kΩ", { size: 9.5, weight: 700, fill: "#1c1b18" });
-  addWire(g, [[326, 166], [408, 166]], "#1c1b18");
-  addWire(g, [[366, 166], [366, 190]], "#1c1b18");
-  addWire(g, [[354, 190], [378, 190]], "#1c1b18");
-  addWire(g, [[354, 198], [378, 198]], "#1c1b18");
-  addWire(g, [[366, 198], [366, 214]], "#1c1b18");
-  drawLabel(g, 392, 200, "100nF", { size: 9.5, weight: 700, fill: "#1c1b18" });
+  drawLabel(g, 286, 152, "R = 10 kΩ", { size: 9.5, weight: 700, fill: "#1c1b18" });
+  addWire(g, [[308, 166], [394, 166]], "#1c1b18");
+  addWire(g, [[348, 166], [348, 190]], "#1c1b18");
+  addWire(g, [[336, 190], [360, 190]], "#1c1b18");
+  addWire(g, [[336, 198], [360, 198]], "#1c1b18");
+  addWire(g, [[348, 198], [348, 214]], "#1c1b18");
+  drawLabel(g, 366, 200, "100nF", { size: 9.5, weight: 700, anchor: "start", fill: "#1c1b18" });
 
   g.appendChild(
     svgEl("path", {
-      d: "M272,240 Q290,234 308,240 T344,240 T380,240 T404,240",
+      d: "M256,240 Q274,234 292,240 T328,240 T364,240 T388,240",
       fill: "none",
       stroke: "#1c1b18",
       "stroke-width": "1.8"
     })
   );
-  drawLabel(g, 336, 268, t("Z_out cao (10 kΩ)!", "High Z_out (10 kΩ)!"), {
+  drawLabel(g, 321, 268, t("Z_out cao (10 kΩ)!", "High Z_out (10 kΩ)!"), {
     fill: "#1c1b18",
     weight: 600
   });
@@ -492,97 +458,92 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
   // Stage 3: Op-Amp Unity Buffer
   drawFlatCard(
     g,
-    480,
+    456,
     96,
-    158,
+    178,
     196,
     PALETTE.sage.top,
     "Op-Amp Buffer",
-    "V_out = V_in (Gain = 1)"
+    "V_out = V_in (Gain = 1)",
+    { valign: "top" }
   );
   g.appendChild(
     svgEl("polygon", {
-      points: "524,152 524,208 588,180",
+      points: "510,152 510,208 574,180",
       fill: PALETTE.paper.top,
       stroke: "#1c1b18",
       "stroke-width": "1.6"
     })
   );
-  drawLabel(g, 534, 173, "+", { size: 11, weight: 700, fill: "#1c1b18" });
-  drawLabel(g, 534, 194, "−", { size: 11, weight: 700, fill: "#1c1b18" });
-  addWire(g, [[504, 169], [524, 169]], "#1c1b18");
-  addWire(g, [[588, 180], [612, 180]], "#1c1b18");
-  addWire(g, [[600, 180], [600, 222], [512, 222], [512, 190], [524, 190]], "#1c1b18");
-  drawLabel(g, 559, 248, t("Z_in ≈ ∞ (không rút RC)", "Z_in ≈ ∞ (zero RC droop)"), {
+  drawLabel(g, 520, 173, "+", { size: 11, weight: 700, fill: "#1c1b18" });
+  drawLabel(g, 520, 194, "−", { size: 11, weight: 700, fill: "#1c1b18" });
+  addWire(g, [[490, 169], [510, 169]], "#1c1b18");
+  addWire(g, [[574, 180], [598, 180]], "#1c1b18");
+  addWire(g, [[586, 180], [586, 222], [498, 222], [498, 190], [510, 190]], "#1c1b18");
+  drawLabel(g, 545, 248, t("Z_in ≈ ∞ (không rút RC)", "Z_in ≈ ∞ (zero RC droop)"), {
+    size: 9.8,
     fill: "#1c1b18",
     weight: 600
   });
-  drawLabel(g, 559, 268, t("Z_out < 1 Ω (lái S&H)", "Z_out < 1 Ω (drives S&H)"), {
+  drawLabel(g, 545, 268, t("Z_out < 1 Ω (lái S&H)", "Z_out < 1 Ω (drives S&H)"), {
+    size: 9.8,
     fill: "#3f3c33"
   });
 
   // Stage 4: ADC 12-bit S&H Cap
   drawFlatCard(
     g,
-    694,
+    680,
     96,
-    156,
+    174,
     196,
     PALETTE.lavender.top,
     "ADC 12-bit S&H",
-    "0 .. 4095 counts"
+    "0 .. 4095 counts",
+    { valign: "top" }
   );
-  addWire(g, [[712, 172], [738, 172], [762, 160]], "#1c1b18");
-  addWire(g, [[764, 172], [790, 172], [790, 192]], "#1c1b18");
-  addWire(g, [[776, 192], [804, 192]], "#1c1b18");
-  addWire(g, [[776, 200], [804, 200]], "#1c1b18");
-  addWire(g, [[790, 200], [790, 218]], "#1c1b18");
-  drawLabel(g, 816, 198, "C_SH", { size: 9.5, weight: 700, fill: "#1c1b18" });
-  drawLabel(g, 772, 246, "1.65V → 2048", { fill: "#1c1b18", weight: 700 });
-  drawLabel(g, 772, 268, t("Nạp tụ S&H nhanh ✓", "Fast S&H settle ✓"), { fill: "#3f3c33" });
+  addWire(g, [[706, 172], [732, 172], [756, 160]], "#1c1b18");
+  addWire(g, [[758, 172], [784, 172], [784, 192]], "#1c1b18");
+  addWire(g, [[770, 192], [798, 192]], "#1c1b18");
+  addWire(g, [[770, 200], [798, 200]], "#1c1b18");
+  addWire(g, [[784, 200], [784, 218]], "#1c1b18");
+  drawLabel(g, 804, 198, "C_SH", { size: 9.5, weight: 700, anchor: "start", fill: "#1c1b18" });
+  drawLabel(g, 767, 246, "1.65V → 2048", { fill: "#1c1b18", weight: 700 });
+  drawLabel(g, 767, 268, t("Nạp tụ S&H nhanh ✓", "Fast S&H settle ✓"), { fill: "#3f3c33" });
 
   // Inter-stage wires & packets
-  addWire(g, [[192, 174], [248, 174]], "#84b4df");
-  addWire(g, [[424, 174], [480, 174]], "#d3b25a");
-  addWire(g, [[638, 174], [694, 174]], "#84b684");
+  addWire(g, [[186, 174], [232, 174]], "#84b4df", false, { markerEnd: true });
+  addWire(g, [[410, 174], [456, 174]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[634, 174], [680, 174]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[192, 174], [248, 174]], "#84b4df", 1, 0.36, "PWM");
-  addPacketTrack([[424, 174], [480, 174]], "#f5d88b", 1, 0.36, "V_filt");
-  addPacketTrack([[638, 174], [694, 174]], "#84be88", 1, 0.36, "low Z");
+  addPacketTrack([[186, 174], [232, 174]], "#84b4df", 1, 0.36, "PWM");
+  addPacketTrack([[410, 174], [456, 174]], "#f5d88b", 1, 0.36, "V_filt");
+  addPacketTrack([[634, 174], [680, 174]], "#84be88", 1, 0.36, "low Z");
 
   // Bottom f_c & EMA formula cards
   drawFlatCard(
     g,
-    30,
+    26,
     316,
-    398,
-    86,
+    402,
+    88,
     "var(--bg-elevated)",
     t("Tần số cắt lọc Analog (Cutoff f_c)", "Analog RC Cutoff Frequency (f_c)"),
-    "f_c = 1 / (2π · R · C)  =  159 Hz  (≪ 20 kHz PWM)"
-  );
-  drawLabel(
-    g,
-    229,
-    380,
-    t("Chọn f_c ≤ f_PWM / 100 để gợn sóng < 1%", "Pick f_c ≤ f_PWM / 100 for <1% ripple")
+    t(
+      "f_c = 1 / (2π · R · C) = 159 Hz (≪ 20 kHz PWM)\nChọn f_c ≤ f_PWM / 100 để gợn sóng < 1%",
+      "f_c = 1 / (2π · R · C) = 159 Hz (≪ 20 kHz PWM)\nPick f_c ≤ f_PWM / 100 for <1% ripple"
+    )
   );
 
   drawFlatCard(
     g,
     452,
     316,
-    398,
-    86,
+    402,
+    88,
     "var(--bg-elevated)",
     t("Lọc số tương đương trên MCU (EMA)", "Discrete MCU Equivalent (EMA Filter)"),
-    "y[n] = y[n-1] + α · (x[n] - y[n-1])"
-  );
-  drawLabel(
-    g,
-    651,
-    380,
-    "α = Δt / (τ + Δt)   (Q-format >> shift, no float)"
+    "y[n] = y[n-1] + α · (x[n] - y[n-1])\nα = Δt / (τ + Δt)  (Q-format >> shift, no float)"
   );
 }
 
@@ -614,14 +575,7 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     88,
     PALETTE.amber.top,
     "1. I2C (Open-Drain)",
-    "100–400 kHz (2 wires)"
-  );
-  drawLabel(
-    g,
-    133,
-    144,
-    t("Chỉ kéo LOW, cần R_pu", "Pulls LOW only + R_pu"),
-    { fill: "#3f3c33" }
+    t("100–400 kHz (2 wires)\nChỉ kéo LOW, cần R_pu", "100–400 kHz (2 wires)\nPulls LOW only + R_pu")
   );
 
   drawFlatCard(g, 256, 98, 96, 62, PALETTE.paper.top, "Master", "Open-Drain");
@@ -648,14 +602,7 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     86,
     PALETTE.sky.top,
     "2. SPI (Push-Pull)",
-    "1–50 MHz (4 wires)"
-  );
-  drawLabel(
-    g,
-    133,
-    268,
-    t("Full-duplex, không R kéo", "Full-duplex, no pull-up"),
-    { fill: "#3f3c33" }
+    t("1–50 MHz (4 wires)\nFull-duplex, không R kéo", "1–50 MHz (4 wires)\nFull-duplex, no pull-up")
   );
 
   drawFlatCard(g, 256, 202, 96, 82, PALETTE.paper.top, "SPI Master", "SCK / CS");
@@ -684,23 +631,16 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     86,
     PALETTE.sage.top,
     "3. CAN / RS-485",
-    t("Vi sai 2 dây (100m+)", "Differential (100m+)")
-  );
-  drawLabel(
-    g,
-    133,
-    390,
-    t("Khử nhiễu EMI cực tốt", "High EMI immunity"),
-    { fill: "#3f3c33" }
+    t("Vi sai 2 dây (100m+)\nKhử nhiễu EMI cực tốt", "Differential (100m+)\nHigh EMI immunity")
   );
 
-  drawFlatCard(g, 256, 332, 54, 62, PALETTE.amber.top, "120 Ω", "Term");
-  drawFlatCard(g, 766, 332, 54, 62, PALETTE.amber.top, "120 Ω", "Term");
+  drawFlatCard(g, 256, 332, 66, 62, PALETTE.amber.top, "120 Ω", "Term");
+  drawFlatCard(g, 766, 332, 66, 62, PALETTE.amber.top, "120 Ω", "Term");
 
-  addWire(g, [[310, 350], [766, 350]], "#d38383");
-  addWire(g, [[310, 378], [766, 378]], "#84b4df");
-  drawLabel(g, 342, 344, "CAN_H", { size: 9.5, weight: 700, fill: "var(--ink)" });
-  drawLabel(g, 342, 372, "CAN_L", { size: 9.5, weight: 700, fill: "var(--ink)" });
+  addWire(g, [[322, 350], [766, 350]], "#d38383");
+  addWire(g, [[322, 378], [766, 378]], "#84b4df");
+  drawLabel(g, 354, 344, "CAN_H", { size: 9.5, weight: 700, fill: "var(--ink)" });
+  drawLabel(g, 354, 372, "CAN_L", { size: 9.5, weight: 700, fill: "var(--ink)" });
 
   // Twisted pair X crossings
   [505, 595].forEach((tx) => {
@@ -742,13 +682,14 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     324,
     "var(--bg-elevated)",
     t("Sơ đồ chân STM32F103 (LQFP-48)", "STM32F103 Package (LQFP-48)"),
-    ""
+    "",
+    { valign: "top" }
   );
 
   // IC dark silicon body
   g.appendChild(
     svgEl("rect", {
-      x: 138,
+      x: 152,
       y: 144,
       width: 118,
       height: 140,
@@ -760,15 +701,15 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
   );
   g.appendChild(
     svgEl("circle", {
-      cx: 152,
+      cx: 166,
       cy: 158,
       r: 4.5,
       fill: "#faf7ef"
     })
   );
-  drawLabel(g, 197, 206, "STM32F103", { size: 12, weight: 700, fill: "#faf7ef" });
-  drawLabel(g, 197, 224, "VDD = 3.3V", { size: 10, fill: "#e6decb" });
-  drawLabel(g, 197, 240, "Boot0 = 0", { size: 10, fill: "#e6decb" });
+  drawLabel(g, 211, 206, "STM32F103", { size: 12, weight: 700, fill: "#faf7ef" });
+  drawLabel(g, 211, 224, "VDD = 3.3V", { size: 10, fill: "#e6decb" });
+  drawLabel(g, 211, 240, "Boot0 = 0", { size: 10, fill: "#e6decb" });
 
   // Left pins: FT vs TT
   const leftPins = [
@@ -778,19 +719,19 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     [272, "TTa ≤3.6V", PALETTE.rose.top, "#d38383"]
   ];
   leftPins.forEach(([py, label, bg, wireCol]) => {
-    addWire(g, [[112, py], [138, py]], wireCol);
-    drawPillTag(g, 76, py, label, bg, "#1c1b18");
+    addWire(g, [[126, py], [152, py]], wireCol);
+    drawPillTag(g, 82, py, label, bg, "#1c1b18");
   });
 
   // Right pins: SWDIO, SWCLK, GPIO 20mA
-  addWire(g, [[256, 168], [284, 168]], "#84b4df");
-  drawLabel(g, 290, 172, "SWDIO", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
+  addWire(g, [[270, 168], [294, 168]], "#84b4df");
+  drawLabel(g, 298, 172, "SWDIO", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
 
-  addWire(g, [[256, 204], [284, 204]], "#84b4df");
-  drawLabel(g, 290, 208, "SWCLK", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
+  addWire(g, [[270, 204], [294, 204]], "#84b4df");
+  drawLabel(g, 298, 208, "SWCLK", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
 
-  addWire(g, [[256, 256], [284, 256]], "#d3b25a");
-  drawLabel(g, 290, 260, "≤ 20 mA", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
+  addWire(g, [[270, 256], [294, 256]], "#d3b25a");
+  drawLabel(g, 298, 260, "≤ 20 mA", { size: 9.5, weight: 700, anchor: "start", fill: "var(--ink)" });
 
   drawLabel(
     g,
@@ -823,7 +764,8 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     120,
     "var(--bg-elevated)",
     t("Giới hạn dòng: 1 chân vs Tổng cả chip", "Current Budget: Single-Pin vs Package Sum"),
-    "I_pin ≤ 20 mA   |   ΣI_VDD / ΣI_VSS ≤ 120 mA (Abs Max)"
+    "I_pin ≤ 20 mA   |   ΣI_VDD / ΣI_VSS ≤ 120 mA (Abs Max)",
+    { valign: "top" }
   );
 
   // Meter 1: single pin OK
@@ -890,17 +832,18 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
   drawFlatCard(
     g,
     422,
-    208,
+    206,
     428,
-    78,
+    82,
     PALETTE.sky.top,
     t("Cổng Debug SWD 4 chân (ST-Link)", "4-Pin SWD Debug Header (ST-Link)"),
-    t("Không nối VCC nếu board đang có nguồn ngoài!", "Skip VCC if board is externally powered!")
+    t("Không nối VCC nếu board đang có nguồn ngoài!", "Skip VCC if board is externally powered!"),
+    { valign: "top" }
   );
-  drawPillTag(g, 476, 266, "VCC", PALETTE.paper.top, "#1c1b18");
-  drawPillTag(g, 566, 266, "SWDIO", PALETTE.amber.top, "#1c1b18");
-  drawPillTag(g, 666, 266, "SWCLK", PALETTE.amber.top, "#1c1b18");
-  drawPillTag(g, 776, 266, "GND (0V)", PALETTE.sage.top, "#1c1b18");
+  drawPillTag(g, 476, 269, "VCC", PALETTE.paper.top, "#1c1b18");
+  drawPillTag(g, 566, 269, "SWDIO", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 666, 269, "SWCLK", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 776, 269, "GND (0V)", PALETTE.sage.top, "#1c1b18");
 
   // Bottom-Right: 6-Step DMM Smoke Test Badge
   drawFlatCard(
@@ -908,29 +851,18 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     422,
     298,
     428,
-    100,
+    102,
     PALETTE.amber.top,
     t("Smoke Test 6 bước bằng DMM trước khi bật điện", "6-Step Pre-Power DMM Smoke Test"),
-    t("1. Soi mạch   →   2. Đo thông mạch VDD–GND (≠ 0Ω)", "1. Visual check → 2. Continuity VDD–GND (no short)")
-  );
-  drawLabel(
-    g,
-    636,
-    356,
-    t("3. Kiểm cực tụ/diode → 4. Cấp nguồn giới hạn dòng", "3. Cap/diode polarity → 4. Current-limited power"),
-    { fill: "#1c1b18", weight: 600 }
-  );
-  drawLabel(
-    g,
-    636,
-    376,
-    t("5. Đo áp 3.3V (±5%) → 6. Kiểm tra nhiệt trước khi nạp", "5. Verify 3.3V (±5%) → 6. Thermal check before flash"),
-    { fill: "#3f3c33" }
+    t(
+      "1. Soi mạch → 2. Đo thông mạch VDD–GND (≠ 0Ω)\n3. Kiểm cực tụ/diode → 4. Cấp nguồn giới hạn dòng\n5. Đo áp 3.3V (±5%) → 6. Kiểm tra nhiệt trước khi nạp",
+      "1. Visual check → 2. Continuity VDD–GND (no short)\n3. Cap/diode polarity → 4. Current-limited power\n5. Verify 3.3V (±5%) → 6. Thermal check before flash"
+    )
   );
 
   // Gutter connecting tracks
-  addWire(g, [[362, 136], [422, 136]], "#d38383");
-  addWire(g, [[362, 247], [422, 247]], "#84b4df");
+  addWire(g, [[362, 136], [422, 136]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[362, 247], [422, 247]], "#84b4df", false, { markerEnd: true });
   addPacketTrack([[362, 136], [422, 136]], "#e57373", 1, 0.34, "ΣI_VDD");
   addPacketTrack([[362, 247], [422, 247]], "#84b4df", 1, 0.36, "SWD");
 }

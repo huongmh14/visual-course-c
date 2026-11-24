@@ -23,16 +23,16 @@ function sceneIntroLoop(g, _scene, { addPacketTrack, t }) {
   drawIsoBlock(g, 640, 125, 130, 82, 26, "amber", t("2. Phá code + assert", "2. Break + assert"), t("Thử sai để nhớ lâu", "Fail fast to remember"));
   drawIsoBlock(g, 440, 265, 140, 84, 28, "sage", t("3. Câu hỏi mở", "3. Open Question"), t("Viết lại bằng lời mình", "Explain in own words"));
 
-  const p1 = [305, 175];
-  const p2 = [575, 175];
+  const p1 = [352, 175];
+  const p2 = [569, 175];
   const p3 = [505, 305];
   const p4 = [375, 305];
 
-  addWire(g, [p1, p2], "#84b4df");
-  addWire(g, [[610, 225], p3], "#d3b25a");
-  addWire(g, [p4, [270, 225]], "#84b684");
+  addWire(g, [p1, p2], "#84b4df", false, { markerEnd: true });
+  addWire(g, [[610, 225], p3], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [p4, [270, 225]], "#84b684", false, { markerEnd: true });
 
-  drawPillTag(g, 440, 148, t("Kiểm chứng trực quan", "Visual feedback"), PALETTE.sky.top);
+  drawPillTag(g, 460, 138, t("Kiểm chứng trực quan", "Visual feedback"), PALETTE.sky.top);
   drawPillTag(g, 645, 290, t("Ghi chú bài toán thật", "Real-world note"), PALETTE.amber.top);
   drawPillTag(g, 235, 290, t("Khóa kiến thức", "Lock insight"), PALETTE.sage.top);
 
@@ -75,11 +75,11 @@ function sceneIntroCaseBms(g, _scene, { addPacketTrack, t }) {
     t("Đủ miền 0..4200 mV & dòng sạc/xả âm dương", "Fits 0..4200 mV and bidirectional current")
   );
 
-  addWire(g, [[255, 200], [390, 151]], "#d38383");
-  addWire(g, [[255, 225], [390, 283]], "#84b684");
+  addWire(g, [[298, 200], [390, 151]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[298, 225], [390, 283]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[255, 200], [390, 151]], "#e57373", 2, 0.38, "overflow");
-  addPacketTrack([[255, 225], [390, 283]], "#84be88", 2, 0.36, "uint16_t");
+  addPacketTrack([[298, 200], [390, 151]], "#e57373", 2, 0.38, "overflow");
+  addPacketTrack([[298, 225], [390, 283]], "#84be88", 2, 0.36, "uint16_t");
 }
 
 function sceneIntroCaseDebounce(g, _scene, { addPacketTrack, t }) {
@@ -95,7 +95,7 @@ function sceneIntroCaseDebounce(g, _scene, { addPacketTrack, t }) {
   );
 
   // Raw bounce signal card + mini square-wave path
-  drawFlatCard(g, 70, 155, 210, 115, PALETTE.rose.top, t("Nút bấm cơ (Rung)", "Bouncy Switch"), "1 → 0 → 1 → 0 → 0 → 0");
+  drawFlatCard(g, 70, 155, 210, 115, PALETTE.rose.top, t("Nút bấm cơ (Rung)", "Bouncy Switch"), "1 → 0 → 1 → 0 → 0 → 0", { valign: "top" });
   addWire(g, [
     [95, 232], [115, 232], [115, 252], [135, 252], [135, 232],
     [155, 232], [155, 252], [250, 252]
@@ -108,11 +108,11 @@ function sceneIntroCaseDebounce(g, _scene, { addPacketTrack, t }) {
   // Clean output
   drawFlatCard(g, 630, 165, 185, 95, PALETTE.sage.top, t("1 Sự kiện nhấn ✓", "1 Clean Press ✓"), t("CPU vẫn rảnh đọc cảm biến", "CPU stays responsive"));
 
-  addWire(g, [[280, 212], [375, 212]], "#d38383");
-  addWire(g, [[505, 212], [630, 212]], "#84b684");
+  addWire(g, [[280, 212], [369, 212]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[552, 212], [630, 212]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[280, 212], [375, 212]], "#e57373", 2, 0.42, "0/1 dội");
-  addPacketTrack([[505, 212], [630, 212]], "#84be88", 1, 0.32, "PRESS");
+  addPacketTrack([[280, 212], [369, 212]], "#e57373", 2, 0.42, "0/1 dội");
+  addPacketTrack([[552, 212], [630, 212]], "#84be88", 1, 0.32, "PRESS");
 }
 
 function sceneIntroCaseUart(g, _scene, { addPacketTrack, t }) {
@@ -150,11 +150,11 @@ function sceneIntroCaseUart(g, _scene, { addPacketTrack, t }) {
     t("Dây truyền: 03 → E8  ⇒  Gateway đọc 0x03E8 = 10.00 °C", "Wire: 03 → E8  ⇒  Gateway reads 0x03E8 = 10.00 °C")
   );
 
-  addWire(g, [[245, 200], [395, 150]], "#d38383");
-  addWire(g, [[245, 228], [395, 282]], "#84b684");
+  addWire(g, [[292, 200], [395, 150]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[292, 228], [395, 282]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[245, 200], [395, 150]], "#e57373", 2, 0.36, "E8 → 03");
-  addPacketTrack([[245, 228], [395, 282]], "#84be88", 2, 0.36, "03 → E8");
+  addPacketTrack([[292, 200], [395, 150]], "#e57373", 2, 0.36, "E8 → 03");
+  addPacketTrack([[292, 228], [395, 282]], "#84be88", 2, 0.36, "03 → E8");
 }
 
 function sceneIntroRoadmap(g, _scene, { addPacketTrack, t }) {
@@ -169,9 +169,9 @@ function sceneIntroRoadmap(g, _scene, { addPacketTrack, t }) {
     drawIsoBlock(g, st.x, st.y, 125, 78, 24, st.tone, st.title, st.sub);
     if (i > 0) {
       const prev = stages[i - 1];
-      const pA = [prev.x + 60, prev.y + 42];
-      const pB = [st.x - 55, st.y + 42];
-      addWire(g, [pA, pB], "#84b684");
+      const pA = [prev.x + 108, prev.y + 58];
+      const pB = [st.x - 68, st.y + 42];
+      addWire(g, [pA, pB], "#84b684", false, { markerEnd: true });
       addPacketTrack([pA, pB], "#84be88", 1, 0.35);
     }
   });

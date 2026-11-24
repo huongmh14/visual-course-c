@@ -83,3 +83,54 @@ export function showUpcomingOverlay(dom, { lesson, t }) {
     .join("");
   dom.upcomingOverlay.classList.remove("hidden");
 }
+
+const ARCHIFY_DIAGRAMS = {
+  "c-control-flow": { file: "diagrams/c-fsm-lifecycle.html", vi: "Vòng đời FSM", en: "FSM Lifecycle" },
+  "c-callbacks-fsm": { file: "diagrams/c-fsm-lifecycle.html", vi: "Vòng đời FSM", en: "FSM Lifecycle" },
+  "c-modular-makefile": { file: "diagrams/c-firmware-pipeline.html", vi: "Luồng Firmware", en: "Firmware Pipeline" },
+  "b05-volatile-storage": { file: "diagrams/c-firmware-pipeline.html", vi: "Luồng Firmware", en: "Firmware Pipeline" },
+  "c-ringbuf-pool-misra": { file: "diagrams/c-firmware-pipeline.html", vi: "Luồng Firmware", en: "Firmware Pipeline" }
+};
+
+export function getArchifyDiagram(lessonId) {
+  if (lessonId && lessonId.startsWith("e-")) {
+    return {
+      file: "diagrams/electronics-bench-architecture.html",
+      vi: "Kiến trúc Điện tử Nhúng",
+      en: "Electronics Bench Map"
+    };
+  }
+  return (
+    ARCHIFY_DIAGRAMS[lessonId] || {
+      file: "diagrams/c-mcu-architecture.html",
+      vi: "Kiến trúc STM32 & Bộ nhớ",
+      en: "STM32 Memory & MMIO Map"
+    }
+  );
+}
+
+export function syncArchifyStage(dom, { lessonId, theme, mode, t }) {
+  const isArchify = mode === "archify";
+  const spec = getArchifyDiagram(lessonId);
+  const embedSrc = `${spec.file}?embed=1&theme=${theme === "dark" ? "dark" : "light"}`;
+
+  dom.btnViewStep.classList.toggle("active", !isArchify);
+  dom.btnViewArchify.classList.toggle("active", isArchify);
+  dom.btnArchifyExt.classList.toggle("hidden", !isArchify);
+  dom.btnArchifyExt.href = `${spec.file}?theme=${theme === "dark" ? "dark" : "light"}`;
+
+  dom.svgViewport.classList.toggle("hidden", isArchify);
+  dom.archifyViewport.classList.toggle("hidden", !isArchify);
+  dom.kpiStrip.classList.toggle("hidden", isArchify || dom.kpiStrip.children.length === 0);
+  dom.packetLegend.classList.toggle("hidden", isArchify);
+  dom.btnReplay.classList.toggle("hidden", isArchify);
+  dom.btnPlayPause.classList.toggle("hidden", isArchify);
+
+  if (isArchify) {
+    if (dom.archifyFrame.dataset.loadedSrc !== embedSrc) {
+      dom.archifyFrame.src = embedSrc;
+      dom.archifyFrame.dataset.loadedSrc = embedSrc;
+    }
+    dom.archifyFrame.title = t(spec.vi, spec.en);
+  }
+}

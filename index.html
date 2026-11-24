@@ -104,6 +104,11 @@
             <svg id="iso-svg" viewBox="0 0 880 430" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mô phỏng kiến trúc bộ nhớ và dữ liệu vi điều khiển"></svg>
           </div>
 
+          <!-- Embedded Archify Interactive Map -->
+          <div class="archify-viewport hidden" id="archify-viewport">
+            <iframe id="archify-frame" title="Bản đồ kiến trúc Archify" data-en-title="Archify architecture diagram" loading="lazy"></iframe>
+          </div>
+
           <!-- Upcoming / Locked Lesson Overlay (shown only when user clicks an upcoming lesson) -->
           <div class="upcoming-overlay hidden" id="upcoming-overlay">
             <div class="upcoming-card">
@@ -121,6 +126,13 @@
           <div class="stage-footer">
             <div class="packet-legend" id="packet-legend"></div>
             <div class="stage-controls">
+              <div class="stage-view-switch" role="group" aria-label="Chế độ sơ đồ" data-en-aria-label="Diagram view">
+                <button class="view-pill active" id="btn-view-step" type="button" data-en="Step view">Sơ đồ bước</button>
+                <button class="view-pill" id="btn-view-archify" type="button" data-en="Archify map">Bản đồ Archify</button>
+                <a class="ctrl-btn ctrl-link hidden" id="btn-archify-ext" href="diagrams/c-mcu-architecture.html" target="_blank" rel="noopener" title="Mở sơ đồ Archify toàn trang" data-en-title="Open Archify diagram in new tab" aria-label="Mở sơ đồ Archify toàn trang" data-en-aria-label="Open Archify diagram in new tab">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
               <button class="ctrl-btn" id="btn-replay" title="Phát lại bước này (R)" data-en-title="Replay this step (R)" aria-label="Phát lại" data-en-aria-label="Replay">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
               </button>

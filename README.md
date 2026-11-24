@@ -19,7 +19,7 @@ Interactive visual course for Embedded C & Electronics (**Designed to Embed**), 
 ## Features
 
 - **Bilingual Curriculum (`VI` / `EN`)**: 20 ready bilingual lessons (`00`–`19`) covering the full Phase A Embedded C track (12 lessons from Lesson `00` to `MISRA C`) and Basic Electronics track (8 lessons from `LDO/Buck & DMM` to `UART/I2C/SPI/CAN & Datasheet`), plus 11 planned STM32/RTOS roadmap topics (`20`–`30`).
-- **Animated Isometric SVG Engine**: 34 registered SVG scenes (`flow`, 10 `memory` scenes, 5 `onboarding` scenes, 8 `bitwise` scenes, 5 `c-embedded` scenes, and 5 `electronics` scenes) with animated data packets and step-by-step hardware/memory state transitions.
+- **Animated Isometric SVG Engine + Archify Maps**: 34 registered step scenes (`flow`, `memory`, `onboarding`, `bitwise`, `c-embedded`, `electronics`) with automatic wrapping & zero-ligature C operators (`==`, `!=`, `<<`, `>>`), plus 4 embedded interactive **Archify** showcase diagrams (`diagrams/*.html`) toggleable right on the stage (`Sơ đồ bước` ↔ `Bản đồ Archify`).
 - **Linked Hands-On Labs**: Every lesson links directly to its graded exercises, WSL C17 self-checks, and 4-stage Board Bring-Up Lab in [Embedded-C](https://github.com/huongmh14/Embedded-C).
 - **Open-Ended Project Reflection**: Interactive open-ended questions (`#open-q-box`) with `localStorage` auto-save and Markdown export.
 - **Self-Check Quizzes & Boundary Data**: Per-lesson check questions (`#quiz-box`), curated course resources, and 4 CSV boundary datasets (`adc.csv`, `debounce.csv`, `fsm.csv`, `pwm.csv`).
@@ -52,6 +52,11 @@ visual-course-c/
 │   ├── debounce.csv
 │   ├── fsm.csv
 │   └── pwm.csv
+├── diagrams/                    # Embedded interactive Archify showcase diagrams
+│   ├── c-mcu-architecture.html
+│   ├── c-firmware-pipeline.html
+│   ├── c-fsm-lifecycle.html
+│   └── electronics-bench-architecture.html
 └── src/
     ├── main.js                  # Composition root (state, shortcuts, UI & animator wiring)
     ├── core/

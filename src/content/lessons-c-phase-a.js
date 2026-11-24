@@ -113,9 +113,9 @@ uint16_t adc_to_mv(uint16_t raw) {
             { op: "-", text: "(uint32_t)(raw * 3300U) trên MCU int 16-bit chỉ giữ 13,513,500 mod 65,536 = 13,084!" }
           ],
           kpis: [
-            { label: "INT32_MIN / -1", value: "UB (Tràn +2³¹)", sub: "Bắt buộc chặn trước /", tone: "rose" },
+            { label: "INT32_MIN / -1", value: "UB (Tràn +2³¹)", sub: "Chặn trước khi chia", tone: "rose" },
             { label: "4095 × 3300", value: "13,513,500", sub: "Tràn int 16-bit (65,535)", tone: "amber" },
-            { label: "Ép trước nhân", value: "(uint32_t)raw *", sub: "Di động mọi MCU", tone: "sage" }
+            { label: "Ép trước nhân", value: "(uint32_t)raw * 3300U", sub: "Di động mọi MCU", tone: "sage" }
           ],
           legend: [
             { label: "Ép kiểu mở rộng", color: "#84be88" },

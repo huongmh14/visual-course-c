@@ -1,37 +1,37 @@
 import { PALETTE, svgEl, drawIsoBlock, drawPillTag, drawFlatCard, addWire } from "../svg-primitives.js";
 
 function sceneMcuOverview(g, _scene, { addPacketTrack, t }) {
-  drawIsoBlock(g, 440, 175, 115, 78, 22, "amber", "AHB / APB Bus", "32-bit Address");
-  drawIsoBlock(g, 440, 42, 110, 74, 28, "sky", "ARM Cortex-M3", "CPU Core (72 MHz)");
-  drawIsoBlock(g, 200, 175, 120, 80, 36, "lavender", "FLASH (64 KB)", "0x0800_0000");
-  drawIsoBlock(g, 680, 175, 120, 80, 30, "sage", "SRAM (20 KB)", "0x2000_0000");
-  drawIsoBlock(g, 440, 298, 125, 74, 24, "paper", "PERIPHERALS", "0x4000_0000 (GPIO)");
+  drawIsoBlock(g, 440, 150, 115, 78, 22, "amber", "AHB / APB Bus", "32-bit Address");
+  drawIsoBlock(g, 440, 22, 110, 74, 24, "sky", "ARM Cortex-M3", "CPU Core (72 MHz)");
+  drawIsoBlock(g, 200, 150, 120, 80, 32, "lavender", "FLASH (64 KB)", "0x0800_0000");
+  drawIsoBlock(g, 680, 150, 120, 80, 28, "sage", "SRAM (20 KB)", "0x2000_0000");
+  drawIsoBlock(g, 440, 296, 125, 74, 24, "paper", "PERIPHERALS", "0x4000_0000 (GPIO)");
 
-  const cpuP = [440, 142];
-  const busP = [440, 175];
-  const flashP = [265, 220];
-  const sramP = [615, 220];
-  const periphP = [440, 305];
+  const cpuP = [440, 128];
+  const busP = [440, 166];
+  const flashP = [294, 204];
+  const sramP = [612, 204];
+  const periphP = [440, 304];
 
   addWire(g, [cpuP, busP]);
-  addWire(g, [flashP, [355, 220]]);
-  addWire(g, [[525, 220], sramP]);
-  addWire(g, [[440, 265], periphP]);
+  addWire(g, [flashP, [372, 204]]);
+  addWire(g, [[538, 204], sramP]);
+  addWire(g, [[440, 266], periphP]);
 
-  drawPillTag(g, 195, 135, t("Lưu code & const", "Stores code & constants"));
-  drawPillTag(g, 685, 135, t("Lưu biến & Stack", "Stores variables & stack"));
-  drawPillTag(g, 610, 345, t("Điều khiển chân I/O", "Controls I/O pins"));
+  drawPillTag(g, 195, 116, t("Lưu code & const", "Stores code & constants"));
+  drawPillTag(g, 685, 116, t("Lưu biến & Stack", "Stores variables & stack"));
+  drawPillTag(g, 632, 345, t("Điều khiển chân I/O", "Controls I/O pins"));
 
-  addPacketTrack([flashP, [355, 220]], "#c7b8ea", 1, 0.36, "fetch");
-  addPacketTrack([[525, 220], sramP], "#84be88", 1, 0.32, "R/W");
-  addPacketTrack([[440, 265], periphP], "#f5d88b", 1, 0.28, "GPIO");
+  addPacketTrack([flashP, [372, 204]], "#c7b8ea", 1, 0.36, "fetch");
+  addPacketTrack([[538, 204], sramP], "#84be88", 1, 0.32, "R/W");
+  addPacketTrack([[440, 266], periphP], "#f5d88b", 1, 0.28, "GPIO");
 }
 
 function sceneIntTrap(g, _scene, { addPacketTrack, t }) {
   drawFlatCard(
     g,
     70,
-    52,
+    24,
     740,
     48,
     "var(--bg-elevated)",
@@ -39,19 +39,21 @@ function sceneIntTrap(g, _scene, { addPacketTrack, t }) {
     t("Cùng một dòng code C nhưng kích thước int khác nhau theo chip!", "The same C code can use different int widths on different chips.")
   );
 
-  drawIsoBlock(g, 245, 160, 145, 90, 30, "rose", "8-bit AVR MCU", "sizeof(int) = 2B");
-  drawFlatCard(g, 145, 295, 200, 62, PALETTE.rose.top, "avr-gcc: adc_mv = -25,536", t("Kết quả phụ thuộc triển khai", "Implementation-defined result"));
+  drawIsoBlock(g, 245, 118, 140, 88, 28, "rose", "8-bit AVR MCU", "sizeof(int) = 2B");
+  drawFlatCard(g, 145, 306, 200, 74, PALETTE.rose.top, "avr-gcc: adc_mv = -25,536", t("Kết quả phụ thuộc triển khai", "Implementation-defined result"));
 
-  drawIsoBlock(g, 635, 160, 145, 90, 30, "sage", "32-bit STM32", "sizeof(int) = 4B");
-  drawFlatCard(g, 535, 295, 200, 62, PALETTE.sage.top, "adc_mv = +40,000", t("0x00009C40 → AN TOÀN", "0x00009C40 → IN RANGE"));
+  drawIsoBlock(g, 635, 118, 140, 88, 28, "sage", "32-bit STM32", "sizeof(int) = 4B");
+  drawFlatCard(g, 535, 306, 200, 74, PALETTE.sage.top, "adc_mv = +40,000", t("0x00009C40 → AN TOÀN", "0x00009C40 → IN RANGE"));
 
-  addWire(g, [[440, 102], [245, 160]], "#d38383");
-  addWire(g, [[440, 102], [635, 160]], "#84b684");
-  addWire(g, [[245, 250], [245, 295]], "#d38383");
-  addWire(g, [[635, 250], [635, 295]], "#84b684");
+  addWire(g, [[440, 72], [245, 118]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[440, 72], [635, 118]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[245, 258], [245, 306]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[635, 258], [635, 306]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[440, 102], [245, 160], [245, 295]], "#e57373", 2, 0.35, "0x9C40");
-  addPacketTrack([[440, 102], [635, 160], [635, 295]], "#84be88", 2, 0.35, "0x00009C40");
+  addPacketTrack([[440, 72], [245, 118]], "#e57373", 1, 0.36, "0x9C40");
+  addPacketTrack([[440, 72], [635, 118]], "#84be88", 1, 0.36, "0x00009C40");
+  addPacketTrack([[245, 258], [245, 306]], "#e57373", 1, 0.36);
+  addPacketTrack([[635, 258], [635, 306]], "#84be88", 1, 0.36);
 }
 
 function sceneStdintSram(g, _scene, { addPacketTrack, t }) {
@@ -98,23 +100,23 @@ function sceneStdintSram(g, _scene, { addPacketTrack, t }) {
 }
 
 function sceneFlashVsSram(g, _scene, { addPacketTrack, t }) {
-  drawIsoBlock(g, 230, 75, 150, 95, 28, "lavender", "FLASH .text", t("Mã máy chương trình", "Machine code"));
-  drawIsoBlock(g, 230, 175, 150, 95, 28, "lavender", "FLASH .rodata", "const font_rom[256]");
-  drawIsoBlock(g, 230, 275, 150, 95, 28, "amber", "FLASH .data_init", t("Bản sao font_ram", "Initial font_ram data"));
+  drawIsoBlock(g, 225, 26, 135, 82, 20, "lavender", "FLASH .text", t("Mã máy chương trình", "Machine code"));
+  drawIsoBlock(g, 225, 156, 135, 82, 20, "lavender", "FLASH .rodata", "const font_rom[256]");
+  drawIsoBlock(g, 225, 286, 135, 82, 20, "amber", "FLASH .data_init", t("Bản sao font_ram", "Initial font_ram data"));
 
-  drawIsoBlock(g, 650, 125, 150, 95, 28, "amber", "SRAM .data", "font_ram[256] (256B)");
-  drawIsoBlock(g, 650, 235, 150, 95, 28, "sage", "SRAM .bss", "rx_count = 0");
+  drawIsoBlock(g, 670, 86, 135, 82, 20, "amber", "SRAM .data", "font_ram[256] (256B)");
+  drawIsoBlock(g, 670, 228, 135, 82, 20, "sage", "SRAM .bss", "rx_count = 0");
 
-  drawIsoBlock(g, 440, 275, 105, 70, 24, "sky", "CPU Core", t("Đọc thẳng .rodata", "Read .rodata directly"));
+  drawIsoBlock(g, 450, 260, 105, 68, 22, "sky", "CPU Core", t("Đọc thẳng .rodata", "Read .rodata directly"));
 
-  addWire(g, [[310, 315], [570, 185]], "#d3b25a", true);
-  addWire(g, [[305, 225], [440, 295]], "#ad9cd8");
+  addWire(g, [[342, 340], [599, 140]], "#d3b25a", true, { markerEnd: true });
+  addWire(g, [[342, 220], [391, 294]], "#ad9cd8", false, { markerEnd: true });
 
-  drawPillTag(g, 440, 120, t("Startup copy khi cấp nguồn", "Copied during startup"), PALETTE.amber.top);
-  drawPillTag(g, 370, 365, t("0 byte SRAM nhờ const!", "0 SRAM bytes in this example"), PALETTE.sage.top);
+  drawPillTag(g, 450, 74, t("Startup copy khi cấp nguồn", "Copied during startup"), PALETTE.amber.top);
+  drawPillTag(g, 450, 396, t("0 byte SRAM nhờ const!", "0 SRAM bytes in this example"), PALETTE.sage.top);
 
-  addPacketTrack([[310, 315], [570, 185]], "#f5d88b", 2, 0.34, "boot copy");
-  addPacketTrack([[305, 225], [440, 295]], "#d9c8f0", 2, 0.38, "read");
+  addPacketTrack([[342, 340], [599, 140]], "#f5d88b", 2, 0.34, "boot copy");
+  addPacketTrack([[342, 220], [391, 294]], "#d9c8f0", 2, 0.38, "read");
 }
 
 function sceneOverflowAlu(g, _scene, { addPacketTrack, t }) {
@@ -167,30 +169,30 @@ function sceneTwosComplement(g, _scene, { addPacketTrack, t }) {
   const bitsA = ["0", "0", "0", "0", "1", "0", "1", "0"];
   const bitsB = ["1", "1", "1", "1", "1", "0", "1", "1"];
   const bitsR = ["0", "0", "0", "0", "0", "1", "0", "1"];
-  const bitW = 46;
-  const x0 = 260;
+  const bitW = 54;
+  const x0 = 256;
 
-  drawPillTag(g, 160, 130, "a = +10 (0x0A)", PALETTE.sage.top);
+  drawPillTag(g, 152, 128, "a = +10 (0x0A)", PALETTE.sage.top);
   bitsA.forEach((b, i) => {
     drawFlatCard(g, x0 + i * (bitW + 4), 105, bitW, 46, i === 0 ? PALETTE.lavender.top : PALETTE.sage.top, b, i === 0 ? "-128" : `+${1 << (7 - i)}`);
   });
 
-  drawPillTag(g, 160, 192, "b = -5 (0xFB)", PALETTE.amber.top);
+  drawPillTag(g, 152, 190, "b = -5 (0xFB)", PALETTE.amber.top);
   bitsB.forEach((b, i) => {
     drawFlatCard(g, x0 + i * (bitW + 4), 167, bitW, 46, i === 0 ? PALETTE.lavender.top : PALETTE.amber.top, b, i === 0 ? "-128" : `+${1 << (7 - i)}`);
   });
 
-  drawFlatCard(g, 370, 232, 175, 40, PALETTE.sky.top, t("Cộng nhị phân", "Binary addition"), t("Minh họa trên 8 bit", "8-bit example"));
+  drawFlatCard(g, 395, 232, 185, 42, PALETTE.sky.top, t("Cộng nhị phân", "Binary addition"), t("Minh họa trên 8 bit", "8-bit example"));
 
-  drawPillTag(g, 160, 315, "sum = +5 (0x05)", PALETTE.sage.top);
+  drawPillTag(g, 152, 313, "sum = +5 (0x05)", PALETTE.sage.top);
   bitsR.forEach((b, i) => {
     drawFlatCard(g, x0 + i * (bitW + 4), 290, bitW, 46, i === 0 ? PALETTE.lavender.top : PALETTE.sage.top, b, "");
   });
 
-  addWire(g, [[455, 213], [455, 232]]);
-  addWire(g, [[455, 272], [455, 290]]);
-  addPacketTrack([[283, 151], [455, 250], [455, 290]], "#d9c8f0", 1, 0.35);
-  addPacketTrack([[615, 213], [455, 250], [615, 290]], "#84be88", 1, 0.35);
+  addWire(g, [[487, 213], [487, 232]], "var(--border)", false, { markerEnd: true });
+  addWire(g, [[487, 274], [487, 290]], "var(--border)", false, { markerEnd: true });
+  addPacketTrack([[283, 151], [487, 250], [487, 290]], "#d9c8f0", 1, 0.35);
+  addPacketTrack([[687, 213], [487, 250], [687, 290]], "#84be88", 1, 0.35);
 }
 
 function sceneLittleEndian(g, _scene, { addPacketTrack, t }) {
@@ -241,17 +243,17 @@ function sceneEndianWire(g, _scene, { addPacketTrack, t }) {
   drawFlatCard(g, 330, 232, 220, 64, PALETTE.sage.top, t("Dịch bit (mv >> 8)", "Bit shift (mv >> 8)"), t("Gửi 0x03 trước, 0xE8 sau", "Send 0x03 then 0xE8"));
   drawFlatCard(g, 635, 227, 195, 74, PALETTE.sage.top, "0x03E8 = 1,000 mV", t("Khôi phục chính xác!", "Correctly decoded"));
 
-  addWire(g, [[240, 150], [330, 94]], "#d38383");
-  addWire(g, [[550, 94], [635, 94]], "#d38383");
-  addWire(g, [[240, 195], [330, 264]], "#84b684");
-  addWire(g, [[550, 264], [635, 264]], "#84b684");
+  addWire(g, [[240, 150], [330, 94]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[550, 94], [635, 94]], "#d38383", false, { markerEnd: true });
+  addWire(g, [[240, 195], [330, 264]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[550, 264], [635, 264]], "#84b684", false, { markerEnd: true });
 
   addPacketTrack([[240, 150], [330, 94], [635, 94]], "#e57373", 2, 0.36, "E8 → 03");
   addPacketTrack([[240, 195], [330, 264], [635, 264]], "#84be88", 2, 0.36, "03 → E8");
 }
 
 function sceneMmioLed(g, _scene, { addPacketTrack, t }) {
-  drawIsoBlock(g, 165, 138, 125, 86, 28, "sky", "CPU Core", "ODR |= (1 << 5)");
+  drawIsoBlock(g, 155, 138, 125, 86, 28, "sky", "CPU Core", "ODR |= (1 << 5)");
   drawIsoBlock(g, 435, 138, 138, 90, 28, "lavender", "GPIOA_ODR", "0x4001_080C [b5]");
 
   drawFlatCard(g, 645, 130, 160, 110, PALETTE.sage.top, t("Chân PA5 = 3.3 V", "Pin PA5 = 3.3 V"), t("ĐÈN LED SÁNG!", "LED ON"));
@@ -259,31 +261,31 @@ function sceneMmioLed(g, _scene, { addPacketTrack, t }) {
   g.appendChild(svgEl("circle", { cx: 725, cy: 295, r: 14, fill: "#4caf50", stroke: "#1c1b18", "stroke-width": "1.5" }));
   g.appendChild(svgEl("text", { x: 725, y: 342, "text-anchor": "middle", "font-size": "11", "font-weight": "700", fill: "var(--ink)" }, "LED ON (HIGH)"));
 
-  addWire(g, [[225, 195], [370, 195]], "#ad9cd8");
-  addWire(g, [[505, 195], [645, 185]], "#84b684");
-  addWire(g, [[725, 240], [725, 267]], "#84b684");
+  addWire(g, [[263, 200], [357, 200]], "#ad9cd8", false, { markerEnd: true });
+  addWire(g, [[554, 195], [645, 185]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[725, 240], [725, 267]], "#84b684", false, { markerEnd: true });
 
-  drawPillTag(g, 298, 152, "APB2 Bus Write", PALETTE.lavender.top);
-  addPacketTrack([[225, 195], [370, 195]], "#d9c8f0", 2, 0.38, "0x0020");
-  addPacketTrack([[505, 195], [645, 185], [725, 295]], "#84be88", 2, 0.4, "3.3V");
+  drawPillTag(g, 310, 118, "APB2 Bus Write", PALETTE.lavender.top);
+  addPacketTrack([[263, 200], [357, 200]], "#d9c8f0", 2, 0.38, "0x0020");
+  addPacketTrack([[554, 195], [645, 185]], "#84be88", 2, 0.4, "3.3V");
 }
 
 function sceneRecapMap(g, _scene, { addPacketTrack, t }) {
-  drawIsoBlock(g, 190, 145, 130, 86, 28, "sky", "Code C + stdint", "uint8_t / uint32_t");
-  drawIsoBlock(g, 450, 48, 145, 86, 28, "lavender", "FLASH 0x0800_0000", ".text + const .rodata");
-  drawIsoBlock(g, 450, 175, 145, 86, 28, "sage", "SRAM 0x2000_0000", ".data + .bss (LE)");
-  drawIsoBlock(g, 450, 302, 145, 86, 24, "amber", "MMIO 0x4000_0000", t("Thanh ghi Ngoại vi", "Peripheral registers"));
+  drawIsoBlock(g, 160, 156, 130, 82, 24, "sky", "Code C + stdint", "uint8_t / uint32_t");
+  drawIsoBlock(g, 450, 22, 135, 76, 20, "lavender", "FLASH 0x0800_0000", ".text + const .rodata");
+  drawIsoBlock(g, 450, 156, 135, 76, 20, "sage", "SRAM 0x2000_0000", ".data + .bss (LE)");
+  drawIsoBlock(g, 450, 290, 135, 76, 20, "amber", "MMIO 0x4000_0000", t("Thanh ghi Ngoại vi", "Peripheral registers"));
 
-  drawFlatCard(g, 675, 155, 155, 92, PALETTE.sage.top, t("Phần cứng thật", "Physical hardware"), "LED, Timer, UART,\nCAN, LoRa SX1278");
+  drawFlatCard(g, 675, 164, 165, 92, PALETTE.sage.top, t("Phần cứng thật", "Physical hardware"), "LED, Timer, UART,\nCAN, LoRa SX1278");
 
-  addWire(g, [[260, 190], [385, 100]], "#ad9cd8");
-  addWire(g, [[260, 195], [385, 220]], "#84b684");
-  addWire(g, [[260, 200], [385, 340]], "#d3b25a");
-  addWire(g, [[520, 340], [750, 247]], "#84b684");
+  addWire(g, [[272, 204], [384, 88]], "#ad9cd8", false, { markerEnd: true });
+  addWire(g, [[272, 210], [384, 218]], "#84b684", false, { markerEnd: true });
+  addWire(g, [[272, 216], [384, 348]], "#d3b25a", false, { markerEnd: true });
+  addWire(g, [[567, 348], [675, 210]], "#84b684", false, { markerEnd: true });
 
-  addPacketTrack([[260, 190], [385, 100]], "#d9c8f0", 1, 0.32);
-  addPacketTrack([[260, 195], [385, 220]], "#84be88", 1, 0.35);
-  addPacketTrack([[260, 200], [385, 340], [750, 247]], "#f5d88b", 2, 0.32);
+  addPacketTrack([[272, 204], [384, 88]], "#d9c8f0", 1, 0.32);
+  addPacketTrack([[272, 210], [384, 218]], "#84be88", 1, 0.35);
+  addPacketTrack([[272, 216], [384, 348], [567, 348], [675, 210]], "#f5d88b", 2, 0.32);
 }
 
 export function registerMemoryScenes(registerScene) {

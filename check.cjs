@@ -1,10 +1,47 @@
 const assert = require("node:assert/strict");
-const { readFileSync } = require("node:fs");
+const { existsSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
+function createStubSvgRoot() {
+  const makeNode = (tag) => ({
+    tag,
+    attrs: {},
+    textContent: "",
+    children: [],
+    classList: { add() {} },
+    setAttribute(k, v) {
+      this.attrs[k] = String(v);
+    },
+    getAttribute(k) {
+      return this.attrs[k] ?? null;
+    },
+    appendChild(child) {
+      this.children.push(child);
+      return child;
+    },
+    set innerHTML(_v) {
+      this.children = [];
+    }
+  });
+  globalThis.document = {
+    createElementNS: (_ns, tag) => makeNode(tag)
+  };
+  return makeNode("svg");
+}
+
+function measureVisualUnits(text) {
+  let units = 0;
+  for (const ch of text) {
+    units += /[\u0100-\uFFFF]/.test(ch) ? 1.05 : 1.0;
+  }
+  return units;
+}
+
 (async () => {
+  const svgStub = createStubSvgRoot();
   const { COURSES, COURSE_EN, COURSE_RESOURCES } = await import("./src/content/index.js");
-  const { hasScene, listRegisteredScenes } = await import("./src/engine/index.js");
+  const { hasScene, listRegisteredScenes, renderScene } = await import("./src/engine/index.js");
+  const { getArchifyDiagram } = await import("./src/ui/stage.js");
   const { createSearchIndex } = await import("./src/core/search-index.js");
 
   const { modules } = COURSES.vi;
@@ -116,7 +153,84 @@ const { join } = require("node:path");
     assert.equal(enabled * Math.round(code * 1000 / 4095), expected);
   }
 
+  // Verify SVG geometry (0 text overflow, 0 out-of-bounds) across all 20 lessons x 2 languages
+  const noopAnimator = { setTracks() {} };
+  let renderedCount = 0;
+  const geomIssues = [];
+  for (const lang of ["vi", "en"]) {
+    const langReady = COURSES[lang].modules.flatMap((m) => m.lessons).filter((l) => !l.locked);
+    for (const lesson of langReady) {
+      const archSpec = getArchifyDiagram(lesson.id);
+      const archPath = join(__dirname, archSpec.file);
+      assert.ok(existsSync(archPath), `Missing Archify diagram for ${lesson.id}: ${archSpec.file}`);
+      for (const step of lesson.steps) {
+        renderScene(svgStub, step.scene, noopAnimator, {
+          t: (vi, en) => (lang === "en" ? en : vi),
+          vertical: false
+        });
+        renderedCount++;
+        const walk = (node, depth = 0) => {
+          if (node.attrs.id === "scene-packets") return;
+          const rects = node.children.filter((c) => c.tag === "rect");
+          const texts = node.children.filter((c) => c.tag === "text");
+          // Check card/pill containers (<g> nodes below root staticLayer/packetLayer)
+          if (depth >= 2 && rects.length >= 1 && texts.length >= 1) {
+            const box = rects.reduce((best, cur) =>
+              parseFloat(cur.attrs.width || "0") > parseFloat(best.attrs.width || "0") ? cur : best
+            );
+            const bw = parseFloat(box.attrs.width || "0");
+            const bx = parseFloat(box.attrs.x || "0");
+            if (bx < -2 || bx + bw > 882) {
+              geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] box OOB x=${bx}, w=${bw}`);
+            }
+            for (const tx of texts) {
+              const fs = parseFloat(tx.attrs["font-size"] || "11");
+              const spans = tx.children.filter((c) => c.tag === "tspan");
+              const lines = spans.length ? spans.map((s) => s.textContent) : [tx.textContent];
+              for (const line of lines) {
+                const est = measureVisualUnits(line) * fs * 0.61;
+                if (bw > 40 && est > bw - 8) {
+                  geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text(${Math.round(est)}) > box(${bw}): "${line}"`);
+                }
+              }
+            }
+          }
+          // Check global horizontal bounds 0..880 for every text element
+          for (const tx of texts) {
+            const fs = parseFloat(tx.attrs["font-size"] || "11");
+            const x = parseFloat(tx.attrs.x || "0");
+            const anchor = tx.attrs["text-anchor"] || "start";
+            const spans = tx.children.filter((c) => c.tag === "tspan");
+            const lines = spans.length ? spans.map((s) => s.textContent) : [tx.textContent];
+            for (const line of lines) {
+              const w = measureVisualUnits(line) * fs * 0.61;
+              const left = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
+              const right = left + w;
+              if (left < -4 || right > 884) {
+                geomIssues.push(`${lang}:${lesson.id}:${step.id} [${step.scene.type}] text OOB [${Math.round(left)}..${Math.round(right)}]: "${line}"`);
+              }
+            }
+          }
+          node.children.forEach((c) => walk(c, depth + 1));
+        };
+        walk(svgStub, 0);
+      }
+    }
+  }
+  assert.equal(geomIssues.length, 0, `SVG geometry issues:\n${geomIssues.join("\n")}`);
+
+  const archifyFiles = [
+    "c-mcu-architecture.html",
+    "c-firmware-pipeline.html",
+    "c-fsm-lifecycle.html",
+    "electronics-bench-architecture.html"
+  ];
+  for (const f of archifyFiles) {
+    const html = readFileSync(join(__dirname, "diagrams", f), "utf8");
+    assert.ok(html.includes("<svg") && html.includes("archify"), `Invalid Archify output: ${f}`);
+  }
+
   console.log(
-    `Verified ${ready.length} bilingual lessons, ${listRegisteredScenes().length} registered scenes, search index, resource coverage, and 4 CSV datasets.`
+    `Verified ${ready.length} bilingual lessons, ${listRegisteredScenes().length} registered scenes (${renderedCount} rendered SVG checks clean), ${archifyFiles.length} Archify diagrams, search index, resource coverage, and 4 CSV datasets.`
   );
 })();
