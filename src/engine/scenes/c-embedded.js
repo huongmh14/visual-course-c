@@ -39,8 +39,8 @@ function sceneConvPromotionTrap(g, _scene, { addPacketTrack, t }) {
     46,
     "var(--bg-elevated)",
     t(
-      "Chuyển đổi kiểu ngầm C17: So sánh Signed/Unsigned & Thu hẹp 8-bit",
-      "C17 Implicit Conversions: Signed/Unsigned Promotion & 8-bit Narrowing"
+      "Ép kiểu ngầm trong C: So sánh có/không dấu & Cắt gọn 8-bit",
+      "Implicit Conversions in C: Signed/Unsigned & 8-bit Narrowing"
     ),
     t(
       "C nâng kiểu toán hạng trước khi tính biểu thức, rồi mới cắt gọn khi gán vào biến đích",
@@ -67,7 +67,7 @@ function sceneConvPromotionTrap(g, _scene, { addPacketTrack, t }) {
     265,
     92,
     PALETTE.amber.top,
-    t("Nâng hạng: int → unsigned int", "Usual Conversion: int → unsigned"),
+    t("Tự đổi: int → unsigned int", "Auto-Convert: int → unsigned"),
     "-1  →  0xFFFFFFFFU\n4,294,967,295U < 1U ?"
   );
 
@@ -118,7 +118,7 @@ function sceneConvPromotionTrap(g, _scene, { addPacketTrack, t }) {
     265,
     100,
     PALETTE.amber.top,
-    t("Integer Promotion → int", "Integer Promotion → int"),
+    t("Tự nâng lên int", "Auto-Promote → int"),
     t("(int)250 + (int)10 = 260\n0x0104 (chưa tràn ở int)", "(int)250 + (int)10 = 260\n0x0104 (no overflow in int)")
   );
 
@@ -160,7 +160,7 @@ function sceneConvTimerWrap(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Tràn bộ đếm 16-bit (Timer Rollover): Trừ Modulo an toàn 100%",
+      "Bộ đếm 16-bit quay vòng: Phép trừ không dấu an toàn 100%",
       "16-bit Timer Rollover: Wrap-Safe Unsigned Subtraction"
     ),
     t(
@@ -263,7 +263,7 @@ function sceneConvTimerWrap(g, _scene, { addPacketTrack, t }) {
     415,
     94,
     PALETTE.sky.top,
-    t("1. Phép trừ Unsigned 16-bit (mod 2¹⁶)", "1. 16-bit Unsigned Subtraction (mod 2¹⁶)"),
+    t("1. Phép trừ không dấu 16-bit (quay vòng)", "1. 16-bit Unsigned Subtraction (wrap)"),
     "(uint16_t)(0x0005U - 0xFFF0U) = 0x0015 = 21\n0xFFF0→0xFFFF (16) + 0x0005 (5) = 21 ticks ✓"
   );
 
@@ -274,7 +274,7 @@ function sceneConvTimerWrap(g, _scene, { addPacketTrack, t }) {
     415,
     90,
     PALETTE.sage.top,
-    t("2. Bộ so sánh Timeout (elapsed >= 20)", "2. Timeout Comparator (elapsed >= 20)"),
+    t("2. Kiểm tra quá hạn (elapsed >= 20)", "2. Timeout Check (elapsed >= 20)"),
     t("(uint16_t)(now - start) >= 20U → 21 >= 20 → TRUE ✓\nChuẩn 100% khi tràn qua 0xFFFF → 0x0000", "(uint16_t)(now - start) >= 20U → 21 >= 20 → TRUE ✓\nZero glitch across 0xFFFF → 0x0000")
   );
 
@@ -302,8 +302,8 @@ function sceneModularBuildDag(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Chuỗi Build C mô-đun: Header → Biên dịch (-MMD -MP) → Linker → Flash / SRAM",
-      "Modular C Build DAG: Headers → Compile (-MMD -MP) → Link → Flash / SRAM"
+      "Chia nhỏ file C: Header → Biên dịch (-MMD -MP) → Ghép file → Flash / SRAM",
+      "Modular C Build: Headers → Compile (-MMD -MP) → Link → Flash / SRAM"
     ),
     t(
       "File .d giúp Make chỉ build lại đúng .c bị ảnh hưởng khi sửa một file .h",
@@ -346,7 +346,7 @@ function sceneModularBuildDag(g, _scene, { addPacketTrack, t }) {
   );
 
   // Col 2: gcc -c -MMD -MP -> .o + .d
-  drawPillTag(g, 360, 86, "gcc -std=c17 -c -MMD -MP", PALETTE.amber.top, "#1c1b18");
+  drawPillTag(g, 360, 86, "gcc -c -MMD -MP", PALETTE.amber.top, "#1c1b18");
 
   drawFlatCard(
     g,
@@ -434,12 +434,12 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "FSM dạng Bảng & Callback Con trỏ hàm (Event-Driven Firmware)",
-      "Table-Driven FSM & Function-Pointer Callback Dispatch"
+      "Máy trạng thái bảng tra & Con trỏ hàm gọi lại (Callback)",
+      "Table-Driven FSM & Function-Pointer Callback"
     ),
     t(
-      "Tách lớp phần cứng bằng callback cb(evt, ctx) và chuyển trạng thái O(1) qua table[STATE][EVT]",
-      "Decouple HAL IRQ via cb(evt, void *ctx) and dispatch transitions in O(1) via table[STATE][EVT]"
+      "Tách phần cứng bằng hàm gọi lại cb(evt, ctx) và tra bảng tốc độ cố định table[STATE][EVT]",
+      "Decouple hardware via cb(evt, void *ctx) and look up transitions in constant time"
     )
   );
 
@@ -462,7 +462,7 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
     250,
     92,
     PALETTE.amber.top,
-    "2. Callback Dispatch",
+    t("2. Bảng chọn hàm (Callback)", "2. Callback Dispatch Table"),
     "typedef void (*cb_t)(evt, void *ctx);\nif (cb) cb(evt, ctx);"
   );
 
@@ -473,7 +473,7 @@ function sceneFsmCallbackTable(g, _scene, { addPacketTrack, t }) {
     210,
     92,
     PALETTE.lavender.top,
-    t("3. Tra bảng O(1)", "3. O(1) Table Lookup"),
+    t("3. Tra bảng 1 bước", "3. 1-Step Table Lookup"),
     "next = table[state][evt];\nstate = next; action(ctx);"
   );
 
@@ -592,12 +592,12 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Ring Buffer UART & Pool bộ nhớ tĩnh O(1) — Tuyệt đối không malloc()",
-      "Lock-Free UART Ring Buffer & Static O(1) Memory Pool — Zero malloc()"
+      "Hàng đợi vòng UART & Kho nhớ tĩnh tốc độ cố định — Không dùng malloc()",
+      "UART Ring Buffer & Fixed-Time Static Pool — No malloc()"
     ),
     t(
-      "SPSC không cần khóa giữa ISR và main; pool khối cố định cho WCET xác định 100%",
-      "Single-producer/consumer ISR→main queue; fixed-block pool prevents heap fragmentation"
+      "1 bên ghi (ngắt) - 1 bên đọc (main); kho nhớ khối cố định, thời gian chạy luôn đều",
+      "Single-writer ISR → single-reader main; fixed-block pool prevents RAM fragmentation"
     )
   );
 
@@ -676,8 +676,8 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     396,
     208,
     "var(--bg-elevated)",
-    t("Static Memory Pool (Khối cố định 32B)", "Static Memory Pool (Fixed 32B Blocks)"),
-    t("Free list O(1): alloc()/free() không phân mảnh RAM", "O(1) free list: deterministic, zero fragmentation"),
+    t("Kho nhớ tĩnh (Khối cố định 32B)", "Static Pool (Fixed 32B Blocks)"),
+    t("Cấp/trả tốc độ cố định: không phân mảnh RAM", "Constant-time free list: zero RAM fragmentation"),
     { valign: "top" }
   );
 
@@ -688,7 +688,7 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
 
   drawPillTag(g, 558, 260, "free_head → #1 → #3", PALETTE.amber.top, "#1c1b18");
   addWire(g, [[640, 260], [743, 260], [743, 240]], "#84b684", false, { markerEnd: true });
-  addPacketTrack([[640, 260], [743, 260], [743, 240]], "#84be88", 1, 0.38, "O(1)");
+  addPacketTrack([[640, 260], [743, 260], [743, 240]], "#84be88", 1, 0.38, t("nhanh", "fast"));
 
   // Right Bottom: MISRA Gate Badge
   drawFlatCard(
@@ -698,12 +698,12 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     396,
     88,
     PALETTE.rose.top,
-    t("Cổng kiểm soát MISRA-C & An toàn Embedded", "MISRA-C & Embedded Safety Gate"),
-    t("Kiểm tra tĩnh bắt buộc trước khi build Firmware", "Mandatory compile-time rules before flashing"),
+    t("Viết C an toàn (MISRA) cho hệ nhúng", "Safe C Rules (MISRA) for Embedded"),
+    t("Kiểm tra quy tắc an toàn trước khi nạp chip", "Mandatory compile-time rules before flashing"),
     { valign: "top" }
   );
-  drawPillTag(g, 520, 360, "No malloc", PALETTE.paper.top, "#1c1b18");
-  drawPillTag(g, 650, 360, "No recursion", PALETTE.paper.top, "#1c1b18");
+  drawPillTag(g, 520, 360, t("Không malloc", "No malloc"), PALETTE.paper.top, "#1c1b18");
+  drawPillTag(g, 650, 360, t("Không đệ quy", "No recursion"), PALETTE.paper.top, "#1c1b18");
   drawPillTag(g, 778, 360, "-Werror", PALETTE.sage.top, "#1c1b18");
 
   drawPillTag(
@@ -711,8 +711,8 @@ function sceneRingbufStaticPool(g, _scene, { addPacketTrack, t }) {
     440,
     404,
     t(
-      "WCET xác định 100% — Không bao giờ Out-of-Memory bất ngờ lúc chạy",
-      "100% Deterministic WCET — Zero runtime OOM or heap fragmentation"
+      "Thời gian chạy cố định 100% — Không bao giờ tràn bộ nhớ bất ngờ",
+      "100% Predictable Timing — Zero unexpected out-of-memory errors"
     ),
     PALETTE.sage.top,
     "#1c1b18"

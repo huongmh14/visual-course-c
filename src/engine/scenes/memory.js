@@ -40,7 +40,7 @@ function sceneIntTrap(g, _scene, { addPacketTrack, t }) {
   );
 
   drawIsoBlock(g, 245, 118, 140, 88, 28, "rose", "8-bit AVR MCU", "sizeof(int) = 2B");
-  drawFlatCard(g, 145, 306, 200, 74, PALETTE.rose.top, "avr-gcc: adc_mv = -25,536", t("Kết quả phụ thuộc triển khai", "Implementation-defined result"));
+  drawFlatCard(g, 145, 306, 200, 74, PALETTE.rose.top, "avr-gcc: adc_mv = -25,536", t("Tùy con chip!", "Chip-dependent result!"));
 
   drawIsoBlock(g, 635, 118, 140, 88, 28, "sage", "32-bit STM32", "sizeof(int) = 4B");
   drawFlatCard(g, 535, 306, 200, 74, PALETTE.sage.top, "adc_mv = +40,000", t("0x00009C40 → AN TOÀN", "0x00009C40 → IN RANGE"));
@@ -144,7 +144,7 @@ function sceneOverflowAlu(g, _scene, { addPacketTrack, t }) {
   for (let i = 0; i < 8; i++) {
     drawFlatCard(g, x0 + i * (bitW + 4), 275, bitW, 52, PALETTE.paper.top, "0", `b${7 - i}`);
   }
-  drawPillTag(g, 455, 360, t("Kết quả trong uint8_t = 0 (Wrap-around!)", "uint8_t result = 0 (wraparound)"), PALETTE.rose.top);
+  drawPillTag(g, 455, 360, t("Kết quả trong uint8_t = 0 (Quay vòng về 0!)", "uint8_t result = 0 (wraps back to 0!)"), PALETTE.rose.top);
 
   addWire(g, [[440, 165], [440, 195]]);
   addWire(g, [[440, 240], [440, 275]]);
@@ -231,7 +231,7 @@ function sceneLittleEndian(g, _scene, { addPacketTrack, t }) {
     );
   });
 
-  drawPillTag(g, 440, 368, t("Little-Endian: Byte thấp nhất nằm ở địa chỉ thấp nhất", "Little-endian: the lowest address holds the least significant byte"), PALETTE.sage.top);
+  drawPillTag(g, 440, 368, t("Little-Endian (byte thấp trước): Địa chỉ thấp nhất giữ byte thấp nhất", "Little-endian (low byte first): lowest address holds lowest byte"), PALETTE.sage.top);
 }
 
 function sceneEndianWire(g, _scene, { addPacketTrack, t }) {
@@ -273,7 +273,7 @@ function sceneMmioLed(g, _scene, { addPacketTrack, t }) {
 function sceneRecapMap(g, _scene, { addPacketTrack, t }) {
   drawIsoBlock(g, 160, 156, 130, 82, 24, "sky", "Code C + stdint", "uint8_t / uint32_t");
   drawIsoBlock(g, 450, 22, 135, 76, 20, "lavender", "FLASH 0x0800_0000", ".text + const .rodata");
-  drawIsoBlock(g, 450, 156, 135, 76, 20, "sage", "SRAM 0x2000_0000", ".data + .bss (LE)");
+  drawIsoBlock(g, 450, 156, 135, 76, 20, "sage", "SRAM 0x2000_0000", ".data + .bss (RAM)");
   drawIsoBlock(g, 450, 290, 135, 76, 20, "amber", "MMIO 0x4000_0000", t("Thanh ghi Ngoại vi", "Peripheral registers"));
 
   drawFlatCard(g, 675, 164, 165, 92, PALETTE.sage.top, t("Phần cứng thật", "Physical hardware"), "LED, Timer, UART,\nCAN, LoRa SX1278");

@@ -330,8 +330,8 @@ function sceneCTypesLab(g, _scene, { addPacketTrack, t }) {
     48,
     "var(--bg-elevated)",
     t(
-      "Thực hành Bài 01: Viết 3 chương trình C17 & tự kiểm thử biên",
-      "Lab 01: Write 3 C17 programs & verify edge cases"
+      "Thực hành Bài 01: Viết 3 chương trình C & tự kiểm thử biên",
+      "Lab 01: Write 3 C programs & verify edge cases"
     ),
     t(
       "Ghi ca thường + ca biên + đầu ra dự kiến trước khi chạy và đối chiếu từng bài",
@@ -388,7 +388,7 @@ function sceneCTypesLab(g, _scene, { addPacketTrack, t }) {
     660,
     74,
     "var(--bg-elevated)",
-    "gcc -std=c17 -Wall -Wextra -Wpedantic",
+    "gcc -Wall -Wextra -Werror",
     t(
       "0 cảnh báo + mọi ca thường & ca biên khớp kết quả dự kiến → git commit",
       "0 warnings + all normal & boundary cases match predictions → git commit"
@@ -424,8 +424,8 @@ function sceneCShortCircuit(g, _scene, { addPacketTrack, t }) {
     48,
     "var(--bg-elevated)",
     t(
-      "Đoản mạch && (Short-Circuit): Chặn chia 0 trước khi tính %",
-      "Short-Circuit && Guard: Block divide-by-zero before scaling"
+      "Dừng sớm với &&: Chặn phép chia 0 trước khi tính %",
+      "Stop Early with &&: Block divide-by-zero before scaling"
     ),
     t(
       "C chỉ tính vế phải của && khi vế trái khác 0; nâng toán hạng lên uint32_t trước khi nhân",
@@ -550,8 +550,8 @@ function sceneCForBounds(g, _scene, { addPacketTrack, t }) {
     440,
     376,
     t(
-      "sizeof(samples) chỉ cho số phần tử khi nhìn thấy đối tượng mảng (không dùng sau decay con trỏ)",
-      "sizeof(samples) counts elements only where the array object itself is visible"
+      "sizeof(samples) chỉ đếm đúng khi còn là mảng (không dùng trong hàm nhận con trỏ)",
+      "sizeof(samples) counts elements only on the array itself (not via a pointer)"
     ),
     PALETTE.sky.top
   );
@@ -566,8 +566,8 @@ function sceneCDowhileTimeout(g, _scene, { addPacketTrack, t }) {
     48,
     "var(--bg-elevated)",
     t(
-      "while vs do-while: Giới hạn số lần đọc cờ chống treo phần cứng",
-      "while vs do-while: Bounded Retry Loop Prevents Hardware Hang"
+      "while vs do-while: Thử lại có giới hạn chống treo phần cứng",
+      "while vs do-while: Retry Limit Loop Prevents Hardware Hang"
     ),
     t(
       "while kiểm tra đầu lượt (có thể chạy 0 lần); do-while kiểm tra cuối lượt (chạy ≥ 1 lần)",
@@ -634,8 +634,8 @@ function sceneCDowhileTimeout(g, _scene, { addPacketTrack, t }) {
     440,
     358,
     t(
-      "Trong super-loop thực tế, kiểm tra 1 lần mỗi tick thay vì chặn CPU chờ đợi",
-      "In a firmware super-loop, sample once per tick with timestamps instead of busy-waiting"
+      "Trong vòng lặp chính, kiểm tra 1 lần mỗi nhịp thay vì chặn CPU chờ",
+      "In the main loop, check once per tick using timestamps instead of busy-waiting"
     ),
     PALETTE.lavender.top
   );
@@ -650,8 +650,8 @@ function sceneCSwitchHysteresis(g, _scene, { addPacketTrack, t }) {
     48,
     "var(--bg-elevated)",
     t(
-      "Switch máy trạng thái (FSM) với vùng trễ 650..700 chống giật cờ",
-      "Switch State Machine (FSM) with 650..700 Hysteresis Band"
+      "Máy trạng thái switch với vùng đệm 650..700 chống giật cờ",
+      "Switch State Machine with 650..700 Hold Band"
     ),
     t(
       "Mỗi lần gọi next_state(state, sample) chỉ xét nhánh case hiện tại rồi return trạng thái mới",
@@ -700,8 +700,8 @@ function sceneCSwitchHysteresis(g, _scene, { addPacketTrack, t }) {
     74,
     PALETTE.lavender.top,
     t(
-      "Vùng trễ (Hysteresis) 650..699: Giữ nguyên trạng thái đang có!",
-      "Hysteresis Band 650..699: Hold Current State!"
+      "Vùng đệm 650..699 giữ ổn định: Không đổi trạng thái đang có!",
+      "Hold Band 650..699: Keep Current State!"
     ),
     t(
       "Ngăn dao động quanh 700 bật/tắt cảnh báo liên tục · Nhánh default trả WAIT để an toàn",
@@ -731,7 +731,7 @@ function sceneCFsmCsvLab(g, _scene, { addPacketTrack, t }) {
   const trace = [
     { sample: "699", state: "→ WAIT", sub: t("Khởi tạo WAIT", "Starts WAIT"), fill: PALETTE.paper.top },
     { sample: "700", state: "→ ALERT", sub: t("Đạt ngưỡng 700", "Hits ≥ 700"), fill: PALETTE.rose.top },
-    { sample: "680", state: "→ ALERT", sub: t("Giữ vùng trễ", "Hold band"), fill: PALETTE.amber.top },
+    { sample: "680", state: "→ ALERT", sub: t("Giữ vùng đệm", "Hold band"), fill: PALETTE.amber.top },
     { sample: "650", state: "→ ALERT", sub: t("Biên ≥ 650 giữ", "At 650 holds"), fill: PALETTE.amber.top },
     { sample: "649", state: "→ WAIT", sub: t("Hồi < 650 ✓", "< 650 clears ✓"), fill: PALETTE.sage.top }
   ];
@@ -753,7 +753,7 @@ function sceneCFsmCsvLab(g, _scene, { addPacketTrack, t }) {
     660,
     76,
     "var(--bg-elevated)",
-    "gcc -std=c17 -Wall -Wextra -Wpedantic  +  assert()",
+    "gcc -Wall -Wextra -Werror  +  assert()",
     t(
       "Kỳ vọng: WAIT → ALERT → ALERT → ALERT → WAIT · Đang ALERT nhận 670 giữ ALERT",
       "Expected: WAIT → ALERT → ALERT → ALERT → WAIT · ALERT + 670 stays ALERT"

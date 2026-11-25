@@ -85,7 +85,7 @@ export const EN_ELECTRONICS = {
         codeLang: "Voltage divider diagram",
         code: "Vin ── 10 kΩ ──●── 10 kΩ ── GND\n               └── ADC",
         nodes: [["Vin", "3.30 V"], ["Two resistors", "1/2 ratio"], ["ADC", "Vout ≈ 1.65 V"]],
-        callout: { text: "When connecting a real ADC, check its input range and source impedance requirements in the datasheet. Two 10 kΩ resistors give a Thévenin resistance of 5 kΩ." },
+        callout: { text: "When connecting a real ADC, check its input range and source impedance requirements in the datasheet. Two 10 kΩ resistors have an equivalent resistance of 5 kΩ." },
         diff: ["Vin = 0 V → Vout = 0 V.", "Vin = 2.0 V → Vout ≈ 1.0 V."]
       },
       {
@@ -94,7 +94,7 @@ export const EN_ELECTRONICS = {
         codeLang: "C · estimate mV at the ADC pin",
         code: "uint32_t adc_mv(uint16_t code) {\n    return ((uint32_t)code * 3300u + 2047u) / 4095u;\n}",
         nodes: [["Analog input", "≈ 1.65 V"], ["12-bit ADC", "≈ 2048"], ["Firmware", "≈ 1650 mV"]],
-        callout: { text: "The highest code is 4095. The ideal quantization step is Vref / 4096. On a real board, the result also depends on the actual Vref, ADC error, and sampling time." },
+        callout: { text: "The highest code is 4095. The smallest ideal step size is Vref / 4096. On a real board, the result also depends on the actual Vref, ADC error, and sampling time." },
         diff: ["The input code must be in the range 0..4095.", "The formula maps 2048 to 1650 mV."]
       },
       {

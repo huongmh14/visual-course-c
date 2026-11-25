@@ -100,16 +100,25 @@ function measureTextSpan(tx) {
   const bitwiseOpenCount = bitwise.steps.reduce((acc, s) => acc + (s.openQuestions?.length || 0), 0);
   assert.ok(bitwiseOpenCount >= 2, "b02-bitwise should have open-ended questions");
 
+  const jargonTagRe = /\bC1[127]\b|\bC99\b|\bT1 N\d\b|\b6\.5p7\b/;
   for (const [index, lesson] of lessons.entries()) {
     assert.equal(Number(lesson.number), index);
     const translation = english[index];
     assert.equal(translation.id, lesson.id);
     assert.ok(translation.title && translation.subtitle);
     if (!lesson.locked) {
+      for (const [langName, loc] of [["vi", lesson], ["en", translation]]) {
+        assert.ok(!jargonTagRe.test(loc.title), `Unexpected tag in ${langName}:${lesson.id} title: ${loc.title}`);
+        assert.ok(!jargonTagRe.test(loc.subtitle), `Unexpected tag in ${langName}:${lesson.id} subtitle: ${loc.subtitle}`);
+      }
       assert.equal(COURSE_EN[lesson.id].steps.length, lesson.steps.length, lesson.id);
       for (const [i, step] of lesson.steps.entries()) {
         const translated = translation.steps[i];
         assert.equal(translated.id, step.id);
+        for (const [langName, locStep] of [["vi", step], ["en", translated]]) {
+          assert.ok(!jargonTagRe.test(locStep.title), `Unexpected tag in ${langName}:${lesson.id}:${step.id} title: ${locStep.title}`);
+          assert.ok(!jargonTagRe.test(locStep.codeLang || ""), `Unexpected tag in ${langName}:${lesson.id}:${step.id} codeLang: ${locStep.codeLang}`);
+        }
         assert.ok(translated.body && translated.callout.text);
         assert.equal(translated.scene.nodes?.length, step.scene.nodes?.length);
         assert.ok(hasScene(step.scene.type), `Missing registered scene: ${step.scene.type}`);

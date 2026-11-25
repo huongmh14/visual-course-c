@@ -80,8 +80,8 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     PALETTE.rose.top,
     "LDO (AMS1117-3.3)",
     t(
-      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (HOT! η = 27.5%)\nTỏa nhiệt nặng, dễ ngắt nhiệt",
-      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (HOT! η = 27.5%)\nSevere heat, thermal cutoff risk"
+      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (NÓNG! 27.5%)\nTỏa nhiệt nặng, dễ ngắt nhiệt",
+      "P_heat = (12 - 3.3) × 0.3A\n= 2,610 mW (HOT! 27.5%)\nSevere heat, thermal cutoff risk"
     )
   );
 
@@ -109,9 +109,9 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     205,
     108,
     PALETTE.sage.top,
-    "Buck (90% Eff)",
+    t("Mạch hạ áp Buck (90%)", "Buck Converter (90%)"),
     t(
-      "Switching + Inductor\nP_loss = 110 mW (COOL ✓)\nMát & tiết kiệm pin vượt trội",
+      "Đóng cắt + Cuộn cảm\nTổn hao 110 mW (MÁT ✓)\nMát & tiết kiệm pin hơn hẳn",
       "Switching + Inductor\nP_loss = 110 mW (COOL ✓)\nCool & battery-friendly"
     )
   );
@@ -191,7 +191,7 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
       "stroke-width": "1.3"
     })
   );
-  drawLabel(g, 712, 224, "Non-FT", { size: 9.5, weight: 700, fill: "var(--ink)" });
+  drawLabel(g, 712, 224, t("Chân 3.3V", "3.3V pin"), { size: 9.5, weight: 700, fill: "var(--ink)" });
   drawLabel(g, 796, 174, "ESD Diode", { size: 9.5, weight: 600, fill: "var(--ink)" });
   drawLabel(g, 796, 190, "Vf ≈ 0.7V", { size: 9.5 });
 
@@ -212,8 +212,8 @@ function scenePowerLdoVsBuck(g, _scene, { addPacketTrack, t }) {
     "var(--bg-elevated)",
     t("Kéo VDD vọt lên ~4.3V!", "Pulls 3.3V Rail up to ~4.3V!"),
     t(
-      "V_pin > 3.3V + 0.7V = 4.0V\nTreo / cháy MCU & cháy ESD\nSửa: cầu chia 1k/2k hoặc chân FT",
-      "V_pin > 3.3V + 0.7V = 4.0V\nLatches up / burns MCU & ESD\nFix: 1k/2k divider or FT pin"
+      "Áp chân > 3.3V + 0.7V = 4.0V\nTreo / cháy chip & diode bảo vệ\nSửa: cầu chia 1k/2k hoặc chân 5V",
+      "Pin > 3.3V + 0.7V = 4.0V\nLatches / burns chip & ESD\nFix: 1k/2k divider or 5V pin"
     )
   );
 }
@@ -227,12 +227,12 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Mạch lái MOSFET N-Channel tải cảm + Diode Flyback & Tụ 100 nF",
-      "Logic-Level N-MOSFET Inductive Driver, Flyback Diode & 100 nF Decoupling"
+      "Mạch MOSFET đóng cắt cuộn dây + Diode bảo vệ & Tụ lọc 100 nF",
+      "N-MOSFET Inductive Driver, Flyback Diode & 100 nF Filter Cap"
     ),
     t(
-      "Đặt 100 nF sát VDD-VSS; diode xả ngược chặn xung -L·dI/dt đánh thủng Drain",
-      "Place 100 nF right across VDD-VSS; flyback diode clamps -L·dI/dt kickback"
+      "Đặt tụ 100 nF sát chân nguồn; diode xả dòng ngược bảo vệ MOSFET khi ngắt",
+      "Place 100 nF right by power pins; flyback diode protects MOSFET on turn-off"
     )
   );
 
@@ -298,7 +298,10 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     96,
     PALETTE.amber.top,
     "N-MOSFET",
-    "AO3400 / IRLZ44N\nVgs(th) ≈ 1.0–2.0V\nRds(on) < 50 mΩ"
+    t(
+      "AO3400 / IRLZ44N\nNgưỡng mở ≈ 1–2V\nTrở dẫn < 50 mΩ",
+      "AO3400 / IRLZ44N\nTurn-on ≈ 1–2V\nOn-resist < 50 mΩ"
+    )
   );
 
   // Source to GND
@@ -319,14 +322,14 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     72,
     PALETTE.lavender.top,
     t("Cuộn Relay", "Inductive Load"),
-    "12V Coil (L)\nV = -L · dI/dt"
+    t("Cuộn hút 12V\nTích năng lượng từ", "12V Relay Coil\nStores magnetic energy")
   );
 
   addWire(g, [[498, 170], [498, 212]], "#84b684");
   addWire(g, [[498, 192], [660, 192], [660, 84]], "#84b684");
   drawDiodeUp(g, 660, 126, 150, PALETTE.sage.top);
 
-  drawLabel(g, 682, 130, "Flyback Diode", {
+  drawLabel(g, 682, 130, t("Diode xả ngược", "Flyback Diode"), {
     size: 11,
     weight: 700,
     anchor: "start",
@@ -337,7 +340,7 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     g,
     682,
     162,
-    t("(mắc ngược // tải)", "(reverse parallel)"),
+    t("(mắc ngược tải)", "(reverse across coil)"),
     { size: 9.5, anchor: "start" }
   );
 
@@ -350,8 +353,8 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     PALETTE.sage.top,
     t("Vòng xả dòng cảm ứng", "Safe Kickback Loop"),
     t(
-      "Khi MOSFET ngắt:\nxả -L·dI/dt qua Diode về +12V\nGhim V_DS ≤ 12.7V ✓",
-      "When MOSFET turns OFF:\nrecirculates -L·dI/dt to +12V\nClamps V_DS ≤ 12.7V ✓"
+      "Khi MOSFET ngắt:\ndòng cuộn dây xả qua Diode\nGiữ áp ở mức ≤ 12.7V ✓",
+      "When MOSFET turns OFF:\ncoil current loops via Diode\nClamps voltage ≤ 12.7V ✓"
     )
   );
 
@@ -370,8 +373,8 @@ function sceneMosfetFlybackDecap(g, _scene, { addPacketTrack, t }) {
     440,
     396,
     t(
-      "Thiếu Diode Flyback → gai áp hàng trăm Volt đánh chết MOSFET ngay lần tắt đầu!",
-      "Missing Flyback Diode → 100V+ inductive spike kills the MOSFET on first turn-off!"
+      "Thiếu Diode → gai áp trăm Volt làm chết MOSFET! (Thử bỏ diode chỉ làm trên mô phỏng Falstad)",
+      "No Diode → 100V+ spike kills MOSFET! (Only test removing diode in Falstad simulator)"
     ),
     PALETTE.rose.top,
     "#1c1b18"
@@ -387,12 +390,12 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Lọc thông thấp RC + Đệm Op-Amp (Unity Buffer) vào ADC 12-bit",
-      "RC Low-Pass Filter + Op-Amp Unity Buffer Driving 12-bit ADC"
+      "Mạch lọc RC + Tầng đệm Op-Amp làm phẳng xung PWM vào chân đọc áp",
+      "RC Low-Pass Filter + Op-Amp Buffer Smoothing PWM for 12-bit ADC"
     ),
     t(
-      "Làm phẳng xung PWM thành DC sạch và cách ly trở kháng trước tụ lấy mẫu S&H của ADC",
-      "Smooths PWM ripple into steady DC and isolates impedance from the ADC S&H capacitor"
+      "Biến xung vuông thành áp DC phẳng và giữ ổn định áp khi chip lấy mẫu",
+      "Smooths PWM into steady DC and prevents voltage droop when the ADC samples"
     )
   );
 
@@ -450,7 +453,7 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
       "stroke-width": "1.8"
     })
   );
-  drawLabel(g, 321, 268, t("Z_out cao (10 kΩ)!", "High Z_out (10 kΩ)!"), {
+  drawLabel(g, 321, 268, t("Đầu ra yếu (10 kΩ)!", "High output R (10 kΩ)!"), {
     fill: "#1c1b18",
     weight: 600
   });
@@ -480,12 +483,12 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
   addWire(g, [[490, 169], [510, 169]], "#1c1b18");
   addWire(g, [[574, 180], [598, 180]], "#1c1b18");
   addWire(g, [[586, 180], [586, 222], [498, 222], [498, 190], [510, 190]], "#1c1b18");
-  drawLabel(g, 545, 248, t("Z_in ≈ ∞ (không rút RC)", "Z_in ≈ ∞ (zero RC droop)"), {
+  drawLabel(g, 545, 248, t("Không rút dòng mạch RC", "Draws zero RC current"), {
     size: 9.8,
     fill: "#1c1b18",
     weight: 600
   });
-  drawLabel(g, 545, 268, t("Z_out < 1 Ω (lái S&H)", "Z_out < 1 Ω (drives S&H)"), {
+  drawLabel(g, 545, 268, t("Đầu ra khỏe (nạp tụ nhanh)", "Strong drive (fast sample)"), {
     size: 9.8,
     fill: "#3f3c33"
   });
@@ -528,7 +531,7 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
     402,
     88,
     "var(--bg-elevated)",
-    t("Tần số cắt lọc Analog (Cutoff f_c)", "Analog RC Cutoff Frequency (f_c)"),
+    t("Tần số cắt của mạch lọc RC", "RC Filter Cutoff Frequency"),
     t(
       "f_c = 1 / (2π · R · C) = 159 Hz (≪ 20 kHz PWM)\nChọn f_c ≤ f_PWM / 100 để gợn sóng < 1%",
       "f_c = 1 / (2π · R · C) = 159 Hz (≪ 20 kHz PWM)\nPick f_c ≤ f_PWM / 100 for <1% ripple"
@@ -542,7 +545,7 @@ function sceneOpampRcFilter(g, _scene, { addPacketTrack, t }) {
     402,
     88,
     "var(--bg-elevated)",
-    t("Lọc số tương đương trên MCU (EMA)", "Discrete MCU Equivalent (EMA Filter)"),
+    t("Bộ lọc làm mượt bằng phần mềm (EMA)", "Software Smoothing Filter (EMA)"),
     "y[n] = y[n-1] + α · (x[n] - y[n-1])\nα = Δt / (τ + Δt)  (Q-format >> shift, no float)"
   );
 }
@@ -575,7 +578,7 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     88,
     PALETTE.amber.top,
     "1. I2C (Open-Drain)",
-    t("100–400 kHz (2 wires)\nChỉ kéo LOW, cần R_pu", "100–400 kHz (2 wires)\nPulls LOW only + R_pu")
+    t("100–400 kHz (2 dây)\nChỉ kéo xuống 0V, cần trở kéo", "100–400 kHz (2 wires)\nPulls LOW only + pull-up")
   );
 
   drawFlatCard(g, 256, 98, 96, 62, PALETTE.paper.top, "Master", "Open-Drain");
@@ -602,7 +605,7 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     86,
     PALETTE.sky.top,
     "2. SPI (Push-Pull)",
-    t("1–50 MHz (4 wires)\nFull-duplex, không R kéo", "1–50 MHz (4 wires)\nFull-duplex, no pull-up")
+    t("1–50 MHz (4 dây)\nGửi-nhận 2 chiều, 0 cần trở", "1–50 MHz (4 wires)\nFull-duplex, no pull-up")
   );
 
   drawFlatCard(g, 256, 202, 96, 82, PALETTE.paper.top, "SPI Master", "SCK / CS");
@@ -631,7 +634,7 @@ function sceneSerialBusesWave(g, _scene, { addPacketTrack, t }) {
     86,
     PALETTE.sage.top,
     "3. CAN / RS-485",
-    t("Vi sai 2 dây (100m+)\nKhử nhiễu EMI cực tốt", "Differential (100m+)\nHigh EMI immunity")
+    t("Cặp dây xoắn (100m+)\nChống nhiễu rất tốt", "Twisted pair (100m+)\nHigh noise immunity")
   );
 
   drawFlatCard(g, 256, 332, 66, 62, PALETTE.amber.top, "120 Ω", "Term");
@@ -664,12 +667,12 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t(
-      "Đọc Datasheet STM32: Chân FT vs TT, Tổng dòng ΣI_VDD, SWD & Smoke Test",
-      "STM32 Datasheet Budget: FT vs TT Pins, ΣI_VDD Cap, SWD & Smoke Test"
+      "Đọc thông số STM32: Chân chịu 5V vs 3.3V, Tổng dòng chip & Kiểm tra DMM",
+      "STM32 Datasheet Limits: 5V vs 3.3V Pins, Total Current & DMM Check"
     ),
     t(
-      "Kiểm tra giới hạn Abs Max & đo thông mạch DMM trước khi cấp nguồn cho board",
-      "Verify Absolute Maximum Ratings & DMM continuity before powering any board"
+      "Đo thông mạch bằng đồng hồ DMM trước khi cấp điện · Không đo dòng trực tiếp qua pin!",
+      "Check DMM continuity before powering on · Never measure current straight across a battery!"
     )
   );
 
@@ -737,14 +740,14 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     g,
     197,
     318,
-    t("FT = Chịu 5V ở chế độ Input (an toàn)", "FT = Five-volt Tolerant (5V input safe)"),
+    t("FT = Chân nhận được áp 5V (an toàn)", "FT = Five-volt Tolerant (5V input safe)"),
     { size: 10, weight: 600, fill: "var(--ink)" }
   );
   drawLabel(
     g,
     197,
     338,
-    t("TT = Chỉ 3.3V (cấm > VDD + 0.3V!)", "TT = 3.3V-only (NEVER > VDD + 0.3V!)"),
+    t("TT = Chỉ 3.3V (cấm quá 3.6V!)", "TT = 3.3V-only (NEVER > 3.6V!)"),
     { size: 10 }
   );
   drawLabel(
@@ -853,10 +856,10 @@ function sceneDatasheetPinBudget(g, _scene, { addPacketTrack, t }) {
     428,
     102,
     PALETTE.amber.top,
-    t("Smoke Test 6 bước bằng DMM trước khi bật điện", "6-Step Pre-Power DMM Smoke Test"),
+    t("Kiểm tra 6 bước bằng đồng hồ DMM trước khi bật điện", "6-Step Pre-Power DMM Safety Check"),
     t(
-      "1. Soi mạch → 2. Đo thông mạch VDD–GND (≠ 0Ω)\n3. Kiểm cực tụ/diode → 4. Cấp nguồn giới hạn dòng\n5. Đo áp 3.3V (±5%) → 6. Kiểm tra nhiệt trước khi nạp",
-      "1. Visual check → 2. Continuity VDD–GND (no short)\n3. Cap/diode polarity → 4. Current-limited power\n5. Verify 3.3V (±5%) → 6. Thermal check before flash"
+      "1. Soi mạch → 2. Đo thông mạch VDD–GND (≠ 0Ω)\n3. Kiểm cực tụ/diode → 4. Cấp nguồn giới hạn dòng\n5. Đo áp 3.3V (±5%) → Không đo dòng trực tiếp qua pin",
+      "1. Visual check → 2. Continuity VDD–GND (no short)\n3. Cap/diode polarity → 4. Current-limited power\n5. Verify 3.3V (±5%) → Never probe current across battery"
     )
   );
 

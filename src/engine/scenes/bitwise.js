@@ -177,7 +177,7 @@ function sceneBitwiseBitsHex(g, _scene, { addPacketTrack, t }) {
 
   addWire(g, [[400, 339], [480, 339]], "#84b684", false, { markerEnd: true });
   addPacketTrack([[400, 339], [480, 339]], "#84be88", 1, 0.35, "1U<<3");
-  drawPillTag(g, 440, 274, t("Phân biệt 10U ≠ 010 (bát phân = 8)", "Note: 10U ≠ 010 (octal = 8)"), PALETTE.lavender.top);
+  drawPillTag(g, 440, 274, t("Luôn thêm chữ U cho bit (10U ≠ 010)", "Add U suffix for bits (10U ≠ 010)"), PALETTE.lavender.top);
 }
 
 function sceneBitwiseOpsGrid(g, _scene, { addPacketTrack, t }) {
@@ -244,7 +244,7 @@ function sceneBitwiseMaskClear(g, _scene, { addPacketTrack, t }) {
     700,
     44,
     "var(--bg-elevated)",
-    t("Từ 03_clear_bit.c: Vì sao xóa bit 3 của 0x88 phải dùng & ~mask?", "From 03_clear_bit.c: Why Clear Bit 3 of 0x88 with & ~mask?"),
+    t("Xóa 1 bit giữ bit khác: Vì sao xóa bit 3 của 0x88 dùng & ~mask?", "Clear 1 Bit, Keep Others: Why Clear Bit 3 of 0x88 with & ~mask?"),
     t("Mục tiêu: xóa đúng bit 3 về 0, GIỮ NGUYÊN bit 7 (0x88 → 0x80 = 128)", "Goal: clear only bit 3 to 0, PRESERVE bit 7 (0x88 → 0x80 = 128)")
   );
 
@@ -358,7 +358,7 @@ function sceneBitwiseFieldRmw(g, _scene, { addPacketTrack, t }) {
     44,
     "var(--bg-elevated)",
     t("Thay trường 2 bit [7:6] trong config = 0xFFFF thành mode = 1 (01)", "Update 2-Bit Field [7:6] in config = 0xFFFF to mode = 1 (01)"),
-    t("Quy trình 3 bước CMSIS: Xóa trường cũ (& ~Msk) → Dịch giá trị (<< Pos) → Ghép (|)", "3-Step CMSIS Pattern: Clear old field (& ~Msk) → Shift new value (<< Pos) → OR (|)")
+    t("Nhóm nhiều bit (_Pos/_Msk): Xóa cũ (& ~Msk) → Dịch mới (<< Pos) → Ghép (|)", "Multi-Bit Field (_Pos/_Msk): Clear old (& ~Msk) → Shift new (<< Pos) → OR (|)")
   );
 
   drawFlatCard(
@@ -427,7 +427,7 @@ function sceneBitwiseC17Traps(g, _scene, { addPacketTrack, t }) {
     700,
     44,
     "var(--bg-elevated)",
-    t("4 bẫy C17 hay làm hỏng code Bitwise trên MCU", "4 C17 Traps That Silently Break Embedded Bitwise Code"),
+    t("4 bẫy hay làm hỏng code xử lý bit trên chip", "4 Traps That Silently Break Embedded Bitwise Code"),
     t("Biến nhận kết quả KHÔNG quyết định kiểu tính biểu thức", "The destination variable does NOT control the type used to evaluate the expression")
   );
 
@@ -438,7 +438,7 @@ function sceneBitwiseC17Traps(g, _scene, { addPacketTrack, t }) {
     365,
     126,
     PALETTE.rose.top,
-    t("Bẫy 1: Nâng kiểu (Integer Promotion)", "Trap 1: Integer Promotion"),
+    t("Bẫy 1: Tự nâng lên int", "Trap 1: Auto-Promote to int"),
     t("uint8_t m = 0x0F; → ~m thành int (-16), KHÔNG phải 0xF0!", "uint8_t m = 0x0F; → ~m promotes to int (-16), NOT 0xF0!"),
     { valign: "top" }
   );
@@ -451,8 +451,8 @@ function sceneBitwiseC17Traps(g, _scene, { addPacketTrack, t }) {
     365,
     126,
     PALETTE.amber.top,
-    t("Bẫy 2: Dịch quá độ rộng / số âm = UB", "Trap 2: Shift >= Width or Negative = UB"),
-    t("1U << 32U, 1U << -1, -1 << 1 đều là Undefined Behavior!", "1U << 32U, 1U << -1, -1 << 1 are Undefined Behavior!"),
+    t("Bẫy 2: Dịch quá cỡ hoặc số âm (Lỗi!)", "Trap 2: Shift Too Far or Negative (Bug!)"),
+    t("1U << 32U, 1U << -1, -1 << 1 đều sai chuẩn C (lỗi ngầm)!", "1U << 32U, 1U << -1, -1 << 1 are invalid in C!"),
     { valign: "top" }
   );
   drawPillTag(g, 642, 192, "if (n < 8U && (reg & (1U << n))) ✓", PALETTE.sage.top);
@@ -477,8 +477,8 @@ function sceneBitwiseC17Traps(g, _scene, { addPacketTrack, t }) {
     365,
     126,
     PALETTE.sky.top,
-    t("Bẫy 4: Signed >> và printf sai định dạng", "Trap 4: Signed >> and Wrong printf Spec"),
-    t("-4 >> 1 là implementation-defined; in uint32_t dùng PRIX32", "-4 >> 1 is implementation-defined; print uint32_t with PRIX32"),
+    t("Bẫy 4: Dịch phải số âm & printf sai kiểu", "Trap 4: Signed >> and Wrong printf Spec"),
+    t("-4 >> 1 tùy từng con chip; in uint32_t dùng PRIX32", "-4 >> 1 depends on the chip; print uint32_t with PRIX32"),
     { valign: "top" }
   );
   drawPillTag(g, 642, 352, "printf(\"0x%08\" PRIX32, reg) ✓", PALETTE.paper.top);
@@ -495,8 +495,8 @@ function sceneBitwiseMcuHw(g, _scene, { addPacketTrack, t }) {
     720,
     44,
     "var(--bg-elevated)",
-    t("Từ RAM lên phần cứng thật: Race Condition (ISR), BSRR & Giải mã ADC", "From RAM to Real MCU: ISR Race, Atomic BSRR & ADC Decoding"),
-    t("volatile KHÔNG làm reg |= mask thành thao tác nguyên tử!", "volatile does NOT make reg |= mask atomic!")
+    t("Lên phần cứng thật: Đụng độ ngắt (ISR), BSRR 1 lần ghi & Giải mã ADC", "RAM to Hardware: ISR Race, 1-Write BSRR & ADC Decoding"),
+    t("volatile KHÔNG giúp reg |= mask chạy gọn trong 1 bước!", "volatile does NOT make reg |= mask a single atomic step!")
   );
 
   drawFlatCard(
@@ -506,7 +506,7 @@ function sceneBitwiseMcuHw(g, _scene, { addPacketTrack, t }) {
     360,
     134,
     PALETTE.rose.top,
-    t("NGUY HIỂM: Main & ISR cùng RMW (ODR |= ...)", "DANGER: Main & ISR Race on RMW (ODR |= ...)"),
+    t("NGUY HIỂM: Main & Ngắt cùng đọc-sửa-ghi", "DANGER: Main & ISR Race on Read-Modify-Write"),
     t("Main đọc ODR → ISR xen vào ghi bit 5 → Main ghi đè → MẤT cờ ISR!", "Main reads ODR → ISR sets bit 5 → Main writes stale value → ISR flag LOST!")
   );
   drawFlatCard(
@@ -516,7 +516,7 @@ function sceneBitwiseMcuHw(g, _scene, { addPacketTrack, t }) {
     360,
     134,
     PALETTE.sage.top,
-    t("AN TOÀN: Ghi nguyên tử STM32 BSRR ✓", "SAFE: Atomic STM32 BSRR Write ✓"),
+    t("AN TOÀN: Xóa cờ W1C & BSRR 1 lần ghi ✓", "SAFE: W1C Flag & 1-Write BSRR ✓"),
     t("Set pin n: BSRR = 1U << n  |  Reset: BSRR = 1U << (n + 16) (không đọc cũ)", "Set pin n: BSRR = 1U << n  |  Reset: BSRR = 1U << (n + 16) (no read step)")
   );
 
@@ -530,7 +530,7 @@ function sceneBitwiseMcuHw(g, _scene, { addPacketTrack, t }) {
     770,
     138,
     PALETTE.sky.top,
-    t("Ghép gói cảm biến theo giá trị số (không phụ thuộc Endian RAM)", "Decode Sensor Bytes Numerically (Endian-Independent)"),
+    t("Ghép 2 byte cảm biến bằng dịch bit (không lo thứ tự RAM)", "Decode Sensor Bytes Numerically (Byte-Order Safe)"),
     t("high = [S3..S0 | D11..D8], low = [D7..D0]  →  ((uint16_t)(high & 0x0FU) << 8U) | low", "high = [S3..S0 | D11..D8], low = [D7..D0]  →  ((uint16_t)(high & 0x0FU) << 8U) | low"),
     { valign: "top" }
   );
@@ -547,8 +547,8 @@ function sceneBitwiseLabFlow(g, _scene, { addPacketTrack, t }) {
     720,
     44,
     "var(--bg-elevated)",
-    t("Quy trình giải bài Bitwise Ngày 04: Yêu cầu → Mask → Biểu thức → assert", "Day-04 Bitwise Workflow: Requirement → Mask → Expression → assert"),
-    t("Biên dịch chuẩn C17 trên Ubuntu WSL: gcc -std=c17 -Wall -Wextra -Wpedantic -Werror", "Compile with C17 on Ubuntu WSL: gcc -std=c17 -Wall -Wextra -Wpedantic -Werror")
+    t("Quy trình xử lý bit: Yêu cầu → Mặt nạ → Biểu thức → assert", "Bitwise Lab Workflow: Requirement → Mask → Expression → assert"),
+    t("Biên dịch trên Ubuntu/WSL: gcc -Wall -Wextra -Werror", "Compile on Ubuntu/WSL: gcc -Wall -Wextra -Werror")
   );
 
   drawIsoBlock(g, 125, 130, 104, 70, 22, "sky", t("1. Yêu cầu", "1. Spec"), "set / clear / field");

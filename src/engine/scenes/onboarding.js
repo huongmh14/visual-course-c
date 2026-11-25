@@ -123,7 +123,7 @@ function sceneIntroCaseUart(g, _scene, { addPacketTrack, t }) {
     42,
     "var(--bg-elevated)",
     t("Bài toán thực tế #3: Nhiệt độ trên màn hình hiện 59.395 °C", "Real Case #3: Dashboard Displays 59,395 °C"),
-    t("STM32 (Little-Endian) gửi thô byte trong RAM sang giao thức Big-Endian", "STM32 (little-endian) dumps raw RAM bytes into a big-endian protocol")
+    t("STM32 gửi byte thấp trước, còn đường truyền đọc byte cao trước", "STM32 sends low byte first, while the wire expects high byte first")
   );
 
   drawIsoBlock(g, 180, 165, 130, 84, 28, "sky", "STM32 SRAM", "0x03E8 → [E8][03]");
@@ -186,7 +186,7 @@ function sceneIntroWeek1Lab(g, _scene, { addPacketTrack, t }) {
     740,
     50,
     "var(--bg-elevated)",
-    t("Khởi động Tuần 1: Quy trình học, ghi chú .md & repo C17", "Week 1 Kickoff: Study Rhythm, .md Notes & C17 Repo"),
+    t("Khởi động Tuần 1: Quy trình học, ghi chú .md & repo C", "Week 1 Kickoff: Study Rhythm, .md Notes & C Repo"),
     t("Chốt khung giờ · Xuất câu hỏi mở thành file notes.md · Biên dịch với -Werror", "Lock your daily slot · Export Open Qs to notes.md · Build cleanly with -Werror")
   );
 
@@ -218,7 +218,7 @@ function sceneIntroWeek1Lab(g, _scene, { addPacketTrack, t }) {
     114,
     PALETTE.sage.top,
     t("3. Repo week01 + -Werror", "3. week01 Repo + -Werror"),
-    t("mkdir -p embedded-journey\ngcc -std=c17 -Wall\n-Wextra -Werror main.c", "mkdir -p embedded-journey\ngcc -std=c17 -Wall\n-Wextra -Werror main.c")
+    t("mkdir -p embedded-journey\ngcc -Wall -Wextra\n-Werror main.c", "mkdir -p embedded-journey\ngcc -Wall -Wextra\n-Werror main.c")
   );
 
   addWire(g, [[268, 161], [332, 161]], "#84b4df", false, { markerEnd: true });
@@ -233,7 +233,7 @@ function sceneIntroWeek1Lab(g, _scene, { addPacketTrack, t }) {
     650,
     72,
     "var(--bg-elevated)",
-    t("Đầu ra Tuần 1: 1 file notes.md + 3 bài C17 biên dịch không cảnh báo", "Week 1 Output: 1 notes.md + 3 Warning-Free C17 Programs"),
+    t("Đầu ra Tuần 1: 1 file notes.md + 3 bài C biên dịch không cảnh báo", "Week 1 Output: 1 notes.md + 3 Warning-Free C Programs"),
     t("types.c · temperature.c · average.c — chạy đủ ca biên & assert trước khi commit", "types.c · temperature.c · average.c — verify edge cases & asserts before commit")
   );
 
@@ -242,7 +242,7 @@ function sceneIntroWeek1Lab(g, _scene, { addPacketTrack, t }) {
 
   drawPillTag(g, 195, 376, t("Space: Dừng soi sơ đồ", "Space: Pause diagram"), PALETTE.sky.top);
   drawPillTag(g, 440, 376, t("Nút Sao chép (.md)", "Copy (.md) button"), PALETTE.amber.top);
-  drawPillTag(g, 685, 376, "-std=c17 -Wall -Wextra -Werror", PALETTE.sage.top);
+  drawPillTag(g, 685, 376, "gcc -Wall -Wextra -Werror", PALETTE.sage.top);
 }
 
 export function registerOnboardingScenes(registerScene) {

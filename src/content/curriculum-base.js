@@ -13,14 +13,14 @@ export function createBaseCourse() {
           duration: "15 phút",
           level: "Cơ bản",
           subtitle:
-            "Hiểu cách biến C nằm trong Flash/SRAM, tại sao phải dùng uint8_t, tràn số, bù 2, Little-Endian và thanh ghi phần cứng.",
+            "Hiểu cách biến C nằm trong Flash/SRAM, tại sao phải dùng uint8_t, tràn số, cách lưu số âm (bù 2), thứ tự byte (little-endian) và thanh ghi điều khiển phần cứng.",
           locked: false,
           youllLearn: [
             "Phân biệt 3 vùng nhớ trên STM32: Flash, SRAM và Thanh ghi Ngoại vi",
             "Tránh bẫy kích thước kiểu int bằng chuẩn <stdint.h> (uint8_t..uint32_t)",
             "Đọc linker map để biết hằng số và biến nằm ở đâu",
-            "Hiểu cơ chế tràn số (wrap-around) và số âm mã bù 2 trong ALU",
-            "Nắm thứ tự byte Little-Endian khi đọc RAM hoặc gửi khung UART/CAN"
+            "Hiểu cơ chế quay vòng về 0 khi tràn số và cách lưu số âm (bù 2) trong ALU",
+            "Nắm cách xếp byte nhỏ trước (little-endian) khi đọc RAM hoặc gửi khung UART/CAN"
           ],
           steps: [
             {
@@ -28,13 +28,13 @@ export function createBaseCourse() {
               badge: "SETUP",
               title: "Từ code C trên PC xuống con chip STM32",
               body:
-                "Trên PC, hệ điều hành cấp cho bạn hàng GB RAM ảo. Trên vi điều khiển (như STM32F103), không có Windows/Linux: code chạy trực tiếp trên silicon với 64 KB Flash (lưu mã lệnh) và chỉ 20 KB SRAM (lưu biến tạm). Mọi thao tác đều đi qua Bus AHB/APB nối CPU với 3 vùng địa chỉ: Flash, SRAM và Ngoại vi.",
-              codeLang: "main.c (STM32 Bare-metal)",
+                "Trên PC, hệ điều hành cấp cho bạn hàng GB RAM ảo. Trên vi điều khiển (như STM32F103), không có Windows/Linux: code chạy thẳng trên chip (không OS) với 64 KB Flash (lưu mã lệnh) và chỉ 20 KB SRAM (lưu biến tạm). Mọi thao tác đều đi qua Bus AHB/APB nối CPU với 3 vùng địa chỉ: Flash, SRAM và Ngoại vi.",
+              codeLang: "main.c (Chạy thẳng trên chip STM32)",
               code: `// STM32F103C8T6: 64 KB Flash | 20 KB SRAM
 int main(void) {
     // Xem linker map để kiểm tra dung lượng SRAM dùng cho dữ liệu.
     while (1) {
-        // Vòng lặp siêu tốc độ (Super-loop) chạy vĩnh viễn
+        // Vòng lặp chính chạy vĩnh viễn
     }
 }`,
               callout: {
@@ -51,7 +51,7 @@ int main(void) {
                 { label: "Flash (ROM)", value: "64 KB", sub: "0x0800_0000", tone: "lavender" },
                 { label: "SRAM", value: "20 KB", sub: "0x2000_0000", tone: "sage" },
                 { label: "Kiến trúc", value: "32-bit", sub: "ARM Cortex-M", tone: "" },
-                { label: "Hệ điều hành", value: "Bare-metal", sub: "Không có OS", tone: "amber" }
+                { label: "Hệ điều hành", value: "Chạy thẳng trên chip", sub: "Không có OS", tone: "amber" }
               ],
               legend: [
                 { label: "Nạp lệnh (Instruction)", color: "#d9c8f0" },
@@ -66,27 +66,27 @@ int main(void) {
               badge: "PROBLEM",
               title: "Bẫy kiểu int: 16-bit hay 32-bit?",
               body:
-                "Miền giá trị của int tùy trình biên dịch. Trên AVR với avr-gcc, int có 16 bit, tối đa 32.767. Trên STM32 với Arm GCC, int có 32 bit. Khi gán 40000 cho int 16 bit, giá trị vượt miền int. Theo C17, phép chuyển sang kiểu có dấu trong trường hợp này phụ thuộc vào triển khai.",
+                "Miền giá trị của int tùy trình biên dịch. Trên vi điều khiển nhỏ (16-bit), int chỉ tối đa 32.767. Trên STM32 (32-bit), int có 32 bit. Khi gán 40000 cho int 16-bit, giá trị vượt miền int. Theo quy tắc ngôn ngữ C, phép chuyển sang kiểu có dấu trong trường hợp này phụ thuộc vào chip và trình biên dịch.",
               codeLang: "bug_int_size.c",
               code: `// NGUY HIỂM: Kích thước phụ thuộc trình biên dịch!
 int adc_mv = 40000;
 
-// Arm GCC trên STM32: adc_mv = 40000
-// avr-gcc với int 16 bit: kết quả thường thấy là -25536`,
+// Trên STM32 (32-bit): adc_mv = 40000
+// Trên vi điều khiển nhỏ (16-bit): kết quả thường bị lật thành -25536`,
               callout: {
                 type: "watch-out",
                 label: "LƯU Ý",
-                text: "Kiểm tra INT_MIN và INT_MAX trong <limits.h>. Khi thanh ghi hoặc giao thức quy định độ rộng cụ thể, dùng kiểu phù hợp trong <stdint.h> và tuần tự hóa từng byte theo giao thức."
+                text: "Kiểm tra INT_MIN và INT_MAX trong <limits.h>. Khi thanh ghi hoặc giao thức quy định độ rộng cụ thể, dùng kiểu phù hợp trong <stdint.h> và đóng gói từng byte theo giao thức."
               },
               diff: [
-                { op: "~", text: "Target AVR 8-bit: sizeof(int) = 2 bytes (-32768..32767)" },
-                { op: "-", text: "40000 vượt miền int 16 bit. Kết quả minh họa trên avr-gcc là -25536." },
-                { op: "+", text: "Target STM32 32-bit: sizeof(int) = 4 bytes" }
+                { op: "~", text: "Vi điều khiển nhỏ (16-bit): sizeof(int) = 2 bytes (-32768..32767)" },
+                { op: "-", text: "40000 vượt miền int 16-bit. Kết quả minh họa bị lật thành -25536." },
+                { op: "+", text: "STM32 (32-bit): sizeof(int) = 4 bytes" }
               ],
               kpis: [
                 { label: "Giá trị gốc", value: "40,000", sub: "0x9C40 (16-bit)", tone: "" },
-                { label: "avr-gcc với int 16 bit", value: "-25,536", sub: "Kết quả chuyển kiểu", tone: "rose" },
-                { label: "Trên STM32 (4B)", value: "40,000", sub: "Chạy đúng", tone: "sage" },
+                { label: "Vi điều khiển nhỏ (16-bit)", value: "-25,536", sub: "Vượt ngưỡng bị lật âm", tone: "rose" },
+                { label: "Trên STM32 (32-bit)", value: "40,000", sub: "Chạy đúng", tone: "sage" },
                 { label: "Tính khả chuyển", value: "THẤP", sub: "Phụ thuộc MCU", tone: "rose" }
               ],
               legend: [
@@ -178,7 +178,7 @@ uint32_t rx_count; // C bảo đảm giá trị 0 trước khi chương trình b
               badge: "PROBLEM",
               title: "Vì sao uint8_t quay về 0 sau 255?",
               body:
-                "Với `uint8_t tick = 255;`, phép tăng dùng quy tắc nâng kiểu số nguyên (integer promotions). Cộng trong kiểu `int` cho 256. Khi lưu lại vào `uint8_t`, chuẩn C lấy giá trị theo modulo 256, nên `tick` trở về 0. Sơ đồ cho thấy các bit của 256 trước khi chuyển kiểu.",
+                "Với `uint8_t tick = 255;`, phép tăng tự nâng lên kiểu `int` trước khi tính. Cộng trong kiểu `int` cho 256. Khi lưu lại vào `uint8_t`, quy tắc C lấy phần dư chia 256, nên `tick` quay vòng về 0 (như kim đồng hồ). Sơ đồ cho thấy các bit của 256 trước khi chuyển kiểu.",
               codeLang: "overflow_wrap.c",
               code: `uint8_t tick = 255; // 0xFF
 tick++;             // Cộng trong int: 255 + 1 = 256
@@ -192,15 +192,15 @@ tick++;             // Cộng trong int: 255 + 1 = 256
                 text: "Trong vòng lặp `for (uint8_t i = 0; i <= 255; i++)`, mọi giá trị của i đều thỏa điều kiện. Nếu thân vòng lặp không có lối thoát thì nó chạy mãi. Dùng `unsigned int` cho biến đếm nếu cần duyệt đủ 0 đến 255."
               },
               diff: [
-                { op: "~", text: "Nâng tick từ uint8_t lên int trước khi cộng" },
+                { op: "~", text: "Tự nâng tick từ uint8_t lên int trước khi cộng" },
                 { op: "+", text: "Tổng trong int là 256 (0x100)" },
-                { op: "-", text: "Chuyển về uint8_t theo modulo 256, còn 0" }
+                { op: "-", text: "Chuyển về uint8_t: quay vòng về 0 (256 % 256)" }
               ],
               kpis: [
                 { label: "Trước tick++", value: "255", sub: "0b1111_1111 (0xFF)", tone: "amber" },
                 { label: "Tổng trong int", value: "256", sub: "1_0000_0000", tone: "rose" },
                 { label: "Lưu vào uint8_t", value: "0", sub: "0b0000_0000 (0x00)", tone: "rose" },
-                { label: "Hành vi", value: "Wrap-around", sub: "Modulo 256", tone: "lavender" }
+                { label: "Hành vi", value: "Quay vòng về 0", sub: "Như kim đồng hồ", tone: "lavender" }
               ],
               legend: [
                 { label: "Bit hợp lệ (8-bit)", color: "#84be88" },
@@ -212,9 +212,9 @@ tick++;             // Cộng trong int: 255 + 1 = 256
             {
               id: "s6",
               badge: "TECHNIQUE",
-              title: "Số âm trong phần cứng: Mã bù 2 (Two's Complement)",
+              title: "Số âm trong phần cứng: Cách lưu số âm (Bù 2)",
               body:
-                "Kiểu `int8_t` dùng biểu diễn **mã bù 2**. Để tìm mẫu bit của −5, đảo 8 bit của 5 rồi cộng 1, thu được 0xFB. Bit cao nhất mang trọng số −128, các bit còn lại mang trọng số dương. Sơ đồ minh họa phép cộng nhị phân 8 bit. Trong biểu thức C `a + b`, cả hai toán hạng được nâng lên `int` trước khi cộng.",
+                "Kiểu `int8_t` dùng **cách lưu số âm (Bù 2)**. Để tìm mẫu bit của −5, đảo 8 bit của 5 rồi cộng 1, thu được 0xFB. Bit cao nhất mang trọng số −128, các bit còn lại mang trọng số dương. Sơ đồ minh họa phép cộng nhị phân 8 bit. Trong biểu thức C `a + b`, cả hai số được tự nâng lên `int` trước khi cộng.",
               codeLang: "twos_complement.c",
               code: `int8_t a = 10;   // 0b0000_1010 (0x0A)
 int8_t b = -5;   // Đảo bit 5 (1111_1010) + 1 = 0b1111_1011 (0xFB)
@@ -248,9 +248,9 @@ int8_t sum = a + b;
             {
               id: "s7",
               badge: "TECHNIQUE",
-              title: "Thứ tự byte trong RAM: Little-endian trên STM32",
+              title: "Thứ tự byte trong RAM: Ghi byte nhỏ trước (little-endian)",
               body:
-                "Trên STM32, mỗi địa chỉ SRAM ứng với một byte 8 bit. STM32 dùng **little-endian**, nên `uint32_t magic = 0x12345678;` có byte trọng số thấp nhất (0x78) ở địa chỉ thấp nhất của biến. Sơ đồ lấy 0x20000000 làm địa chỉ ví dụ.",
+                "Trên STM32, mỗi địa chỉ SRAM ứng với một byte 8 bit. STM32 dùng kiểu **ghi byte nhỏ trước (little-endian)**, nên `uint32_t magic = 0x12345678;` có byte trọng số nhỏ nhất (0x78) nằm ở địa chỉ thấp nhất của biến. Sơ đồ lấy 0x20000000 làm địa chỉ ví dụ.",
               codeLang: "little_endian.c",
               code: `uint32_t magic = 0x12345678; // Giả sử địa chỉ 0x20000000
 const unsigned char *p = (const unsigned char *)&magic;
@@ -273,7 +273,7 @@ const unsigned char *p = (const unsigned char *)&magic;
               ],
               kpis: [
                 { label: "Giá trị 32-bit", value: "0x12345678", sub: "Trong thanh ghi CPU", tone: "lavender" },
-                { label: "Kiểu xếp Byte", value: "Little-Endian", sub: "Mặc định STM32", tone: "sage" },
+                { label: "Kiểu xếp Byte", value: "Little-Endian", sub: "Byte nhỏ trước (STM32)", tone: "sage" },
                 { label: "Tại 0x2000_0000", value: "0x78", sub: "Byte trọng số thấp", tone: "amber" },
                 { label: "Tại 0x2000_0003", value: "0x12", sub: "Byte trọng số cao", tone: "" }
               ],
@@ -290,21 +290,21 @@ const unsigned char *p = (const unsigned char *)&magic;
               badge: "PROBLEM",
               title: "Lệch khung truyền đa byte qua UART / CAN",
               body:
-                "Bạn đọc cảm biến được `uint16_t mv = 1000` (`0x03E8`) rồi ép con trỏ gửi 2 byte thô qua UART/CAN. Do STM32 là Little-Endian, trên dây truyền byte `0xE8` đi trước, `0x03` đi sau. Thiết bị nhận dùng chuẩn Network (Big-Endian) ghép lại thành `0xE803 = 59,395 mV` — báo sai gấp 59 lần!",
+                "Bạn đọc cảm biến được `uint16_t mv = 1000` (`0x03E8`) rồi ép con trỏ gửi 2 byte thô qua UART/CAN. Do STM32 xếp byte nhỏ trước (little-endian), trên dây truyền byte `0xE8` đi trước, `0x03` đi sau. Thiết bị nhận ghép theo kiểu byte lớn trước sẽ đọc thành `0xE803 = 59,395 mV` — báo sai gấp 59 lần!",
               codeLang: "uart_endian_bug.c",
               code: `uint16_t mv = 1000; // 0x03E8 -> RAM: [0xE8, 0x03]
 
 // LỖI: Gửi thô từ RAM -> dây UART nhận: 0xE8 rồi 0x03
 // uart_send_bytes((uint8_t*)&mv, 2); // Bên nhận đọc ra 0xE803 = 59395!
 
-// CÁCH ĐÚNG: Tự tách byte bằng dịch bit (Độc lập Endianness!)
+// CÁCH ĐÚNG: Tự tách byte bằng dịch bit (Không phụ thuộc chip!)
 uint8_t tx_buf[2];
-tx_buf[0] = (mv >> 8) & 0xFF; // 0x03 (Byte cao đi trước - Big Endian)
-tx_buf[1] =  mv       & 0xFF; // 0xE8 (Byte thấp đi sau)`,
+tx_buf[0] = (mv >> 8) & 0xFF; // 0x03 (Byte lớn đi trước)
+tx_buf[1] =  mv       & 0xFF; // 0xE8 (Byte nhỏ đi sau)`,
               callout: {
                 type: "watch-out",
                 label: "LƯU Ý",
-                text: "Các giao thức công nghiệp (Modbus, TCP/IP, nhiều frame CAN ô tô) thường dùng Big-Endian. Không bao giờ truyền trực tiếp byte thô của struct đa byte mà không chuẩn hóa Endian!"
+                text: "Các giao thức công nghiệp (Modbus, TCP/IP, nhiều khung CAN ô tô) thường gửi byte lớn trước. Không bao giờ truyền trực tiếp byte thô của struct đa byte mà không tự sắp xếp lại thứ tự byte!"
               },
               diff: [
                 { op: "-", text: "Gửi thô RAM [E8, 03] → Bên nhận đọc 0xE803 (59,395 mV)" },
@@ -313,13 +313,13 @@ tx_buf[1] =  mv       & 0xFF; // 0xE8 (Byte thấp đi sau)`,
               ],
               kpis: [
                 { label: "Dữ liệu thật", value: "1,000 mV", sub: "0x03E8", tone: "sage" },
-                { label: "Dây UART (Thô)", value: "E8 → 03", sub: "Little-Endian leak", tone: "rose" },
+                { label: "Dây UART (Thô)", value: "E8 → 03", sub: "Lộ thứ tự RAM", tone: "rose" },
                 { label: "Bên nhận đọc (Lỗi)", value: "59,395 mV", sub: "0xE803 (Sai 59×!)", tone: "rose" },
                 { label: "Chuẩn hóa dịch bit", value: "03 → E8", sub: "An toàn mọi MCU", tone: "sage" }
               ],
               legend: [
                 { label: "Byte gửi thô bị đảo", color: "#e57373" },
-                { label: "Khung Big-Endian chuẩn", color: "#84be88" }
+                { label: "Khung byte lớn trước chuẩn", color: "#84be88" }
               ],
               learnUnlock: [4],
               scene: { type: "endian_wire" }
@@ -327,7 +327,7 @@ tx_buf[1] =  mv       & 0xFF; // 0xE8 (Byte thấp đi sau)`,
             {
               id: "s9",
               badge: "TECHNIQUE",
-              title: "Bản đồ Bộ nhớ & Thanh ghi Ngoại vi (Memory-Mapped I/O)",
+              title: "Bản đồ Bộ nhớ & Thanh ghi điều khiển phần cứng (MMIO)",
               body:
                 "Trên STM32F103, GPIOA_ODR ở địa chỉ 0x4001080C. Nếu đã cấp clock cho GPIOA, cấu hình PA5 là đầu ra push-pull và đấu LED active-high với điện trở, đặt bit 5 của ODR đưa PA5 lên mức cao. Sơ đồ giả định trước đó bit 5 bằng 0.",
               codeLang: "gpio_register_mmio.c",
@@ -369,7 +369,7 @@ void turn_on_led_pa5(void) {
               badge: "RECAP",
               title: "Tổng kết bộ nhớ và kiểm tra nhanh",
               body:
-                "Kiểm tra lại ba điểm trước khi làm bài thực hành: vị trí của bảng tra trong linker script, byte ở địa chỉ thấp trên máy little-endian và miền giá trị của kiểu số nguyên.",
+                "Kiểm tra lại ba điểm trước khi làm bài thực hành: vị trí của bảng tra trong linker script, byte ở địa chỉ thấp khi xếp byte nhỏ trước (little-endian) và miền giá trị của kiểu số nguyên.",
               codeLang: "embedded_c_checklist.h",
               code: `// Chọn kiểu theo miền giá trị và độ rộng cần dùng.
 // Đọc linker map để xác định vị trí của bảng tra.
@@ -378,7 +378,7 @@ void turn_on_led_pa5(void) {
               callout: {
                 type: "good-to-know",
                 label: "TIẾP THEO",
-                text: "Sang bước thực hành để in thứ tự byte và quan sát uint8_t quay vòng khi chuyển giá trị 256."
+                text: "Sang bước thực hành để in thứ tự byte và quan sát uint8_t quay vòng về 0 khi chuyển giá trị 256."
               },
               diff: [
                 { op: "+", text: "Đọc miền giá trị trước khi chuyển kiểu." },
@@ -387,7 +387,7 @@ void turn_on_led_pa5(void) {
               kpis: [
                 { label: "Flash / SRAM", value: "64K / 20K", sub: "Đã nắm bản đồ", tone: "sage" },
                 { label: "Kiểu dữ liệu", value: "<stdint.h>", sub: "Chuẩn cố định bit", tone: "sage" },
-                { label: "Endian ARM", value: "Little", sub: "LSB ở địa chỉ thấp", tone: "lavender" },
+                { label: "Thứ tự byte ARM", value: "Byte nhỏ trước", sub: "Little-endian", tone: "lavender" },
                 { label: "Bước tiếp theo", value: "Thực hành", sub: "Quan sát byte trên PC", tone: "sage" }
               ],
               legend: [
@@ -408,7 +408,7 @@ void turn_on_led_pa5(void) {
                   explain: "Bảng nằm trong Flash theo linker script của bản build. Có thể kiểm tra địa chỉ của bảng trong linker map."
                 },
                 {
-                  prompt: "Câu 2: Trên ARM Cortex-M (Little-Endian), `uint32_t x = 0xAABBCCDD;` đặt tại 0x2000_0000. Giá trị byte tại 0x2000_0000 là gì?",
+                  prompt: "Câu 2: Trên ARM Cortex-M (ghi byte nhỏ trước / little-endian), `uint32_t x = 0xAABBCCDD;` đặt tại 0x2000_0000. Giá trị byte tại 0x2000_0000 là gì?",
                   options: [
                     "A. 0xAA",
                     "B. 0xBB",
@@ -416,7 +416,7 @@ void turn_on_led_pa5(void) {
                     "D. 0xCC"
                   ],
                   correctIndex: 2,
-                  explain: "Chính xác! Little-Endian lưu Byte có trọng số nhỏ nhất (LSB = 0xDD) tại địa chỉ nhỏ nhất (0x2000_0000)."
+                  explain: "Chính xác! Kiểu ghi byte nhỏ trước (little-endian) lưu byte có trọng số nhỏ nhất (LSB = 0xDD) tại địa chỉ nhỏ nhất (0x2000_0000)."
                 },
                 {
                   prompt: "Câu 3: `uint8_t a = 250; a += 10;` cho kết quả bao nhiêu?",
@@ -427,7 +427,7 @@ void turn_on_led_pa5(void) {
                     "D. -6"
                   ],
                   correctIndex: 1,
-                  explain: "Chính xác! Phép cộng cho 260 trong int. Khi lưu vào uint8_t, kết quả là 260 % 256 = 4."
+                  explain: "Chính xác! Phép cộng cho 260 trong int. Khi lưu vào uint8_t, kết quả quay vòng về 260 % 256 = 4."
                 }
               ]
             }
@@ -459,9 +459,9 @@ void turn_on_led_pa5(void) {
           title: "Struct, Union & Bit-field",
           duration: "18 phút",
           level: "Trung bình",
-          subtitle: "Memory Alignment/Padding, đóng gói gói tin UART/CAN và gom nhóm thanh ghi STM32 kiểu CMSIS.",
+          subtitle: "Căn lề bộ nhớ / byte đệm (padding), đóng gói gói tin UART/CAN và gom nhóm thanh ghi STM32.",
           locked: true,
-          topics: ["Struct padding & __packed", "Union tách byte/float", "Bit-field trên thanh ghi", "GPIO_TypeDef mô phỏng CMSIS"]
+          topics: ["Struct padding & __packed", "Union tách byte/float", "Bit-field trên thanh ghi", "GPIO_TypeDef"]
         },
         {
           id: "b05-volatile-storage",
@@ -570,7 +570,7 @@ void turn_on_led_pa5(void) {
         {
           id: "b14-makefile-linker",
           number: "14",
-          title: "Bare-metal GCC, Makefile & Linker",
+          title: "GCC chạy thẳng trên chip, Makefile & Linker",
           duration: "22 phút",
           level: "Nâng cao",
           subtitle: "Thoát khỏi IDE: cách arm-none-eabi-gcc biên dịch, Linker Script (.ld) chia Flash/RAM và Startup.s gọi main().",

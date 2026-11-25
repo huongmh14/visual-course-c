@@ -5,8 +5,8 @@ export const EN_C = {
     youllLearn: [
       "70-minute active loop: Predict 15s → Break code + assert → Answer open questions",
       "Case #1: Prevent integer overflow in a Battery Management System (BMS)",
-      "Case #2: Debounce a mechanical button without blocking the CPU using delay()",
-      "Case #3: Send multi-byte UART/CAN frames without endianness or padding bugs",
+      "Case #2: Debounce a mechanical button without stalling the CPU using delay()",
+      "Case #3: Send multi-byte UART/CAN frames without byte-order or padding bugs",
       "Plan your personal project direction across the 4 course stages"
     ],
     steps: [
@@ -67,7 +67,7 @@ if (read_button() == 0) {
     delay_ms(50);          // CPU stalls, missing every other sensor!
     if (read_button() == 0) toggle_led();
 }`,
-        callout: { text: "In real firmware (super-loop or RTOS), busy-wait delays break real-time responsiveness." },
+        callout: { text: "In real firmware (main loop or RTOS), busy-wait delays break real-time responsiveness." },
         diff: [
           "delay_ms(50) blocks all other sensors in the main loop.",
           "Sample periodically (e.g. every 5 ms) and count consecutive stable readings."
@@ -75,24 +75,24 @@ if (read_button() == 0) {
         kpis: [
           { label: "Bounce window", value: "5–20 ms", sub: "Contact chatter" },
           { label: "delay_ms(50)", value: "Frozen CPU", sub: "Blocks everything" },
-          { label: "3-sample filter", value: "Non-blocking", sub: "CPU stays free" }
+          { label: "3-sample filter", value: "No CPU stall", sub: "CPU stays free" }
         ],
         legend: ["Bouncy 0/1 signal", "Clean event"],
         openQuestions: [
           {
             scenario: "REAL CASE #2 · BUTTON DEBOUNCE",
             prompt: "Suppose your MCU must scan a button and read a gas sensor every 10 ms. What fails if you use `delay_ms(50)` for debouncing? Describe in plain words how to debounce WITHOUT stalling the CPU.",
-            placeholder: "Explain the sensor latency issue and a non-blocking state/counter approach..."
+            placeholder: "Explain the sensor latency issue and a non-stalling state/counter approach..."
           }
         ]
       },
       {
         title: "Case #3: 10.00 °C sensor reads 59,395 °C over UART",
-        body: "STM32 stores `uint16_t temp_x100 = 1000` (`0x03E8`) in RAM in **little-endian** order (`0xE8` then `0x03`). Casting a struct pointer directly to `uint8_t*` and sending it to a **big-endian** receiver turns `0x03E8` into `0xE803 = 59,395`!",
+        body: "STM32 stores `uint16_t temp_x100 = 1000` (`0x03E8`) in RAM **low byte first (little-endian)** (`0xE8` then `0x03`). Casting a struct pointer directly to `uint8_t*` and sending it to a **high-byte-first** receiver turns `0x03E8` into `0xE803 = 59,395`!",
         codeLang: "C · raw RAM transmit trap",
         code: `struct Telemetry { uint8_t id; uint16_t temp_x100; };
 // BUG 1: Compiler may insert 1 padding byte between id and temp_x100!
-// BUG 2: Raw byte order depends on CPU endianness.
+// BUG 2: Raw byte order depends on the chip's byte order.
 // FIX: Pack every wire byte explicitly with shifts (>> 8) & 0xFF.`,
         callout: { text: "In-memory struct layout belongs to the compiler and CPU; wire framing must be explicitly encoded byte by byte." },
         diff: [
@@ -101,7 +101,7 @@ if (read_button() == 0) {
         ],
         kpis: [
           { label: "True value", value: "0x03E8", sub: "1,000 (10.00 °C)" },
-          { label: "Raw UART wire", value: "E8 → 03", sub: "Endian leak" },
+          { label: "Raw UART wire", value: "E8 → 03", sub: "Swapped byte order" },
           { label: "Decoded error", value: "59,395", sub: "59× too high!" }
         ],
         legend: ["Raw RAM leak", "Encoded frame"],
@@ -109,8 +109,8 @@ if (read_button() == 0) {
           {
             scenario: "REAL CASE #3 · UART FRAMING",
             prompt: "Why can sending a raw C `struct` directly over UART between an STM32 and a gateway produce garbage numbers even when both sides are written in C? Name at least two reasons.",
-            placeholder: "Hint: think about struct padding and byte order (endianness)...",
-            hint: "Two classic causes: (1) Compiler alignment padding inserts unspecified bytes; (2) Little-endian vs. big-endian mismatch."
+            placeholder: "Hint: think about struct padding bytes and byte order...",
+            hint: "Two classic causes: (1) Compiler alignment padding inserts extra bytes; (2) Low-byte-first (little-endian) vs. high-byte-first mismatch."
           }
         ]
       },
@@ -118,10 +118,10 @@ if (read_button() == 0) {
         title: "4-stage roadmap & your personal project goal",
         body: "Instead of isolated syntax drills, you progress through 4 connected stages: (1) Core Embedded C + PC CSV testing; (2) Electronics (Ohm's law, Pull-up, ADC, PWM); (3) STM32 Cortex-M registers & buses; (4) FreeRTOS, Makefiles & LoRa.",
         codeLang: "Practice path · PC → STM32",
-        code: `// Stage 1 (L00–11): Embedded C17 + bitwise + Makefile + FSM
+        code: `// Stage 1 (L00–11): Core Embedded C + bitwise + Makefile + FSM
 // Stage 2 (L12–19): Basic Electronics (Ohm, MOSFET, Op-Amp, Serial)
 // Stage 3 (L20–26): STM32 registers, NVIC Interrupts, Timers, CAN
-// Stage 4 (L27–30): FreeRTOS, Bare-metal Linker, Bootloader, LoRa`,
+// Stage 4 (L27–30): FreeRTOS, Direct-on-chip Linker, Bootloader, LoRa`,
         callout: { text: "Great firmware is verified on a PC against boundary CSV datasets before flashing real hardware." },
         diff: [
           "Direct bridge between PC C labs and STM32 peripheral registers.",
@@ -136,7 +136,7 @@ if (read_button() == 0) {
         openQuestions: [
           {
             scenario: "PERSONAL PROJECT DIRECTION",
-            prompt: "Among the three real-world problems above (Battery BMS, Non-blocking real-time control, UART/CAN/LoRa framing), which excites you most and what mini-project would you love to build by the end of the course?",
+            prompt: "Among the three real-world problems above (Battery BMS, Real-time button/control without stalling, UART/CAN/LoRa framing), which excites you most and what mini-project would you love to build by the end of the course?",
             placeholder: "e.g., A battery monitor with OLED display, or a remote LoRa sensor node..."
           }
         ]
@@ -158,9 +158,9 @@ EOF`,
         kpis: [
           { label: "Step 1", value: "Predict 15s", sub: "Before revealing solution" },
           { label: "Step 2", value: "notes.md", sub: "Export Open Qs (.md)" },
-          { label: "Step 3", value: "gcc -Werror", sub: "Clean C17 builds" }
+          { label: "Step 3", value: "gcc -Werror", sub: "Clean C builds" }
         ],
-        legend: ["Active prediction", "Markdown notes", "C17 verification"],
+        legend: ["Active prediction", "Markdown notes", "C verification"],
         openQuestions: [
           {
             scenario: "WEEK 1 COMMITMENT",
@@ -184,7 +184,7 @@ EOF`,
   },
   "c-types-io": {
     title: "Data types, variables, printf & scanf",
-    subtitle: "Week 1, Day 3 · Choose types by range, read and print on a PC, and write calculation functions that can also use sensor data.",
+    subtitle: "Choose types by range, read and print on a PC, and write calculation functions that can also use sensor data.",
     steps: [
       {
         title: "Choose a type by its range",
@@ -244,11 +244,11 @@ EOF`,
         codeLang: "C · exercise signatures",
         kpis: [
           { label: "Step 1", value: "Predict", sub: "Range & expected out" },
-          { label: "Step 2", value: "3 C17 files", sub: "types / temp / avg" },
+          { label: "Step 2", value: "3 C files", sub: "types / temp / avg" },
           { label: "Step 3", value: "0 warnings", sub: "-Wall -Wextra" }
         ],
         legend: ["Measure sizes", "Guard scanf", "Edge verification"],
-        callout: { text: "Compile each file with -std=c17 -Wall -Wextra -Wpedantic. Commit once all three files pass their test cases and compile without warnings." },
+        callout: { text: "Compile each file with -Wall -Wextra -Wpedantic. Commit once all three files pass their test cases and compile without warnings." },
         diff: ["types.c: print sizeof for int, uint8_t, uint16_t, and uint32_t. Explain which type can hold a 12-bit ADC sample.",
           "temperature.c: try 0, 100, −40, and abc. Each valid input prints the expected °F value, and abc reports an error.",
           "average.c: call scanf with three %lf conversions and check for a return value of 3. Try 1 2 2 → 1.67, -1 0 1 → 0.00, and 1 x 2 → error.",
@@ -302,7 +302,7 @@ EOF`,
           { label: "Safe exit", value: "ready / Timeout", sub: "Never hangs CPU" }
         ],
         legend: ["Bounded retry", "Ready early", "Retry cap reached"],
-        callout: { text: "A read limit lets the loop exit when hardware does not respond. In a superloop, read once per iteration and track elapsed time so other tasks can keep running." },
+        callout: { text: "A read limit lets the loop exit when hardware does not respond. In the main loop, read once per iteration and track elapsed time so other tasks can keep running." },
         diff: ["Simulate read_ready() returning true immediately → 1 read.", "Simulate read_ready() always returning false → exactly 4 reads."]
       },
       {
@@ -311,25 +311,25 @@ EOF`,
         codeLang: "C · state transition",
         kpis: [
           { label: "Trip high", value: "≥ 700", sub: "WAIT → ALERT" },
-          { label: "Hysteresis", value: "650…699", sub: "Holds state" },
+          { label: "Buffer zone", value: "650…699", sub: "Stops rapid toggling" },
           { label: "Clear low", value: "< 650", sub: "ALERT → WAIT" }
         ],
         legend: ["Trigger ALERT", "Return to WAIT"],
-        callout: { text: "Thresholds of 700 and 650 create hysteresis, which keeps the state stable when samples fluctuate around 700." },
+        callout: { text: "Thresholds of 700 and 650 create a buffer zone (650–699) that stops rapid on/off toggling when samples fluctuate around 700." },
         diff: ["WAIT, 699 → WAIT", "WAIT, 700 → ALERT", "ALERT, 650 → ALERT", "ALERT, 649 → WAIT"]
       },
       {
         title: "Lab · review four C exercises and write an alert",
-        body: "Rerun FizzBuzz, the prime check, the multiplication table, and the switch calculator in c-nhung/day-05-if-switch-loop. Then write next_state, use a for loop to pass each sample to it, and print the resulting state.",
+        body: "Rerun FizzBuzz, the prime check, the multiplication table, and the switch calculator in the if-switch-loop exercises. Then write next_state, use a for loop to pass each sample to it, and print the resulting state.",
         codeLang: "C · test data",
         code: "unsigned samples[] = {699, 700, 680, 650, 649};\n// Start in WAIT. Call next_state for each sample.",
         kpis: [
           { label: "Sample feed", value: "699…649", sub: "5 CSV edge cases" },
-          { label: "Hysteresis", value: "680, 650", sub: "Keeps ALERT active" },
+          { label: "Buffer zone", value: "680, 650", sub: "Keeps ALERT active" },
           { label: "Verification", value: "assert()", sub: "4 C tasks + FSM" }
         ],
         legend: ["State trace flow"],
-        callout: { text: "Run on a PC with GCC using -std=c17 -Wall -Wextra -Wpedantic. Use assert or compare the printed results." },
+        callout: { text: "Run on a PC with GCC using -Wall -Wextra -Wpedantic. Use assert or compare the printed results." },
         diff: [
           "Expected sequence: WAIT, ALERT, ALERT, ALERT, WAIT.",
           "FizzBuzz: 15 → FizzBuzz. Prime check: 1 → false, 2 → true, 9 → false.",
@@ -346,22 +346,22 @@ EOF`,
   "b02-bitwise": {
     title: "Bitwise: from individual bits to embedded registers",
     subtitle:
-      "Day 04 · Progress from bits 0..7, masks, flags, CMSIS multi-bit fields (_Pos/_Msk), and C17 traps to atomic BSRR writes and 12-bit ADC decoding.",
+      "Go step by step from bits 0..7, bit masks, flags, multi-bit fields (_Pos/_Msk), and common bit-shift traps to single-write BSRR registers and 12-bit ADC decoding.",
     youllLearn: [
       "Read bit positions 0..7, convert binary ↔ hex, and distinguish bit index from bit mask",
       "Evaluate and verify all six bitwise operators (& | ^ ~ << >>) by hand",
       "Perform Set, Clear (& ~mask), Toggle, and Test without disturbing other bits",
       "Check multiple flags (Any / All / None) and avoid the & vs == precedence trap",
-      "Update multi-bit fields using CMSIS (_Pos / _Msk) conventions and assert invariants",
-      "Avoid four C17 traps: integer promotion, shift UB, signedness, and printf formats",
-      "Bridge RAM simulation to real MCUs: main/ISR races, atomic BSRR, and ADC decoding"
+      "Update multi-bit fields (_Pos / _Msk) and verify surrounding bits stay untouched",
+      "Avoid four common traps: auto-widening to int, invalid shift counts, signedness, and printf formats",
+      "Bridge RAM simulation to real MCUs: main/ISR races, single-write BSRR, and ADC decoding"
     ],
     steps: [
       {
         title: "One integer, many representations: bits 0..7, hex & masks",
         body:
           "In an 8-bit byte, **bit 0 is on the right** with weight 1, and bit `n` has weight `2^n`. Decimal `10`, binary `0000 1010`, and hex `0x0A` are **the same value**, not three different types. Each hex digit groups exactly 4 bits (`0xA = 1010`, `0xA5 = 1010 0101 = 165`). Always distinguish a **bit index** `3U` from a **bit mask** `1U << 3U` equal to `8U` (`0x08`).",
-        codeLang: "C17 · unsigned literals & bit masks",
+        codeLang: "C · unsigned literals & bit masks",
         callout: {
           text: "Follow the same four steps on every bitwise task: requirement → mask → expression → assert verification. Don’t memorize six isolated symbols."
         },
@@ -379,8 +379,8 @@ EOF`,
       {
         title: "Six bitwise & shift operators (& | ^ ~ << >>)",
         body:
-          "Four operators — `&` (AND to filter), `|` (OR to set), `^` (XOR to toggle), and `~` (NOT to invert every bit) — operate independently per bit column. The shift operators `<<` and `>>` shift bits left or right and fill with `0` for unsigned operands (`6U << 2U = 24U`, `6U >> 2U = 1U`). Remember that `~a` inverts the **entire promoted `unsigned int` width** — narrow explicitly with `(uint8_t)~a` for an 8-bit result.",
-        codeLang: "C17 · 02_bitwise_operators.c & 05_bitwise_self_check.c",
+          "Four operators — `&` (AND to filter), `|` (OR to set), `^` (XOR to toggle), and `~` (NOT to invert every bit) — operate independently per bit column. The shift operators `<<` and `>>` shift bits left or right and fill with `0` for unsigned operands (`6U << 2U = 24U`, `6U >> 2U = 1U`). Remember that `~a` inverts the **entire auto-widened `unsigned int` width** — narrow explicitly with `(uint8_t)~a` for an 8-bit result.",
+        codeLang: "C · bitwise operators & self-check",
         callout: {
           text: "Right-shifting discards low bits permanently; shifting left again cannot recover them. The destination variable type does not make ~ or << run at 8-bit width."
         },
@@ -398,8 +398,8 @@ EOF`,
       {
         title: "Bit masks: Set, Clear (& ~mask), Toggle & Test",
         body:
-          "From `03_clear_bit.c`: `data = 0x88` (`1000 1000`) has both bit 7 and bit 3 set. To **clear only bit 3** while preserving bit 7, invert the mask with `~mask` (`1111 0111 = 0xF7`) and AND: `data &= ~(1U << 3U)` → `0x80` (`128`). Writing `data & mask` by mistake extracts bit 3 (`0x08`) and wipes out bit 7! Remember three self-check properties: setting or clearing twice matches doing it once; toggling twice restores the original value.",
-        codeLang: "C17 · 03_clear_bit.c & sequential updates",
+          "In the clear-bit example, `data = 0x88` (`1000 1000`) has both bit 7 and bit 3 set. To **clear only bit 3** while preserving bit 7, invert the mask with `~mask` (`1111 0111 = 0xF7`) and AND: `data &= ~(1U << 3U)` → `0x80` (`128`). Writing `data & mask` by mistake extracts bit 3 (`0x08`) and wipes out bit 7! Remember three self-check properties: setting or clearing twice matches doing it once; toggling twice restores the original value.",
+        codeLang: "C · clear bit & sequential updates",
         callout: {
           text: "Why do non-selected bits stay intact? Because x | 0 = x (Set), x & 1 = x (Clear via ~mask), and x ^ 0 = x (Toggle)."
         },
@@ -416,7 +416,7 @@ EOF`,
         openQuestions: [
           {
             prompt: "Given data = 0x88 (1000 1000), why must clearing bit 3 use data &= ~(1U << 3U) instead of data &= (1U << 3U)? What happens if you clear bit 3 twice in a row?",
-            hint: "Compare the bit table of 0x88 & 0xF7 against 0x88 & 0x08, and note the idempotence of clearing."
+            hint: "Compare the bit table of 0x88 & 0xF7 against 0x88 & 0x08, and note that clearing twice gives the same result as once."
           }
         ]
       },
@@ -424,7 +424,7 @@ EOF`,
         title: "Status flags, Any vs All & operator precedence trap",
         body:
           "One unsigned variable can pack independent flags (`READ = 1U << 0`, `WRITE = 1U << 1`, `EXEC = 1U << 2`, combined with `|`). When testing against `wanted = READ | WRITE`, distinguish **at least one flag** `(flags & wanted) != 0U` from **all flags** `(flags & wanted) == wanted`. Never test `(flags & wanted) == 1U` (fails when bit 1 is set → result is `2`), and always **parenthesize** `&` because `==` binds tighter than `&`!",
-        codeLang: "C17 · 04_flags_and_permissions.md & precedence trap",
+        codeLang: "C · status flags & precedence trap",
         callout: {
           text: "Unlike && and ||, bitwise & and | do NOT short-circuit. Also, when wanted == 0U, the ALL check is true while ANY is false — validate empty masks explicitly if required."
         },
@@ -447,16 +447,16 @@ EOF`,
         ]
       },
       {
-        title: "Multi-bit fields & CMSIS _Pos / _Msk conventions",
+        title: "Read/write multi-bit fields (_Pos / _Msk)",
         body:
-          "Configuration registers such as `GPIO->MODER` use a **2-bit field** per pin (`pin n` sits at `pos = 2 * n`, mask `UINT32_C(3) << pos`). Replacing an existing `11` field with `01` cannot be done with `|=` alone because OR never clears old `1` bits. Use the 3-step CMSIS pattern: (1) Clear old field `reg & ~Msk`, (2) Shift new value `val << Pos`, (3) OR them together. Avoid `struct` bit-fields for MMIO registers because bit ordering and bus access width are compiler-defined.",
-        codeLang: "C17 · CMSIS _Pos / _Msk & assert invariant",
+          "Configuration registers such as `GPIO->MODER` use a **2-bit field** per pin (`pin n` sits at `pos = 2 * n`, mask `UINT32_C(3) << pos`). Replacing an existing `11` field with `01` cannot be done with `|=` alone because OR never clears old `1` bits. Use the 3-step `(_Pos / _Msk)` pattern: (1) Clear old field `reg & ~Msk`, (2) Shift new value `val << Pos`, (3) OR them together. Avoid `struct` bit-fields for hardware registers because bit ordering and bus access width are compiler-defined.",
+        codeLang: "C · multi-bit fields (_Pos / _Msk) & assert",
         callout: {
           text: "The most important test invariant for field updates is assert((after & ~mask) == (before & ~mask)) — proving 100% of bits outside the field remained untouched."
         },
         diff: [
           "Validate pin <= 15 and mode <= 3 before shifting; never silently truncate invalid inputs.",
-          "Avoid struct { unsigned mode : 2; } for MMIO registers because bit layout depends on the compiler."
+          "Avoid struct { unsigned mode : 2; } for hardware registers because bit layout depends on the compiler."
         ],
         kpis: [
           { label: "Pin n position", value: "pos = 2 * n", sub: "Pin 3 → bits [7:6]" },
@@ -466,52 +466,52 @@ EOF`,
         legend: ["Clear old field", "Merge new value", "Untouched bits"]
       },
       {
-        title: "Four C17 traps: integer promotion, shift UB, signedness & printf",
+        title: "Four common traps: auto-widening to int, bad shifts, signedness & printf",
         body:
-          "On 32-bit GCC, `uint8_t mask = 0x0FU` is **promoted to `int`** before `~mask` runs, producing `-16` instead of `0xF0`! For C17 shifts: shifting by a negative count (`1U << -1`), shifting by `>= width` (`1U << 32U`), or left-shifting a negative value (`-1 << 1`) is **Undefined Behavior (UB)**; right-shifting a negative signed value (`-4 >> 1`) is *implementation-defined*. Also, `1U` is only guaranteed 16 bits wide — use `UINT32_C(1)` for 32-bit masks.",
-        codeLang: "C17 · preventing promotion, UB & printf mismatches",
+          "On 32-bit GCC, `uint8_t mask = 0x0FU` is **auto-widened to `int` before computing** `~mask`, producing `-16` instead of `0xF0`! For bit shifts: shifting by a negative count (`1U << -1`), shifting by `>= width` (`1U << 32U`), or left-shifting a negative value (`-1 << 1`) causes **unpredictable bugs (easy to corrupt your program)**; right-shifting a negative signed value (`-4 >> 1`) depends on the compiler. Also, `1U` is only guaranteed 16 bits wide — use `UINT32_C(1)` for 32-bit masks.",
+        codeLang: "C · preventing widening bugs, bad shifts & printf mismatches",
         callout: {
-          text: "UB has no \"correct numeric answer\" — observing one result on your PC does not make it a rule. Always guard shifts with && (replacing && with & loses short-circuiting and triggers UB)."
+          text: "Unpredictable behavior has no \"correct numeric answer\" — seeing one result on your PC does not make it safe. Always guard shifts with && (replacing && with & loses short-circuiting and still triggers the bug)."
         },
         diff: [
           "Use UINT32_C(1) << pos for 32-bit registers and PRIX32 from <inttypes.h> when printing.",
-          "Avoid 1U << 32U, 1U << -1, and -1 << 1 (all are UB in C17)."
+          "Avoid 1U << 32U, 1U << -1, and -1 << 1 (all cause unpredictable bugs)."
         ],
         kpis: [
           { label: "~mask8 (int)", value: "-16 (32-bit)", sub: "Cast uint8_t → 0xF0" },
           { label: "Shift guard", value: "n < width &&", sub: "Check before shift" },
           { label: "32-bit mask", value: "UINT32_C(1)", sub: "Portable across targets" }
         ],
-        legend: ["Promotion / UB", "&& range guard", "Safe C17 pattern"],
+        legend: ["Widening / Bad shift", "&& range guard", "Safe C pattern"],
         quiz: [
           {
-            prompt: "In C17 on a 32-bit int/unsigned int target, which expression is Undefined Behavior (UB)?",
+            prompt: "On a 32-bit int/unsigned int target, which expression causes unpredictable bugs?",
             options: ["1U << 31U", "1U << 32U", "(uint8_t)~(unsigned int)0x0FU"],
-            explain: "Shifting by the width or more of the left operand (32 bits for unsigned int) is UB in C17. 1U << 31U is well-defined (0x80000000U)."
+            explain: "Shifting by the width or more of the left operand (32 bits for unsigned int) is invalid and unpredictable in C. 1U << 31U is well-defined (0x80000000U)."
           }
         ]
       },
       {
         title: "From RAM to real MCUs: W1C, BSRR, ISR races & sensor decoding",
         body:
-          "A single line `GPIOA->ODR |= mask` compiles into a multi-instruction **Read → Modify → Write** sequence. If an ISR fires between `main`’s read and write, the flag set by the ISR gets overwritten and lost — `volatile` does **not** make `|=` atomic! On STM32, use `BSRR` for single-write atomic set (`0..15`) and reset (`16..31`), and check the Reference Manual for **Write-1-to-Clear (W1C)** status bits. When decoding sensor frames (12-bit ADC or signed 11-bit LM75A temperature), combine bytes numerically via mask & shift so the code is endian-independent.",
-        codeLang: "C17 · atomic BSRR, 12-bit ADC decode & portable sign-extend",
+          "A single line `GPIOA->ODR |= mask` compiles into a multi-instruction **Read → Modify → Write** sequence. If an ISR fires between `main`’s read and write, the flag set by the ISR gets overwritten and lost — `volatile` does **not** make `|=` run in one unbroken step! On STM32, use `BSRR` for single-write set (`0..15`) and reset (`16..31`), and check the chip manual for **Write-1-to-Clear (W1C)** status bits. When decoding sensor frames (12-bit ADC or signed 11-bit LM75A temperature), combine bytes numerically via mask & shift so the code is independent of CPU byte order.",
+        codeLang: "C · single-write BSRR, 12-bit ADC decode & portable sign-extend",
         callout: {
-          text: "volatile only prevents the compiler from optimizing away reads/writes; it provides neither locking nor atomicity. On W1C registers, |= mask accidentally clears other active flags!"
+          text: "volatile only prevents the compiler from optimizing away reads/writes; it provides neither locking nor unbroken single-step execution. On W1C registers, |= mask accidentally clears other active flags!"
         },
         diff: [
           "decode_adc(0xA3, 0x5C) strips status nibble 0xA → returns 0x035C = 860 on any CPU.",
-          "Never reinterpret big-endian UART/I2C sensor bytes by casting raw memory pointers."
+          "Never reinterpret UART/I2C sensor bytes by casting raw memory pointers."
         ],
         kpis: [
-          { label: "BSRR Set / Reset", value: "1<<n / 1<<(n+16)", sub: "Atomic single write" },
-          { label: "12-bit ADC", value: "0xA3, 0x5C → 860", sub: "Strip status nibble" },
-          { label: "11-bit sign-ext", value: "u - 2048", sub: "Portable C17 math" }
+          { label: "BSRR Set / Reset", value: "1<<n / 1<<(n+16)", sub: "Single unbroken write" },
+          { label: "12-bit ADC", value: "0xA3, 0x5C → 860", sub: "Strip 4 status bits" },
+          { label: "11-bit sign-ext", value: "u - 2048", sub: "Portable C math" }
         ],
-        legend: ["RMW / ISR hazard", "Atomic BSRR write", "Sensor frame decode"],
+        legend: ["RMW / ISR hazard", "Single-write BSRR", "Sensor frame decode"],
         openQuestions: [
           {
-            prompt: "Someone claims: \"Because the register is volatile, reg |= mask is guaranteed atomic when main and an ISR both update it.\" Is this true or false? Explain how a flag can be lost and how STM32 BSRR solves it.",
+            prompt: "Someone claims: \"Because the register is volatile, reg |= mask runs in one unbroken step when main and an ISR both update it.\" Is this true or false? Explain how a flag can be lost and how STM32 BSRR solves it.",
             hint: "Break reg |= mask into Read → Modify → Write and interleave an ISR between Read and Write."
           }
         ]
@@ -519,8 +519,8 @@ EOF`,
       {
         title: "Lab · assert self-checks, 4 core exercises & mini-projects",
         body:
-          "Run `05_bitwise_self_check.c` on Ubuntu WSL with `-std=c17 -Wall -Wextra -Wpedantic -Werror` to confirm all fundamentals. Next, complete the **4 core C exercises (80 pts)** from `08_practice_exercises.md` in `submission.c` with `assert` checks: (1) `set/clear/toggle/test_bit` rejecting `bit >= 8`, (2) `should_sample(flags)` sensor gating, (3) `configure_mode(reg, pin, mode)` for 16 two-bit GPIO pins, and (4) 12-bit `decode_adc(high, low)`. Then level up to `09_embedded_mini_projects.md`: `struct` GPIO driver + BSRR, LM75A temperature sensor, shift-register button debounce, and UART CRC-8 framing.",
-        codeLang: "C17 · assert test harness (08_practice_exercises.md)",
+          "Run `05_bitwise_self_check.c` on Ubuntu WSL with `-Wall -Wextra -Wpedantic -Werror` to confirm all fundamentals. Next, complete the **4 core C exercises (80 pts)** from `08_practice_exercises.md` in `submission.c` with `assert` checks: (1) `set/clear/toggle/test_bit` rejecting `bit >= 8`, (2) `should_sample(flags)` sensor gating, (3) `configure_mode(reg, pin, mode)` for 16 two-bit GPIO pins, and (4) 12-bit `decode_adc(high, low)`. Then level up to `09_embedded_mini_projects.md`: `struct` GPIO driver + BSRR, LM75A temperature sensor, shift-register button debounce, and UART CRC-8 framing.",
+        codeLang: "C · assert test harness (08_practice_exercises.md)",
         callout: {
           text: "Keep assert active when compiling (never pass -DNDEBUG). Test boundary cases (bits 0, 7, 8, 32; pins 0, 15, 16; modes 0..4) and assert that bits outside the mask never change."
         },
@@ -533,7 +533,7 @@ EOF`,
           { label: "Core C Lab", value: "4 ex · 80 pts", sub: "08_practice_exercises.md" },
           { label: "Mini-projects", value: "4 ex · 100 pts", sub: "BSRR, LM75A, CRC-8" }
         ],
-        legend: ["Spec & Mask", "C17 Expression", "assert Verification"],
+        legend: ["Spec & Mask", "Bitwise Expression", "assert Verification"],
         quiz: [
           {
             prompt: "Starting from reg = 0x24U, after reg |= (1U << 0U); reg &= ~(1U << 5U); reg ^= (1U << 2U); what is the final value of reg?",
@@ -559,7 +559,7 @@ EOF`,
         codeLang: "C · pass an address",
         code: "void enable(unsigned *dst) {\n    *dst |= 1u;\n}\n// In main:\n// unsigned flag = 0;\n// enable(&flag);",
         nodes: [["flag", "value is 0"], ["dst", "contains the address &flag"], ["*dst", "changes flag to 1"]],
-        callout: { text: "Dereference only valid pointers to objects whose lifetime has begun and has yet to end. The enable function requires dst to point to a writable unsigned object." },
+        callout: { text: "Dereference only valid pointers to objects that are still alive. The enable function requires dst to point to a writable unsigned variable." },
         diff: ["If enable takes an unsigned value and changes that parameter, the caller’s flag stays at 0."]
       },
       {
@@ -591,10 +591,10 @@ EOF`,
     steps: [
       {
         title: "A struct describes data inside a program",
-        body: "The compiler may insert padding between or after members to meet alignment requirements. Use sizeof and offsetof to inspect the actual layout on the target you are compiling for.",
+        body: "The compiler may insert padding bytes between or after members to meet memory alignment requirements. Use sizeof and offsetof to inspect the actual layout on the target you are compiling for.",
         codeLang: "C · inspect the layout",
         code: "struct Sample {\n    uint8_t kind;\n    uint16_t raw;\n};\n// Use <stddef.h> for offsetof.\n// Measure sizeof(struct Sample) and offsetof(struct Sample, raw).",
-        nodes: [["kind", "1 byte"], ["Padding", "ABI determines size"], ["raw", "2 bytes"]],
+        nodes: [["kind", "1 byte"], ["Padding", "Compiler decides"], ["raw", "2 bytes"]],
         callout: { text: "Alignment rules depend on the target. Two members that total three bytes can produce a four-byte struct." },
         diff: ["Print sizeof and offsetof results with %zu.", "Union members share storage. A struct allocates space for each member."]
       },
@@ -603,7 +603,7 @@ EOF`,
         body: "The sample protocol specifies three bytes in order. Write the kind first, then the high byte, and then the low byte. Shift right to extract the high byte, and cast to uint8_t to keep the low eight bits for the final byte.",
         codeLang: "C · encode a frame",
         nodes: [["kind", "0x01"], ["raw", "0x1234"], ["UART", "01 12 34"]],
-        callout: { text: "The caller must provide space for at least three bytes. The function specifies the transmission order independently of target endianness and struct padding." },
+        callout: { text: "The caller must provide space for at least three bytes. The function specifies the transmission order independently of target byte order and struct padding." },
         diff: ["raw = 0x00FF → 00 FF.", "raw = 0xFF00 → FF 00."]
       },
       {
@@ -617,14 +617,14 @@ EOF`,
         quiz: [{
           prompt: "Why can sending the struct Sample directly produce an invalid frame?",
           options: ["UART accepts only characters", "Padding and byte order can differ from the protocol", "uint16_t always takes four bytes"],
-          explain: "The protocol defines where the bytes go and in what order. The ABI and compiler determine the struct layout."
+          explain: "The protocol defines where the bytes go and in what order. The compiler determines the struct layout."
         }]
       }
     ]
   },
   "b05-volatile-storage": {
-    title: "Variable lifetime, volatile & superloops",
-    subtitle: "Distinguish variable lifetime across calls, peripheral access, and nonblocking timing.",
+    title: "Variable lifetime, volatile & main loops",
+    subtitle: "Distinguish variable lifetime across calls, hardware access, and timing without stalling the chip.",
     steps: [
       {
         title: "A local static variable keeps its value between calls",
@@ -636,28 +636,28 @@ EOF`,
       },
       {
         title: "Volatile and peripheral registers",
-        body: "Read the status register again on each iteration because hardware can change it. When the manufacturer qualifies the register type with volatile, the compiler must perform accesses according to the implementation’s volatile rules.",
+        body: "Read the status register again on each iteration because hardware can change it. When a register is marked volatile, the compiler must perform every read or write directly instead of reusing a cached value.",
         codeLang: "C · check the register once",
         nodes: [["Peripheral", "updates status"], ["CPU", "reads *status"], ["Firmware", "checks bit 0"]],
-        callout: { text: "Use a separate synchronization mechanism when an operation needs atomicity. When moving to hardware, use the register definitions from the MCU header." },
+        callout: { text: "Use a separate synchronization mechanism when an operation must run in one unbroken step. When moving to hardware, use the register definitions from the MCU header." },
         diff: ["Test the function on a PC with a volatile uint32_t object in RAM. On hardware, use the address specified by the MCU."]
       },
       {
-        title: "Lab · toggle an LED on a tick without blocking",
-        body: "Simulate a 32-bit tick counter that advances once per millisecond. Use modular subtraction to check whether 100 ms have elapsed since the last update, then toggle the LED and update last. Call the function once for each sample tick.",
+        title: "Lab · toggle an LED without stalling",
+        body: "Simulate a 32-bit tick counter that advances once per millisecond. Use wrap-safe subtraction to check whether 100 ms have elapsed since the last update, then toggle the LED and update last. Call the function once for each sample tick.",
         codeLang: "C · lab timing calculation",
         code: "uint32_t elapsed = (uint32_t)(now - last);\n// Update the LED when elapsed >= 100. Handle the button on the next iteration.",
         nodes: [["last", "UINT32_MAX − 49"], ["now", "50"], ["elapsed", "100 ms"]],
-        callout: { text: "Modular subtraction gives the correct elapsed time if the actual interval is shorter than one full counter cycle." },
+        callout: { text: "Wrap-safe subtraction gives the correct elapsed time as long as the actual interval is shorter than one full counter cycle." },
         diff: [
           "last=0: now=99 → hold, now=100 → toggle.",
           "last=UINT32_MAX−49: now=49 → hold, now=50 → toggle.",
           "After toggling at now=100, calling again with now=100 leaves the LED unchanged."
         ],
         quiz: [{
-          prompt: "Does volatile make count++ atomic across two execution contexts?",
+          prompt: "Does volatile make count++ run in one unbroken step across two execution contexts?",
           options: ["Yes", "No"],
-          explain: "count++ reads, calculates, and writes. Use a synchronization mechanism suited to the execution contexts."
+          explain: "count++ reads, calculates, and writes in three steps. Use a synchronization mechanism suited to the execution contexts."
         }]
       }
     ]

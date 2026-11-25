@@ -12,7 +12,7 @@ export function createIntroLesson() {
       "Vòng lặp học 70 phút: Đoán 15s → Phá code + assert → Tự trả lời câu hỏi mở",
       "Bài toán #1: Tránh lỗi tràn số trên hệ thống quản lý pin (BMS)",
       "Bài toán #2: Xử lý nút nhấn bị dội mà không dùng delay() chặn CPU",
-      "Bài toán #3: Gửi gói tin đa byte qua UART/CAN không bị lệch Endian",
+      "Bài toán #3: Gửi gói tin đa byte qua UART/CAN không bị đảo thứ tự byte",
       "Định hướng sản phẩm cá nhân qua 4 chặng của lộ trình dự án"
     ],
     steps: [
@@ -106,7 +106,7 @@ if (read_button() == 0) {
         callout: {
           type: "watch-out",
           label: "LƯU Ý",
-          text: "Trong firmware thực tế (super-loop hoặc RTOS), mọi hàm delay bận (`busy-wait`) đều là kẻ thù của tính thời gian thực."
+          text: "Trong firmware thực tế (vòng lặp chính hoặc hệ điều hành RTOS), mọi hàm delay chờ bận đều là kẻ thù của tính thời gian thực."
         },
         diff: [
           { op: "-", text: "delay_ms(50) khiến vòng lặp chính không đọc được cảm biến khác." },
@@ -115,7 +115,7 @@ if (read_button() == 0) {
         kpis: [
           { label: "Thời gian dội", value: "5–20 ms", sub: "Nhiễu tiếp điểm cơ", tone: "rose" },
           { label: "delay_ms(50)", value: "Đóng băng", sub: "Chặn toàn CPU", tone: "rose" },
-          { label: "Lọc 3 mẫu", value: "Non-blocking", sub: "Không dừng CPU", tone: "sage" }
+          { label: "Lọc 3 mẫu", value: "Không chặn CPU", sub: "Không làm đứng máy", tone: "sage" }
         ],
         legend: [
           { label: "Tín hiệu rung 0/1", color: "#e57373" },
@@ -138,24 +138,24 @@ if (read_button() == 0) {
         badge: "PROBLEM",
         title: "Bài toán #3: Gửi nhiệt độ 10.00 °C nhưng màn hình hiện 59.395 °C",
         body:
-          "STM32 lưu biến `uint16_t temp_x100 = 1000` (`0x03E8`) trong RAM theo thứ tự **Little-Endian** (`0xE8` trước, `0x03` sau). Nếu bạn ép thẳng con trỏ thành `uint8_t*` để bắn qua UART/CAN mà bên nhận lại ghép theo **Big-Endian**, con số biến thành `0xE803 = 59,395`!",
+          "STM32 lưu biến `uint16_t temp_x100 = 1000` (`0x03E8`) trong RAM theo kiểu **ghi byte nhỏ trước (little-endian)** (`0xE8` trước, `0x03` sau). Nếu bạn ép thẳng con trỏ thành `uint8_t*` để bắn qua UART/CAN mà bên nhận lại ghép theo kiểu **byte lớn trước**, con số biến thành `0xE803 = 59,395`!",
         codeLang: "C · bẫy gửi trực tiếp vùng nhớ RAM",
         code: `struct Telemetry { uint8_t id; uint16_t temp_x100; };
-// LỖI 1: Compiler có thể chèn 1 byte padding giữa id và temp_x100!
-// LỖI 2: Thứ tự byte của temp_x100 phụ thuộc vào Endianness của chip.
+// LỖI 1: Trình biên dịch có thể chèn 1 byte đệm (padding) giữa id và temp_x100!
+// LỖI 2: Thứ tự byte của temp_x100 phụ thuộc vào kiểu xếp byte của chip.
 // ĐÚNG: Luôn tự đóng gói từng byte bằng dịch bit (>> 8) & 0xFF.`,
         callout: {
           type: "key-idea",
           label: "CẦN NHỚ",
-          text: "Bố cục `struct` trong RAM thuộc quyền của compiler và CPU; còn khung truyền trên dây UART/CAN phải do giao thức tự định nghĩa rõ từng byte."
+          text: "Bố cục `struct` trong RAM thuộc quyền của trình biên dịch và CPU; còn khung truyền trên dây UART/CAN phải do giao thức tự định nghĩa rõ từng byte."
         },
         diff: [
-          { op: "-", text: "Gửi thẳng &struct làm rò rỉ padding và đảo ngược thứ tự byte." },
+          { op: "-", text: "Gửi thẳng &struct làm rò rỉ byte đệm (padding) và đảo ngược thứ tự byte." },
           { op: "+", text: "Hàm encode/decode dịch bit chạy đúng trên mọi kiến trúc chip." }
         ],
         kpis: [
           { label: "Giá trị gốc", value: "0x03E8", sub: "1,000 (10.00 °C)", tone: "sage" },
-          { label: "Dây UART (Thô)", value: "E8 → 03", sub: "Lệch Endian", tone: "rose" },
+          { label: "Dây UART (Thô)", value: "E8 → 03", sub: "Lệch thứ tự byte", tone: "rose" },
           { label: "Đọc sai thành", value: "59,395", sub: "Sai gấp 59 lần!", tone: "rose" }
         ],
         legend: [
@@ -170,8 +170,8 @@ if (read_button() == 0) {
             scenario: "BÀI TOÁN THỰC TẾ #3 · KHUNG TRUYỀN",
             prompt:
               "Vì sao gửi nguyên một `struct` C trực tiếp qua UART giữa STM32 và một server/gateway có thể cho ra số sai hoàn toàn dù cả hai bên đều viết bằng C? Hãy nêu ít nhất 2 nguyên nhân.",
-            placeholder: "Gợi ý: Nghĩ về Padding trong struct và thứ tự byte (Endianness)...",
-            hint: "Hai nguyên nhân kinh điển: (1) Compiler alignment padding chèn byte rác; (2) Khác biệt Little-Endian vs Big-Endian."
+            placeholder: "Gợi ý: Nghĩ về byte đệm (padding) trong struct và thứ tự byte...",
+            hint: "Hai nguyên nhân kinh điển: (1) Trình biên dịch chèn byte đệm (padding) để căn lề; (2) Khác biệt ghi byte nhỏ trước (little-endian) vs byte lớn trước."
           }
         ]
       },
@@ -182,10 +182,10 @@ if (read_button() == 0) {
         body:
           "Bạn sẽ không học rời rạc từng lệnh C, mà đi qua 4 chặng nối tiếp nhau: (1) C Nhúng cốt lõi & CSV test trên PC; (2) Điện tử cơ bản (Ohm, Pull-up, ADC, PWM); (3) Vi điều khiển STM32 Cortex-M; (4) FreeRTOS, Makefile & LoRa. Mỗi bài học đều gắn với một bài toán phần cứng có thật.",
         codeLang: "Lộ trình thực hành · PC → STM32",
-        code: `// Chặng 1 (Bài 00–11): C chuẩn C17 + bitwise + Makefile + FSM
+        code: `// Chặng 1 (Bài 00–11): C chuẩn & tư duy nhúng + bitwise + Makefile + FSM
 // Chặng 2 (Bài 12–19): Điện tử cơ bản (Ohm, MOSFET, Op-Amp, UART/I2C/SPI)
 // Chặng 3 (Bài 20–26): Thanh ghi STM32, Ngắt NVIC, Timer, CAN
-// Chặng 4 (Bài 27–30): FreeRTOS, Bare-metal Linker, Bootloader, LoRa`,
+// Chặng 4 (Bài 27–30): FreeRTOS, Chạy thẳng trên chip (Linker), Bootloader, LoRa`,
         callout: {
           type: "key-idea",
           label: "CẦN NHỚ",
@@ -239,12 +239,12 @@ EOF`,
         kpis: [
           { label: "Bước 1", value: "Đoán 15s", sub: "Trước khi mở lời giải", tone: "sky" },
           { label: "Bước 2", value: "notes.md", sub: "Xuất câu hỏi mở (.md)", tone: "amber" },
-          { label: "Bước 3", value: "gcc -Werror", sub: "Biên dịch sạch C17", tone: "sage" }
+          { label: "Bước 3", value: "gcc -Werror", sub: "Biên dịch sạch C", tone: "sage" }
         ],
         legend: [
           { label: "Dự đoán chủ động", color: "#84b4df" },
           { label: "Ghi chú Markdown", color: "#f5d88b" },
-          { label: "Kiểm thử C17", color: "#84be88" }
+          { label: "Kiểm thử code C", color: "#84be88" }
         ],
         learnUnlock: [],
         scene: { type: "intro_week1_lab" },
